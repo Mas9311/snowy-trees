@@ -2,24 +2,24 @@ import numpy as np
 
 
 class Tree:
-    def __init__(self, config):
-        widths = {'t': 151, 'w': 271}  # tall or wide
-        speeds = {'u': 0.1, 'a': 0.465000, 'b': 0.7265000, 'c': 0.9810000}
-        densities = {'a': 512, 'b': 128, 'c': 36}  # 51.2%, 12.8%, 3.6% chance of snow_char
-        tiers = [x for x in range(13, 68, 4)]  # tiers range from [1, 13] (tier * index + 9)
+    def __init__(self, parser):
+        speeds = {'ultra': 0.1, 'fast': 0.465000, 'average': 0.7265000, 'slow': 0.9810000}
+        densities = {'ultra': 750, 'heavy': 512, 'average': 128, 'thin': 36}  # 75%, 51.2%, 12.8%, 3.6% chance of snow_char
+        # tiers = [x for x in range(13, 68, 4)]  # tiers range from [1, 13] (tier * index + 9)
 
+        self.tree_tiers = parser.tiers
+        self.tree_width = [x for x in range(13, 68, 4)][parser.tiers]
+        self.screen_width = parser.width
+        self.sleep_time = speeds[parser.speed]
+        self.max_snow = densities[parser.density]
         self.star_char = '★'
         self.leaf_char = '❇'  # ❇ #
         self.snow_char = '*'  # * ❇
-        self.base_char = '║'  # │ ║
-        self.ornaments = ['●', 'x', '♦']  # ● ♦ x ○ * ★ ⍟ ❤
-        if not config[3]:
+        self.base_char = '┆'  # │ ║ ┃ ┆ ┇ ┊ ┋
+        if parser.yes:
+            self.ornaments = ['●', 'x', '♦']  # ● ♦ x ○ * ★ ⍟ ❤
+        else:
             self.ornaments = []
-        self.tree_tiers = 4  # how many triangles to print on the tree
-        self.tree_width = tiers[self.tree_tiers]
-        self.screen_width = widths[config[0]]
-        self.sleep_time = speeds[config[1]]
-        self.max_snow = densities[config[2]]
 
     def gen_snow(self, snow_len):
         output = ''
