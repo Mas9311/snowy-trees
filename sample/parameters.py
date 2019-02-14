@@ -5,7 +5,7 @@ import sys
 
 def retrieve():
     #  
-    # ^ non-whitespace looking space char
+    # ^ non-whitespace looking whitespace character
     py_cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
     # spaces = ' ' * (17 - len(py_cmd))
     cmd_description = ('       ╔══════════════════════════════════════════════════╗                   \n'
