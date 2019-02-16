@@ -2,21 +2,23 @@ import numpy as np
 
 
 class Tree:
-    def __init__(self, parser):
+    def __init__(self, parsed_args):
+        # how fast the screen refreshes in units of seconds
         speeds = {'ultra': 0.1, 'fast': 0.465000, 'average': 0.7265000, 'slow': 0.9810000}
-        densities = {'ultra': 750, 'heavy': 512, 'average': 128, 'thin': 36}  # 75%, 51.2%, 12.8%, 3.6% chance of snow_char
-        # tiers = [x for x in range(13, 68, 4)]  # tiers range from [1, 13] (tier * index + 9)
+        # printing snow =   73.3%         51.2%           12.8%        3.6%
+        densities = {'ultra': 733, 'heavy': 512, 'average': 128, 'thin': 36}
 
-        self.tree_tiers = parser.tiers
-        self.tree_width = [x for x in range(13, 68, 4)][parser.tiers]
-        self.screen_width = parser.width
-        self.sleep_time = speeds[parser.speed]
-        self.max_snow = densities[parser.density]
+        self.tree_tiers = parsed_args.tiers
+        self.tree_width = [t_width for t_width in range(13, 68, 4)][parsed_args.tiers]
+        self.screen_width = parsed_args.width
+        self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
+        self.sleep_time = speeds[parsed_args.speed]
+        self.max_snow = densities[parsed_args.density]
         self.star_char = '★'
         self.leaf_char = '❇'  # ❇ #
         self.snow_char = '*'  # * ❇
-        self.base_char = '┆'  # │ ║ ┃ ┆ ┇ ┊ ┋
-        if parser.yes:
+        self.base_char = '┋'  # │ ║ ┃ ┆ ┇ ┊ ┋
+        if parsed_args.yes:
             self.ornaments = ['●', 'x', '♦']  # ● ♦ x ○ * ★ ⍟ ❤
         else:
             self.ornaments = []
@@ -60,14 +62,14 @@ class Tree:
         return output + self.gen_snow(self.screen_width)
 
     def star_line(self):
-        spaces_len = ((self.screen_width - 3) // 2)
-        return self.gen_snow(spaces_len) + ' ' + self.star_char + ' ' + self.gen_snow(spaces_len) + '\n'
+        spaces = ((self.screen_width - 3) // 2)
+        return self.gen_snow(spaces) + ' ' + self.star_char + ' ' + self.gen_snow(spaces + self.make_even) + '\n'
 
     def tree_line(self, leaves, buffer_len=2):
         buffer = ' ' * (buffer_len // 2)
         leaves_str = self.gen_leaf(leaves)
-        spaces_len = (self.screen_width - (buffer_len + leaves)) // 2
-        return self.gen_snow(spaces_len) + buffer + leaves_str + buffer + self.gen_snow(spaces_len) + '\n'
+        spaces = (self.screen_width - (buffer_len + leaves)) // 2
+        return self.gen_snow(spaces) + buffer + leaves_str + buffer + self.gen_snow(spaces + self.make_even) + '\n'
 
     def gen_leaf(self, leaves):
         output = ''
@@ -91,7 +93,7 @@ class Tree:
         buffer = ' ' * ((self.tree_width - width - 2) // 2)
         base_str = self.base_char * width
         spaces = (self.screen_width - self.tree_width + 2) // 2
-        return self.gen_snow(spaces) + buffer + base_str + buffer + self.gen_snow(spaces) + '\n'
+        return self.gen_snow(spaces) + buffer + base_str + buffer + self.gen_snow(spaces + self.make_even) + '\n'
 
     def __str__(self):
         return (f'{self.tree_topper()}'
