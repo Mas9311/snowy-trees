@@ -1,22 +1,27 @@
 # Random Snow and Happy Trees #
 
-I made this cozy little loop to distract me when I'm awake at night on my computer.<br>
-The [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from 1987 was the inspiration for the design and added snow for effect.
+I originally made this cozy little loop to minimize the light on the pother monitor when I'm awake at night.<br>
+The inspiration for the design is the [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from 1987. I have added the snow for effect.
 
 ## Usage ##
-As with all of my programs, you simply have to <code>cd</code> into the folder and execute the <code>run.py</code> file.<br>
-By default, the options are <code>wide</code> <code>slow</code> <code>light</code> <code>none</code>
-If you want to use the options, be sure to input them in the given order for now:<br>
-monitor_aspect snow_speed snow_density show_the_ornaments
+Simply <code>cd</code> into the __/snowy-tree*/__ folder and execute the <code>run.py</code> file.<br>
+By default, the options are set to <code>--width 271</code> <code>--speed average</code> <code>--density average</code> <code>--tiers 4</code> <code>--no</code>
 
- - python3 run.py \[wide, tall] \[slow, average, fast, ultra] \[light, moderate, heavy] \[none]
+ - python3 run.py \[-w int] \[-s str] \[-d str] \[-t int] \[-y | -n] \[--help] \[--version]
 
 ### Create a Desktop launcher ###
+
+Before creating a Launcher, I recommend fine-tuning your configurations first in another Terminal window.
+
 ###### Linux users ######
-I set the geometry offset option to my configuration, but feel free to modify the options provided:
+I have provided you with my configurations as a template, but feel free to change the arguments to whatever you want.
+I use Xubuntu, which comes with <code>xfce4-terminal</code> as the default Terminal application, so change that to your go-to Terminal emulator.
+*Most* Terminal emulators come with the additional flags \[--geometry, --maximize, ...].<br>
+The geometry, <code>+0+0</code> and <code>-0+0</code>, is to access the left-most and right-most monitors respectively.
+
  1. Portrait monitors:
-   - Command: x-terminal-emulator -geometry 151x130+0+0 & -e "python3 run.py tall slow light none"
+   - Command: <code>xfce4-terminal --geometry=154x65+0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e 'python3 run.py -w 154 -s slow -d thin -t 4 -n'</code>
    - Working Directory: /path/to/snowy-trees
  2. Landscape monitors:
-   - x-terminal-emulator -geometry 271x68+1080+600 & -e "python3 run.py wide average heavy useThem!"
+   - Command: <code>xfce4-terminal --geometry=274x34-0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e "python3 run.py -w 274 -s average -d heavy -t 6 -y"</code>
    - Working Directory: /path/to/snowy-trees
