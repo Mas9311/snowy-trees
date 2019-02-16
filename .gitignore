@@ -105,4 +105,5 @@ venv.bak/
 
 # Directories I don't want to add to the Repo
 /sample/__pycache__/
+sample/__pycache__/
 .idea
