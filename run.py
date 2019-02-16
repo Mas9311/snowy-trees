@@ -13,6 +13,7 @@ if __name__ == '__main__':
         input('\nPress [Enter] to quit\n>')
         args_to_parse.parse_args()
         raise Exception('Unknown arguments')  # Redundant Exception to ensure failure
+
     my_tree = Tree.Tree(args_to_parse.parse_args())
     count = 0
     while True:

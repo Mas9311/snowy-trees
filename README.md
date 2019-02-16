@@ -1,7 +1,7 @@
 # Random Snow and Happy Trees #
 
-I originally made this cozy little loop to minimize the light on the pother monitor when I'm awake at night.<br>
-The inspiration for the design is the [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from 1987. I have added the snow for effect.
+I originally made this little loop to minimize the light emitted from a monitor at night.<br>
+The [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from 1987 was the inspiration for the design and I have  added snow for effect.
 
 ## Usage ##
 Simply <code>cd</code> into the __/snowy-tree*/__ folder and execute the <code>run.py</code> file.<br>
@@ -11,17 +11,23 @@ By default, the options are set to <code>--width 271</code> <code>--speed averag
 
 ### Create a Desktop launcher ###
 
-Before creating a Launcher, I recommend fine-tuning your configurations first in another Terminal window.
+Before creating a Launcher, I recommend fine-tuning your configurations first via Terminal.
 
-###### Linux users ######
-I have provided you with my configurations as a template, but feel free to change the arguments to whatever you want.
-I use Xubuntu, which comes with <code>xfce4-terminal</code> as the default Terminal application, so change that to your go-to Terminal emulator.
+###### Linux users #####
+
+I have provided my configurations as a baseline *template* for you.<br>
+I use the Xubuntu distro, which comes with <code>xfce4-terminal</code> as the default Terminal application, so change the application to your Terminal emulator.<br>
 *Most* Terminal emulators come with the additional flags \[--geometry, --maximize, ...].<br>
-The geometry, <code>+0+0</code> and <code>-0+0</code>, is to access the left-most and right-most monitors respectively.
+The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest way to assign it to the left and right monitors respectively.
 
- 1. Portrait monitors:
+ Portrait monitors:
+ 
    - Command: <code>xfce4-terminal --geometry=154x65+0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e 'python3 run.py -w 154 -s slow -d thin -t 4 -n'</code>
+   
    - Working Directory: /path/to/snowy-trees
- 2. Landscape monitors:
+   
+ Landscape monitors:
+ 
    - Command: <code>xfce4-terminal --geometry=274x34-0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e "python3 run.py -w 274 -s average -d heavy -t 6 -y"</code>
+
    - Working Directory: /path/to/snowy-trees
