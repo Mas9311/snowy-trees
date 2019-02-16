@@ -1,10 +1,14 @@
 # Random Snow and Happy Trees #
 
+[![image](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/downloads/)
+
 I originally made this little loop to minimize the light emitted from a monitor at night.<br>
 The [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from 1987 was the inspiration for the design and I have  added snow for effect.
 
 ## Usage ##
-Simply <code>cd</code> into the __/snowy-tree*/__ folder and execute the <code>run.py</code> file.<br>
+ 1. [Download this repo](https://github.com/Mas9311/snowy-trees/archive/v0.0.zip) <br>
+ 1. Extract or <code>unzip</code> the snowy-trees-0.0.zip file, then delete the zip.
+ 1. <code>cd _/path/to/snowy-trees-0.0/_ && python3 run.py</code><br>
 By default, the options are set to <code>--width 271</code> <code>--speed average</code> <code>--density average</code> <code>--tiers 4</code> <code>--no</code>
 
  - python3 run.py \[-w int] \[-s str] \[-d str] \[-t int] \[-y | -n] \[--help] \[--version]
@@ -24,10 +28,10 @@ The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest w
  
    - Command: <code>xfce4-terminal --geometry=154x65+0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e 'python3 run.py -w 154 -s slow -d thin -t 4 -n'</code>
    
-   - Working Directory: /path/to/snowy-trees
+   - Working Directory: _/path/to/snowy-trees_
    
  Landscape monitors:
  
    - Command: <code>xfce4-terminal --geometry=274x34-0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e "python3 run.py -w 274 -s average -d heavy -t 6 -y"</code>
 
-   - Working Directory: /path/to/snowy-trees
+   - Working Directory: _/path/to/snowy-trees_

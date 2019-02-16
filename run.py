@@ -9,8 +9,8 @@ if __name__ == '__main__':
     unknown_args = args_to_parse.parse_known_args()[1]
     if unknown_args:
         args_to_parse.print_help()
-        print('\nThe argument(s)', unknown_args, 'are not valid.')
-        input('\nPress [Enter] to quit\n>')
+        print()
+        input('\nThe argument(s)' + unknown_args + 'are not valid.\n\nPress [Enter] to quit\n>')
         args_to_parse.parse_args()
         raise Exception('Unknown arguments')  # Redundant Exception to ensure failure
 
