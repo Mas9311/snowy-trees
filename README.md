@@ -27,11 +27,19 @@ The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest w
  Portrait monitors:
  
    - Command: <code>xfce4-terminal --geometry=154x65+0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e 'python3 run.py -w 154 -s slow -d thin -t 4 -n'</code>
+   - Working Directory: _/full/path/to/snowy-trees_
+   - Icon: <img src="/resources/icons/tree_icon.png"
+                 alt="Snowy Tree icon" 
+                 width="30" 
+                 height="30" /> which can be 
+                 [downloaded here](https://raw.githubusercontent.com/Mas9311/snowy-trees/master/resources/icons/tree_icon.png)!
    
-   - Working Directory: _/path/to/snowy-trees_
-   
- Landscape monitors:
+ Landscape monitors: 
  
    - Command: <code>xfce4-terminal --geometry=274x34-0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e "python3 run.py -w 274 -s average -d heavy -t 6 -y"</code>
-
-   - Working Directory: _/path/to/snowy-trees_
+   - Working Directory: _/full/path/to/snowy-trees_
+   - Icon: <img src="/resources/icons/tree_icon.png"
+                 alt="Snowy Tree icon" 
+                 width="30" 
+                 height="30" /> which can be 
+                 [downloaded here](https://raw.githubusercontent.com/Mas9311/snowy-trees/master/resources/icons/tree_icon.png)!
