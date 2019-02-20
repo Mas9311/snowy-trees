@@ -5,20 +5,15 @@ import time
 from sample import parameters, Tree
 
 if __name__ == '__main__':
-    args_to_parse = parameters.retrieve()
-    unknown_args = args_to_parse.parse_known_args()[1]
-    if unknown_args:
-        args_to_parse.print_help()
-        print()
-        input('\nThe argument(s)' + unknown_args + 'are not valid.\n\nPress [Enter] to quit\n>')
-        args_to_parse.parse_args()
-        raise Exception('Unknown arguments')  # Redundant Exception to ensure failure
+    my_tree = Tree.Tree(parameters.retrieve())
+    max_len = 10
+    tree_list = my_tree.build_list(max_len)
 
-    my_tree = Tree.Tree(args_to_parse.parse_args())
-    count = 0
+    for curr_tree in range(6):
+        print(tree_list[curr_tree])
+
     while True:
-        print(my_tree)
-        if count <= 5:
-            count += 1
-            continue
-        time.sleep(my_tree.sleep_time)
+        for curr_tree in range(max_len):
+            print(tree_list[curr_tree])
+            print(curr_tree)
+            time.sleep(my_tree.sleep_time)

@@ -77,10 +77,25 @@ def retrieve():
                         action='version',
                         version=vrs_description)
 
+    # if no arguments were provided, print the welcome screen
     if len(sys.argv) == 1:
         print_welcome(parser)
-    # return parser.parse_known_args()
-    return parser
+
+    known_args, unknown_args = parser.parse_known_args()
+
+    if unknown_args:
+        # user added unknown args, so print the --help screen
+        parser.print_help()
+        print()
+        if len(unknown_args) is 1:
+            unrecognized = ' \'' + unknown_args[0] + '\' is'
+        else:
+            unrecognized = 's ' + str(unknown_args) + ' are'
+        input('\nThe argument' + unrecognized + ' not valid.\n\nPress [Enter] to quit\n>')
+        parser.parse_args()  # prints error message and stops execution
+        raise Exception('Unknown arguments')  # redundantly raised an Exception to ensure failure
+
+    return known_args
 
 
 def print_welcome(parser):

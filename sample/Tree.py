@@ -95,6 +95,13 @@ class Tree:
         spaces = (self.screen_width - self.tree_width + 2) // 2
         return self.gen_snow(spaces) + buffer + base_str + buffer + self.gen_snow(spaces + self.make_even) + '\n'
 
+    def build_list(self, max_len=25):
+        # tree_list = []
+        tree_list = [str(self) for _ in range(10)]
+        # for _ in range(max_len):
+        #     tree_list.append(str(self))
+        return tree_list
+
     def __str__(self):
         return (f'{self.tree_topper()}'
                 f'{self.tree_shape()}'
