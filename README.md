@@ -14,7 +14,7 @@ The [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from
  - **Note**: By default, the options are set to: <br>
           <code>--width 125</code> <code>--speed average</code> <code>--density average</code> <code>--tiers 4</code> <code>--no</code>
 
- - python3 run.py \[-w int] \[-s str] \[-d str] \[-t int] \[-y | -n] \[--version] \[--help]
+ - usage: **python3 run.py \[-w int] \[-s str] \[-d str] \[-t int] \[-y | -n] \[--version] \[--help]**
 ### Demos for configuration ###
 
 I have added demonstrations for the values follow the width, speed, density, and tiers arguments.<br>
