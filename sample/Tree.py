@@ -1,27 +1,36 @@
 import numpy as np
 
 
-class Tree:
-    def __init__(self, parsed_args):
-        # how fast the screen refreshes in units of seconds
-        speeds = {'ultra': 0.1, 'fast': 0.465000, 'average': 0.7265000, 'slow': 0.9810000}
-        # printing snow =   73.3%         51.2%           12.8%        3.6%
-        densities = {'ultra': 733, 'heavy': 512, 'average': 128, 'thin': 36}
+def set_speed(speed_arg):
+    """assigns a number to the variable, Tree.sleep_time which is used to measure
+    how fast the screen refreshes (in seconds)"""
+    speeds = {'ultra': 0.1, 'fast': 0.465000, 'average': 0.7265000, 'slow': 0.9810000}
+    return speeds[speed_arg]
 
-        self.tree_tiers = parsed_args.tiers
-        self.tree_width = [t_width for t_width in range(13, 68, 4)][parsed_args.tiers]
-        self.screen_width = parsed_args.width
+
+def set_density(density_arg):
+    """Assigns a number (max 999) to the variable, Tree.max_snow, which is used
+    to gauge the probability of printing the snow character.
+    ultra= 733=73.3%.  heavy= 512=51.2%.  average= 128=12.8%.  thin= 36=3.6%"""
+    densities = {'ultra': 733, 'heavy': 512, 'average': 128, 'thin': 36}
+    return densities[density_arg]
+
+
+class Tree:
+    def __init__(self, arg_dict):
+        self.tree_tiers = arg_dict['tiers']
+        self.screen_width = arg_dict['width']
+        self.sleep_time = set_speed(arg_dict['speed'])
+        self.max_snow = set_density(arg_dict['density'])
+        self.ornaments = ([], ['●', 'x', '♦'])[arg_dict['ornaments']]
+        # Additional ornaments  ● x ♦ ○ * ★ ⍟ ❤
+
+        self.tree_width = [t_width for t_width in range(13, 68, 4)][self.tree_tiers]
         self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
-        self.sleep_time = speeds[parsed_args.speed]
-        self.max_snow = densities[parsed_args.density]
         self.star_char = '★'
         self.leaf_char = '❇'  # ❇ #
         self.snow_char = '*'  # * ❇
-        self.base_char = '┋'  # │ ║ ┃ ┆ ┇ ┊ ┋
-        if parsed_args.yes:
-            self.ornaments = ['●', 'x', '♦']  # ● ♦ x ○ * ★ ⍟ ❤
-        else:
-            self.ornaments = []
+        self.base_char = '┆'  # │ ║ ┃ ┆ ┇ ┊ ┋
 
     def gen_snow(self, snow_len):
         output = ''
@@ -96,10 +105,7 @@ class Tree:
         return self.gen_snow(spaces) + buffer + base_str + buffer + self.gen_snow(spaces + self.make_even) + '\n'
 
     def build_list(self, max_len=25):
-        # tree_list = []
-        tree_list = [str(self) for _ in range(10)]
-        # for _ in range(max_len):
-        #     tree_list.append(str(self))
+        tree_list = [str(self) for _ in range(max_len)]
         return tree_list
 
     def __str__(self):
