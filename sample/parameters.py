@@ -86,7 +86,7 @@ def retrieve():
                            help='NO ornaments. Ornaments will not be displayed on the tree')
 
     vrs_description = ('                                                    \n'
-                       '              *   snowy-trees v0.0   *              \n'
+                       '              *   snowy-trees v0.1   *              \n'
                        'Check out if there are any new releases for this at:\n'
                        '\thttps://github.com/Mas9311/snowy-trees/releases')
     parser.add_argument('-v', '--version',
