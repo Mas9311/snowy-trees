@@ -7,21 +7,30 @@ The [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from
 
 ## Usage ##
  1. [Download this repo](https://github.com/Mas9311/snowy-trees/archive/v0.0.zip) <br>
- 1. Extract or <code>unzip</code> the snowy-trees-0.0.zip file, then delete the zip.
- 1. <code>cd _/path/to/snowy-trees-0.0/_ && python3 run.py</code><br>
-By default, the options are set to <code>--width 271</code> <code>--speed average</code> <code>--density average</code> <code>--tiers 4</code> <code>--no</code>
+ 1. Extract or <code>unzip</code> the snowy-trees-0.1.zip file, then delete the zip.
+ 1. A one-liner *can* be executed with:<br>
+        <code>$ cd _/path/to/snowy-trees-0.1/_ && python3 run.py</code><br>
+        but that will print the welcome screen for using the defaults.<br>
+ - **Note**: By default, the options are set to: <br>
+          <code>--width 125</code> <code>--speed average</code> <code>--density average</code> <code>--tiers 4</code> <code>--no</code>
 
- - python3 run.py \[-w int] \[-s str] \[-d str] \[-t int] \[-y | -n] \[--help] \[--version]
+ - python3 run.py \[-w int] \[-s str] \[-d str] \[-t int] \[-y | -n] \[--version] \[--help]
+### Demos for configuration ###
+
+I have added demonstrations for the values follow the width, speed, density, and tiers arguments.<br>
+After any of the aforementioned argument, you can add --config after to view the demo.<br>
+**Note**: they can be chained together to execute each demo in left-to-right order such as:<br>
+<code>$ python3 run.py -w --config -s --config -d --config -t --config</code>
 
 ### Create a Desktop launcher ###
 
-Before creating a Launcher, I recommend fine-tuning your configurations first via Terminal.
+Before creating a Launcher, I recommend fine-tuning your configurations first via Terminal.<br>
 
 ###### Linux users #####
 
-I have provided my configurations as a baseline *template* for you.<br>
-I use the Xubuntu distro, which comes with <code>xfce4-terminal</code> as the default Terminal application, so change the application to your Terminal emulator.<br>
-*Most* Terminal emulators come with the additional flags \[--geometry, --maximize, ...].<br>
+I have provided my configurations as a baseline *template* for you to get you started.<br>
+I use the Xubuntu distro, which comes with <code>xfce4-terminal</code> as the default Terminal application, so change the application to your Terminal emulator of choice.<br>
+*Most* Terminal emulators come with the optional arguments stated below, i.e. --geometry, --maximize, ...<br>
 The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest way to assign it to the left and right monitors respectively.
 
  Portrait monitors:
@@ -31,8 +40,7 @@ The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest w
    - Icon: <img src="/resources/icons/tree_icon.png"
                  alt="Snowy Tree icon" 
                  width="30" 
-                 height="30" /> which can be 
-                 [downloaded here](https://raw.githubusercontent.com/Mas9311/snowy-trees/master/resources/icons/tree_icon.png)!
+                 height="30" /> which can be found in snowy-trees-0.1/resources/icons/tree_icon.png
    
  Landscape monitors: 
  
@@ -41,5 +49,4 @@ The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest w
    - Icon: <img src="/resources/icons/tree_icon.png"
                  alt="Snowy Tree icon" 
                  width="30" 
-                 height="30" /> which can be 
-                 [downloaded here](https://raw.githubusercontent.com/Mas9311/snowy-trees/master/resources/icons/tree_icon.png)!
+                 height="30" /> which can be found in snowy-trees-0.1/resources/icons/tree_icon.png
