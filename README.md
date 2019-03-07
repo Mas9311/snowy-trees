@@ -6,7 +6,7 @@ I originally made this little loop to minimize the light emitted from a monitor 
 The [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from 1987 was the inspiration for the design and I have  added snow for effect.
 
 ## Usage ##
- 1. [Download this repo](https://github.com/Mas9311/snowy-trees/archive/v0.0.zip) <br>
+ 1. [Download this repo](https://github.com/Mas9311/snowy-trees/archive/v0.1.zip) <br>
  1. Extract or <code>unzip</code> the snowy-trees-0.1.zip file, then delete the zip.
  1. A one-liner *can* be executed with:<br>
         <code>$ cd _/path/to/snowy-trees-0.1/_ && python3 run.py</code><br>
