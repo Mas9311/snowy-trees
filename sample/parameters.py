@@ -12,10 +12,13 @@ py_cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
 
 
 def retrieve():
+    """Retrieves the parameters from the console if provided.
+    Returns the parameters in dict format.
+    If an unknown argument is passed, print the --help screen.
+    If no arguments are passed, then print the intro Welcome screen."""
     if '--config' in sys.argv:
         config_argument()
         return
-    # spaces = ' ' * (17 - len(py_cmd))
     cmd_description = ('             ╔══════════════════════════════════════════════════╗            ┃\n'
                        '             ║   Loops a snowy tree much like a gif wallpaper   ║            ┃\n'
                        '             ╚══════════════════════════════════════════════════╝            ┃\n'
@@ -86,7 +89,7 @@ def retrieve():
                            help='NO ornaments. Ornaments will not be displayed on the tree')
 
     vrs_description = ('                                                    \n'
-                       '              *   snowy-trees v0.0   *              \n'
+                       '              *   snowy-trees v0.1   *              \n'
                        'Check out if there are any new releases for this at:\n'
                        '\thttps://github.com/Mas9311/snowy-trees/releases')
     parser.add_argument('-v', '--version',
@@ -117,14 +120,18 @@ def retrieve():
         parser.parse_args()  # prints error message and stops execution
         raise Exception('Unknown arguments')  # redundantly raised an Exception to ensure failure
 
-    # if no arguments were provided, print the welcome screen
     if len(sys.argv) == 1:
+        # no arguments were provided, print the welcome screen
         print_welcome(parser, arg_dict)
 
     return arg_dict
 
 
 def print_welcome(parser, arg_dict):
+    """This function is called when the user does not include any additional arguments.
+    This almost seems counter-productive, but at the very least, the default width
+    should not be used. Instead, the user is informed how to run the --config demo.
+    After the Welcome screen is printed, it will print the --help option."""
     h_option = ' --help'
     d_option = ' -w --config'
     help_flags = h_option + ' ' * (27 - len(py_cmd + h_option))
@@ -157,6 +164,12 @@ def print_welcome(parser, arg_dict):
 
 
 def config_argument():
+    """This function is called when the user specifies to run the --config demo on
+    one or more optional arguments.
+    It will remove the areuments, call the corresponding function associated to the
+    argument, and loop until no more --config arguments are left.
+        Note: the user cannot group arguments such as '-wsdt --config', but should instead
+        run them separately as in '-w --config -s --config -d --config -t --config'"""
     try:
         while sys.argv.index('--config') is not None:
             config_loc = sys.argv.index('--config') - 1
@@ -183,6 +196,7 @@ def config_argument():
 
 
 def width_demo():
+    """Called when the user specifies they wish to run the WIDTH --config demo"""
     print('┌─────────────────────┬──────────────────────────────┬───────────────────────┐\n'
           '│                     │ Width --config Demonstration │                       │\n'
           '│                     └──────────────────────────────┘                       │\n'
@@ -221,6 +235,7 @@ def width_demo():
 
 
 def speed_demo():
+    """Called when the user specifies they wish to run the SPEED --config demo"""
     print('┌────────────────────────────────────────────────────────────────────────────┐\n'
           '│                       Speed --config Demonstration                         │\n'
           '│                                                                            │\n'
@@ -259,6 +274,7 @@ def speed_demo():
 
 
 def density_demo():
+    """Called when the user specifies they wish to run the DENSITY --config demo"""
     print('┌────────────────────────────────────────────────────────────────────────────┐\n'
           '│                       Density --config Demonstration                       │\n'
           '│                                                                            │\n'
@@ -295,6 +311,7 @@ def density_demo():
 
 
 def tiers_demo():
+    """Called when the user specifies they wish to run the TIERS --config demo"""
     print('┌────────────────────────────────────────────────────────────────────────────┐\n'
           '│                        Tiers --config Demonstration                        │\n'
           '│                                                                            │\n'
@@ -338,9 +355,11 @@ def tiers_demo():
 
 
 def retrieve_int(message):
+    """A simple function to retrieve a valid integer."""
     while True:
         input_str = input(message + '\n>').strip()
         try:
             return int(input_str)
         except ValueError:
+            print(f' ** {input_str} is not a valid number **')
             pass
