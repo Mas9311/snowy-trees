@@ -22,7 +22,7 @@ class Tree:
         self.screen_width = arg_dict['width']
         self.sleep_time = set_speed(arg_dict['speed'])
         self.max_snow = set_density(arg_dict['density'])
-        self.ornaments = ([], ['●', 'x', '♦'])[arg_dict['ornaments']]
+        self.ornaments = ([], ['⍟', 'x', '♦'])[arg_dict['ornaments']]
         # Additional ornaments  ● x ♦ ○ * ★ ⍟ ❤
 
         self.tree_width = [t_width for t_width in range(13, 68, 4)][self.tree_tiers]
