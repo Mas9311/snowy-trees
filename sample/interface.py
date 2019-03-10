@@ -46,7 +46,7 @@ class TreeGUI(Frame):
 
     def set_root(self):
         self.root.bind('<Configure>', self.window_change)
-        # self.root.overrideredirect(1)
+        self.root.overrideredirect(1)
         self.root.resizable(width=True, height=True)
         self.root.configure(borderwidth='0')
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
@@ -79,7 +79,7 @@ class TreeGUI(Frame):
         self.opt_button.place(relx=1, rely=0, anchor="ne")
 
     def set_options(self):
-        self.opt_frame = Frame(self, width=60, height=25)
+        self.opt_frame = Frame(self, width=64, height=26)
         self.opt_frame.place(relx=1, rely=0, x=-2, y=2, anchor="ne")
         self.set_opt_button()
 
