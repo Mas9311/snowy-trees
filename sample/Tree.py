@@ -6,6 +6,7 @@ class Tree:
         self.arg_dict = arg_dict
         self.speeds = {'ultra': 0.1, 'fast': 0.465000, 'average': 0.7265000, 'slow': 0.9810000}
         self.densities = {'ultra': 733, 'heavy': 512, 'average': 128, 'thin': 36}
+        self.tree_widths = [t_width for t_width in range(13, 68, 4)]
 
         self.tree_tiers = 0
         self.screen_width = 0
@@ -16,27 +17,29 @@ class Tree:
         self.list = []
         self.set_parameters(True)
 
-        self.tree_width = [t_width for t_width in range(13, 68, 4)][self.tree_tiers]
+        self.tree_width = self.tree_widths[self.tree_tiers]
         self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
         self.star_char = '★'
         self.leaf_char = '❇'  # ❇ #
         self.snow_char = '*'  # * ❇
         self.base_char = '┆'  # │ ║ ┃ ┆ ┇ ┊ ┋
 
-        self.list = self.build_list()
+        self.screen_width = max(self.arg_dict['width'], self.tree_width + 2)
+        self.build_list()
 
     def set_parameters(self, initial_build=False):
         self.tree_tiers = self.arg_dict['tiers']
         self.screen_width = self.arg_dict['width']
         self.sleep_time = self.speeds[self.arg_dict['speed']]
         self.max_snow = self.densities[self.arg_dict['density']]
-        self.list_len = self.arg_dict['list_len']
+        self.list_len = max(self.arg_dict['list_len'], 25)
         self.ornaments = ([], ['⍟', 'x', '♦'])[self.arg_dict['ornaments']]
         # Additional ornaments  ● x ♦ ○ * ★ ⍟
-        if self.list_len < 25:
-            self.list_len = 25
+
         if not initial_build:
-            self.list = self.build_list()
+            self.tree_width = self.tree_widths[self.tree_tiers]
+            self.screen_width = max(self.arg_dict['width'], self.tree_width + 2)
+            self.build_list()
 
     def _gen_snow(self, snow_len):
         output = ''
@@ -111,9 +114,8 @@ class Tree:
         return self._gen_snow(spaces) + buffer + base_str + buffer + self._gen_snow(spaces + self.make_even) + '\n'
 
     def build_list(self):
-        """Returns a list of generated snow and ornament arrangements to be used to print."""
-        tree_list = [str(self) for _ in range(self.list_len)]
-        return tree_list
+        """Generates the list of randomly arranged snow and ornament locations to be printed."""
+        self.list = [str(self) for _ in range(self.list_len)]
 
     def __str__(self):
         return (f'{self._tree_topper()}'
