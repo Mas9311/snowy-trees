@@ -180,7 +180,7 @@ class TreeGUI(Frame):
 
     def set_screen_width(self):
         args = self.tree.arg_dict
-        args['width'] = self.w_dim // 6
+        args['width'] = max(self.w_dim // 6, self.tree.tree_width)
         self.reset_tree(args)
         print('screen_width', self.tree.screen_width)
 
@@ -195,7 +195,7 @@ class TreeGUI(Frame):
 
     def window_change(self, event):
         self.w_dim = self.winfo_width()
-        if self.tree.screen_width is not self.w_dim // 6:
+        if self.tree.screen_width is not self.w_dim // 6 and self.w_dim // 6 > self.tree.tree_width + 1:
             self.set_screen_width()
         self.h_dim = self.winfo_height()
         self.x_dim = self.winfo_rootx()
