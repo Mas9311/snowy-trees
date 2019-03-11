@@ -110,7 +110,6 @@ class TreeGUI(Frame):
             self.maximized = False
             self.root.overrideredirect(0)
             self.root.call("wm", "attributes", ".", "-fullscreen", "false")
-        # self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def _minimize(self):
         self.root.state('iconic')
@@ -121,17 +120,16 @@ class TreeGUI(Frame):
         self.opt_button['activeforeground'] = '#cccccc'
         self.opt_button['bg'] = '#000000'
         self.opt_button['fg'] = '#ffffff'
-        self.opt_button.grid(row=0, column=0, sticky=E)  # N + S + E + W
-        # self.opt_button.place(relx=1, rely=0, anchor="ne")
+        self.opt_button.grid(row=0, column=0, sticky=E)
 
     def set_sub_options(self):
         # Create the rest of the frames
         self.set_opt_speed()
         self.set_opt_density()
         c = Button(self.opt_frame, text='3rd', font=('courier', 25), bg='khaki', command=self._c)
-        c.grid(row=3, column=0, sticky=E + W)
+        c.grid(row=3, column=0, sticky=W + E)
         d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', command=self._c)
-        d.grid(row=4, column=0, sticky=E + W)
+        d.grid(row=4, column=0, sticky=W + E)
 
     def _c(self):
         print('*' * 35)
@@ -180,6 +178,12 @@ class TreeGUI(Frame):
             self.reset_tree(args)
             print('density', self.curr_density)
 
+    def set_screen_width(self):
+        args = self.tree.arg_dict
+        args['width'] = self.w_dim // 6
+        self.reset_tree(args)
+        print('screen_width', self.tree.screen_width)
+
     def reset_tree(self, args):
         print('reset')
         self.textbox.place_forget()
@@ -188,15 +192,14 @@ class TreeGUI(Frame):
         self.tree.arg_dict = args
         self.tree.set_parameters()
         self.print_init()
-        # self.run_gui(self.textbox, 6)
 
     def window_change(self, event):
         self.w_dim = self.winfo_width()
+        if self.tree.screen_width is not self.w_dim // 6:
+            self.set_screen_width()
         self.h_dim = self.winfo_height()
-        self.x_dim = self.winfo_rootx()  # self.winfo_x()
-        self.y_dim = self.winfo_rooty()  # self.winfo_y()
-        # self.x_dim = event.x  # - 3
-        # self.y_dim = event.y  # - 29
+        self.x_dim = self.winfo_rootx()
+        self.y_dim = self.winfo_rooty()
         self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def print_init(self):
