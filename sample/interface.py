@@ -76,7 +76,8 @@ class TreeGUI(Frame):
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def set_text_box(self):
-        self.textbox = Text(self, fg='green', background='#000000', height=200, width=150, wrap='none', font='fixed')
+        self.textbox = Text(self, fg='green', background='#000000', height=200, width=150,
+                            wrap='none', font='fixed', highlightthickness=0)
         self.textbox.pack(fill=BOTH)
 
     def click_options(self):
@@ -87,15 +88,15 @@ class TreeGUI(Frame):
             self.set_sub_options()
 
     def set_win_man_frame(self):
-        self.window_manager_frame = Frame(self)
+        self.window_manager_frame = Frame(self, highlightthickness=0)
         self.window_manager_frame.place(relx=0, rely=0, anchor="nw")
-        self.window_close = Button(self.window_manager_frame, text='×',
+        self.window_close = Button(self.window_manager_frame, text='×', highlightthickness=0,
                                    font=('times new roman', 18, 'bold'), command=self._close)
         self.window_close.grid(row=0, column=0)
-        self.window_maximize = Button(self.window_manager_frame, text='+',
+        self.window_maximize = Button(self.window_manager_frame, text='+', highlightthickness=0,
                                       font=('times new roman', 18, 'bold'), command=self._maximize)
         self.window_maximize.grid(row=0, column=1)
-        self.window_minimize = Button(self.window_manager_frame, text='−',
+        self.window_minimize = Button(self.window_manager_frame, text='−', highlightthickness=0,
                                       font=('times new roman', 18, 'bold'), command=self._minimize)
         self.window_minimize.grid(row=0, column=2)
 
@@ -117,7 +118,8 @@ class TreeGUI(Frame):
         self.root.state('iconic')
 
     def set_opt_button(self):
-        self.opt_button = Button(self.opt_frame, text='options', font=('courier', 25), command=self.click_options)
+        self.opt_button = Button(self.opt_frame, text='options', font=('courier', 25),
+                                 highlightthickness=0, command=self.click_options)
         self.opt_button['activebackground'] = '#444444'
         self.opt_button['activeforeground'] = '#cccccc'
         self.opt_button['bg'] = '#000000'
@@ -128,9 +130,9 @@ class TreeGUI(Frame):
         # Create the rest of the frame
         self.set_opt_speed()
         self.set_opt_density()
-        c = Button(self.opt_frame, text='3rd', font=('courier', 25), bg='khaki', command=self._c)
+        c = Button(self.opt_frame, text='3rd', font=('courier', 25), bg='khaki', highlightthickness=0, command=self._c)
         c.grid(row=5, column=0, sticky=W + E)
-        d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', command=self._c)
+        d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', highlightthickness=0, command=self._c)
         d.grid(row=6, column=0, sticky=W + E)
 
     def _c(self):
@@ -138,22 +140,22 @@ class TreeGUI(Frame):
 
     def set_opt_speed(self):
         self.opt_speed_label = Label(self.opt_frame, text='Refresh Speed', bg='#aaaaaa', fg='#3d008e',
-                                     font=('courier', 25), relief=FLAT)
+                                     highlightthickness=0, font=('courier', 25), relief=FLAT)
         self.opt_speed_label.grid(row=1, column=0, sticky=W + E)
 
         self.opt_speed = Scale(self.opt_frame, label=None, font=('courier', 25), bg='#aaaaaa', fg='#3d008e',
-                               from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT,
+                               from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT, highlightthickness=0,
                                activebackground='#00ff80', troughcolor='#aaaaaa', command=self.set_speed)
         self.opt_speed.set(self.int_speed)
         self.opt_speed.grid(row=2, column=0, sticky=W + E)
 
     def set_opt_density(self):
         self.opt_density_label = Label(self.opt_frame, text='Snow Density', bg='#333333', fg='#00d165',
-                                       font=('courier', 25), relief=FLAT)
+                                       highlightthickness=0, font=('courier', 25), relief=FLAT)
         self.opt_density_label.grid(row=3, column=0, sticky=W + E)
 
         self.opt_density = Scale(self.opt_frame, label=None, font=('courier', 25), bg='#333333', fg='#00d165',
-                                 from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT,
+                                 from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT, highlightthickness=0,
                                  activebackground='#3d008e', troughcolor='#333333', command=self.set_density)
         self.opt_density.set(self.int_density)
         self.opt_density.grid(row=4, column=0, sticky=W + E)
@@ -161,7 +163,7 @@ class TreeGUI(Frame):
     def set_options(self):
         if self.opt_frame:
             self.opt_frame.destroy()
-        self.opt_frame = Frame(self, width=65, height=26)
+        self.opt_frame = Frame(self, width=65, height=26, highlightthickness=0)
         self.opt_frame['bg'] = '#000000'
         self.opt_frame.place(relx=1, rely=0, x=-2, y=2, anchor=NE)
         self.set_opt_button()
