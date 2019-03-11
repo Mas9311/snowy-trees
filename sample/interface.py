@@ -14,8 +14,12 @@ class TreeGUI(Frame):
         self.textbox = Text()
         self.set_text_box()
 
-        self.close_button = None
-        self.set_close_button()
+        self.window_manager_frame = None
+        self.window_close = None
+        self.window_minimize = None
+        self.window_maximize = None
+        self.maximized = False
+        self.set_win_man_frame()
 
         self.opt_frame = None
         self.opt_bool = None
@@ -32,10 +36,12 @@ class TreeGUI(Frame):
         self.opt_density = None
         self.curr_density = None
         self.int_density = None
+        self.curr_tiers = None
         self.init_options()
 
+        self.update()
         self.w_dim = self.tree.screen_width * 6
-        self.h_dim = 17 * (self.tree.tree_tiers * 4 + 3) * 4
+        self.h_dim = self.root.winfo_height()  # 17 * (self.tree.tree_tiers * 4 + 3) * 4
         self.x_dim = 0
         self.y_dim = 0
 
@@ -50,7 +56,6 @@ class TreeGUI(Frame):
         # continue execution
         # self.continue_run = True
         self.run_gui(self.textbox, 6)
-        self.root.update()
 
     def init_options(self):
         speeds = ['slow', 'average', 'fast', 'ultra']
@@ -61,11 +66,14 @@ class TreeGUI(Frame):
         self.int_density = densities.index(self.tree.arg_dict['density']) + 1
         self.curr_density = densities[self.int_density - 1]
 
+        self.curr_tiers = self.tree.tree_tiers
+
     def set_root(self):
-        self.root.bind('<Configure>', self.window_change)
+        # self.root.bind('<Configure>', self.window_change)
         # self.root.overrideredirect(1)
         self.root.resizable(width=True, height=True)
         self.root.configure(borderwidth='0')
+        # self.h_dim = self.winfo_height()
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
         # self.root.call("wm", "attributes", ".", "-fullscreen", "true")
 
@@ -80,12 +88,34 @@ class TreeGUI(Frame):
             self.opt_bool = True
             self.set_sub_options()
 
-    def set_close_button(self):
-        r = '#ff0000'
-        g = '#00ff00'
-        self.close_button = Button(self.textbox, text='×', font=('times new roman', 18), command=self.root.destroy,
-                                   background=r, foreground=g, activebackground=r, activeforeground=g)
-        self.close_button.place(relx=0, rely=0, anchor="nw")
+    def set_win_man_frame(self):
+        self.window_manager_frame = Frame(self)
+        self.window_manager_frame.place(relx=0, rely=0, anchor="nw")
+        self.window_close = Button(self.window_manager_frame, text='×',
+                                   font=('times new roman', 18, 'bold'), command=self._close)
+        self.window_close.grid(row=0, column=0)
+        self.window_maximize = Button(self.window_manager_frame, text='+',
+                                      font=('times new roman', 18, 'bold'), command=self._maximize)
+        self.window_maximize.grid(row=0, column=1)
+        self.window_minimize = Button(self.window_manager_frame, text='−',
+                                      font=('times new roman', 18, 'bold'), command=self._minimize)
+        self.window_minimize.grid(row=0, column=2)
+
+    def _close(self):
+        self.root.destroy()
+        # self.root.state('withdrawn')
+
+    def _maximize(self):
+        if not self.maximized:
+            self.maximized = True
+            self.h_dim = self.winfo_height() * 2
+        else:
+            self.maximized = False
+            self.h_dim = self.h_dim // 2
+        self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
+
+    def _minimize(self):
+        self.root.state('iconic')
 
     def set_opt_button(self):
         self.opt_button = Button(self.opt_frame, text='options', font=('courier', 25), command=self.click_options)
@@ -160,6 +190,7 @@ class TreeGUI(Frame):
         self.h_dim = self.winfo_height()
         self.x_dim = event.x  # - 3
         self.y_dim = event.y  # - 29
+        print(event)
         # print(self.winfo_geometry(), f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}')
         # self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
@@ -173,7 +204,6 @@ class TreeGUI(Frame):
     def run_gui(self, textbox, index):
         """Recursive loop that prints the tree at the top of the GUI"""
         textbox.insert('0.0', self.tree.list[index] + '\n')
-
         # pause execution for the time specified in the --speed argument provided.
         textbox.after(int(self.tree.sleep_time * 1000),
                       self.run_gui, textbox, (index + 1) % self.tree.list_len)
