@@ -24,7 +24,8 @@ class Tree:
         self.snow_char = '*'  # * ❇
         self.base_char = '┆'  # │ ║ ┃ ┆ ┇ ┊ ┋
 
-        self.screen_width = max(self.arg_dict['width'], self.tree_width + 2)
+        self.screen_width = max(self.arg_dict['width'], self.tree_width + 1)
+        self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
         self.build_list()
 
     def set_parameters(self, initial_build=False):
@@ -38,7 +39,8 @@ class Tree:
 
         if not initial_build:
             self.tree_width = self.tree_widths[self.tree_tiers]
-            self.screen_width = max(self.arg_dict['width'], self.tree_width + 2)
+            self.screen_width = max(self.arg_dict['width'], self.tree_width + 1)
+            self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
             self.build_list()
 
     def _gen_snow(self, snow_len):
