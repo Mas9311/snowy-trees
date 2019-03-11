@@ -106,7 +106,8 @@ def retrieve():
                 'speed': known_args.speed,
                 'density': known_args.density,
                 'tiers': known_args.tiers,
-                'ornaments': known_args.ornaments}
+                'ornaments': known_args.ornaments,
+                'list_len': 25}
 
     if unknown_args:
         # user added unknown args, so print the --help screen
