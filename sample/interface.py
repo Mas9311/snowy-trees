@@ -30,9 +30,11 @@ class TreeGUI(Frame):
         self.tree = Tree.Tree(parameters.retrieve())
 
         # Assigns values to the options Frame sliders
+        self.opt_speed_label = None
         self.opt_speed = None
         self.curr_speed = None
         self.int_speed = None
+        self.opt_density_label = None
         self.opt_density = None
         self.curr_density = None
         self.int_density = None
@@ -123,30 +125,38 @@ class TreeGUI(Frame):
         self.opt_button.grid(row=0, column=0, sticky=E)
 
     def set_sub_options(self):
-        # Create the rest of the frames
+        # Create the rest of the frame
         self.set_opt_speed()
         self.set_opt_density()
         c = Button(self.opt_frame, text='3rd', font=('courier', 25), bg='khaki', command=self._c)
-        c.grid(row=3, column=0, sticky=W + E)
+        c.grid(row=5, column=0, sticky=W + E)
         d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', command=self._c)
-        d.grid(row=4, column=0, sticky=W + E)
+        d.grid(row=6, column=0, sticky=W + E)
 
     def _c(self):
         print('*' * 35)
 
     def set_opt_speed(self):
-        self.opt_speed = Scale(self.opt_frame, label='Speed', font=('courier', 25), bg='#aaaaaa', fg='#3d008e',
-                               from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL,
+        self.opt_speed_label = Label(self.opt_frame, text='Refresh Speed', bg='#aaaaaa', fg='#3d008e',
+                                     font=('courier', 25), relief=FLAT)
+        self.opt_speed_label.grid(row=1, column=0, sticky=W + E)
+
+        self.opt_speed = Scale(self.opt_frame, label=None, font=('courier', 25), bg='#aaaaaa', fg='#3d008e',
+                               from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT,
                                activebackground='#00ff80', troughcolor='#aaaaaa', command=self.set_speed)
         self.opt_speed.set(self.int_speed)
-        self.opt_speed.grid(row=1, column=0, sticky=W + E)
+        self.opt_speed.grid(row=2, column=0, sticky=W + E)
 
     def set_opt_density(self):
-        self.opt_density = Scale(self.opt_frame, label='Density', font=('courier', 25), bg='#333333', fg='#00d165',
-                                 from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL,
+        self.opt_density_label = Label(self.opt_frame, text='Snow Density', bg='#333333', fg='#00d165',
+                                       font=('courier', 25), relief=FLAT)
+        self.opt_density_label.grid(row=3, column=0, sticky=W + E)
+
+        self.opt_density = Scale(self.opt_frame, label=None, font=('courier', 25), bg='#333333', fg='#00d165',
+                                 from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT,
                                  activebackground='#3d008e', troughcolor='#333333', command=self.set_density)
         self.opt_density.set(self.int_density)
-        self.opt_density.grid(row=2, column=0, sticky=W + E)
+        self.opt_density.grid(row=4, column=0, sticky=W + E)
 
     def set_options(self):
         if self.opt_frame:
