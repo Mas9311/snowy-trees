@@ -33,6 +33,8 @@ class Tree:
         self.list_len = self.arg_dict['list_len']
         self.ornaments = ([], ['⍟', 'x', '♦'])[self.arg_dict['ornaments']]
         # Additional ornaments  ● x ♦ ○ * ★ ⍟
+        if self.list_len < 25:
+            self.list_len = 25
         if not initial_build:
             self.list = self.build_list()
 
