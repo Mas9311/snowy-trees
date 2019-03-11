@@ -39,22 +39,21 @@ class TreeGUI(Frame):
         self.curr_tiers = None
         self.init_options()
 
-        self.update()
-        self.w_dim = self.tree.screen_width * 6
-        self.h_dim = self.root.winfo_height()  # 17 * (self.tree.tree_tiers * 4 + 3) * 4
-        self.x_dim = 0
-        self.y_dim = 0
+        # self.update()
+        self.update_idletasks()
+        self.w_dim = self.tree.screen_width * 6  # self.winfo_width() - 6
+        self.h_dim = self.winfo_height()  # 17 * (self.tree.tree_tiers * 4 + 3) * 4
+        self.x_dim = self.winfo_x()
+        self.y_dim = self.winfo_y()
+        print(self.w_dim, self.h_dim, self.x_dim, self.y_dim)
+        # 1074 1891 3 29
 
         self.set_root()
-
-        # max length of list to compute. This will save you energy from each snowflake's numpy.random call.
-        self.list_len = 25
 
         # print the first 6 upon execution to immediately fill the screen with snowy trees
         self.print_init()
 
         # continue execution
-        # self.continue_run = True
         self.run_gui(self.textbox, 6)
 
     def init_options(self):
@@ -69,13 +68,11 @@ class TreeGUI(Frame):
         self.curr_tiers = self.tree.tree_tiers
 
     def set_root(self):
-        # self.root.bind('<Configure>', self.window_change)
-        # self.root.overrideredirect(1)
+        self.root.bind('<Configure>', self.window_change)
+        self.root.title('Snowy Trees')
         self.root.resizable(width=True, height=True)
         self.root.configure(borderwidth='0')
-        # self.h_dim = self.winfo_height()
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
-        # self.root.call("wm", "attributes", ".", "-fullscreen", "true")
 
     def set_text_box(self):
         self.textbox = Text(self, fg='green', background='#000000', height=200, width=150, wrap='none', font='fixed')
@@ -108,11 +105,13 @@ class TreeGUI(Frame):
     def _maximize(self):
         if not self.maximized:
             self.maximized = True
-            self.h_dim = self.winfo_height() * 2
+            self.root.overrideredirect(1)
+            self.root.call("wm", "attributes", ".", "-fullscreen", "true")
         else:
             self.maximized = False
-            self.h_dim = self.h_dim // 2
-        self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
+            self.root.overrideredirect(0)
+            self.root.call("wm", "attributes", ".", "-fullscreen", "false")
+        # self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def _minimize(self):
         self.root.state('iconic')
@@ -188,11 +187,11 @@ class TreeGUI(Frame):
     def window_change(self, event):
         self.w_dim = self.winfo_width()
         self.h_dim = self.winfo_height()
-        self.x_dim = event.x  # - 3
-        self.y_dim = event.y  # - 29
-        print(event)
-        # print(self.winfo_geometry(), f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}')
-        # self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
+        self.x_dim = self.winfo_rootx()  # self.winfo_x()
+        self.y_dim = self.winfo_rooty()  # self.winfo_y()
+        # self.x_dim = event.x  # - 3
+        # self.y_dim = event.y  # - 29
+        self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def print_init(self):
         """Print the initial 6 Trees to the GUI"""
@@ -203,7 +202,9 @@ class TreeGUI(Frame):
 
     def run_gui(self, textbox, index):
         """Recursive loop that prints the tree at the top of the GUI"""
+        print(self.w_dim, self.h_dim, self.x_dim, self.y_dim)
+
         textbox.insert('0.0', self.tree.list[index] + '\n')
-        # pause execution for the time specified in the --speed argument provided.
+        # pause execution for the time specified in the speed argument provided.
         textbox.after(int(self.tree.sleep_time * 1000),
                       self.run_gui, textbox, (index + 1) % self.tree.list_len)
