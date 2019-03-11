@@ -106,16 +106,16 @@ class TreeGUI(Frame):
         d.grid(row=4, column=0, sticky=N + S + E + W)
 
     def set_opt_speed(self):
-        self.opt_speed = Scale(self.opt_frame, label='Speed', font=('courier', 25), bg='#aaaaaa', fg='#333333',
+        self.opt_speed = Scale(self.opt_frame, label='Speed', font=('courier', 25), bg='#aaaaaa', fg='#3d008e',
                                from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL,
                                activebackground='#00ff80', troughcolor='#aaaaaa', command=self.set_speed)
         self.opt_speed.set(self.int_speed)
         self.opt_speed.grid(row=1, column=0, sticky=N + S + E + W)
 
     def set_opt_density(self):
-        self.opt_density = Scale(self.opt_frame, label='Density', font=('courier', 25), bg='#333333', fg='#aaaaaa',
+        self.opt_density = Scale(self.opt_frame, label='Density', font=('courier', 25), bg='#333333', fg='#00d165',
                                  from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL,
-                                 activebackground='#00ff80', troughcolor='#333333', command=self.set_density)
+                                 activebackground='#3d008e', troughcolor='#333333', command=self.set_density)
         self.opt_density.set(self.int_density)
         self.opt_density.grid(row=2, column=0, sticky=N + S + E + W)
 
@@ -123,7 +123,7 @@ class TreeGUI(Frame):
         if self.opt_frame:
             self.opt_frame.destroy()
         self.opt_frame = Frame(self, width=65, height=26)
-        self.opt_frame['bg'] = '#444444'
+        self.opt_frame['bg'] = '#000000'
         self.opt_frame.place(relx=1, rely=0, x=-2, y=2, anchor="ne")
         self.set_opt_button()
         self.opt_bool = False
