@@ -1,29 +1,20 @@
 import numpy as np
 
 
-def set_speed(speed_arg):
-    """assigns a number to the variable, Tree.sleep_time which is used to measure
-    how fast the screen refreshes (in seconds)"""
-    speeds = {'ultra': 0.1, 'fast': 0.465000, 'average': 0.7265000, 'slow': 0.9810000}
-    return speeds[speed_arg]
-
-
-def set_density(density_arg):
-    """Assigns a number (max 999) to the variable, Tree.max_snow, which is used
-    to gauge the probability of printing the snow character.
-    ultra= 733=73.3%.  heavy= 512=51.2%.  average= 128=12.8%.  thin= 36=3.6%"""
-    densities = {'ultra': 733, 'heavy': 512, 'average': 128, 'thin': 36}
-    return densities[density_arg]
-
-
 class Tree:
     def __init__(self, arg_dict):
-        self.tree_tiers = arg_dict['tiers']
-        self.screen_width = arg_dict['width']
-        self.sleep_time = set_speed(arg_dict['speed'])
-        self.max_snow = set_density(arg_dict['density'])
-        self.ornaments = ([], ['⍟', 'x', '♦'])[arg_dict['ornaments']]
-        # Additional ornaments  ● x ♦ ○ * ★ ⍟ ❤
+        self.arg_dict = arg_dict
+        self.speeds = {'ultra': 0.1, 'fast': 0.465000, 'average': 0.7265000, 'slow': 0.9810000}
+        self.densities = {'ultra': 733, 'heavy': 512, 'average': 128, 'thin': 36}
+
+        self.tree_tiers = 0
+        self.screen_width = 0
+        self.sleep_time = None
+        self.max_snow = None
+        self.ornaments = None
+        self.list_len = 0
+        self.list = []
+        self.set_parameters(True)
 
         self.tree_width = [t_width for t_width in range(13, 68, 4)][self.tree_tiers]
         self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
@@ -31,6 +22,19 @@ class Tree:
         self.leaf_char = '❇'  # ❇ #
         self.snow_char = '*'  # * ❇
         self.base_char = '┆'  # │ ║ ┃ ┆ ┇ ┊ ┋
+
+        self.list = self.build_list()
+
+    def set_parameters(self, initial_build=False):
+        self.tree_tiers = self.arg_dict['tiers']
+        self.screen_width = self.arg_dict['width']
+        self.sleep_time = self.speeds[self.arg_dict['speed']]
+        self.max_snow = self.densities[self.arg_dict['density']]
+        self.list_len = self.arg_dict['list_len']
+        self.ornaments = ([], ['⍟', 'x', '♦'])[self.arg_dict['ornaments']]
+        # Additional ornaments  ● x ♦ ○ * ★ ⍟
+        if not initial_build:
+            self.list = self.build_list()
 
     def _gen_snow(self, snow_len):
         output = ''
@@ -104,9 +108,9 @@ class Tree:
         spaces = (self.screen_width - self.tree_width + 2) // 2
         return self._gen_snow(spaces) + buffer + base_str + buffer + self._gen_snow(spaces + self.make_even) + '\n'
 
-    def build_list(self, max_len=25):
+    def build_list(self):
         """Returns a list of generated snow and ornament arrangements to be used to print."""
-        tree_list = [str(self) for _ in range(max_len)]
+        tree_list = [str(self) for _ in range(self.list_len)]
         return tree_list
 
     def __str__(self):
