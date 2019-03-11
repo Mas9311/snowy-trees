@@ -41,12 +41,11 @@ class TreeGUI(Frame):
 
         # self.update()
         self.update_idletasks()
-        self.w_dim = self.tree.screen_width * 6  # self.winfo_width() - 6
-        self.h_dim = self.winfo_height()  # 17 * (self.tree.tree_tiers * 4 + 3) * 4
+        self.w_dim = self.tree.screen_width * 6 + 12  # self.winfo_width() - 6
+        self.h_dim = 117 * self.tree.tree_tiers + 163  # self.winfo_height() * 2
         self.x_dim = self.winfo_x()
         self.y_dim = self.winfo_y()
         print(self.w_dim, self.h_dim, self.x_dim, self.y_dim)
-        # 1074 1891 3 29
 
         self.set_root()
 
@@ -129,60 +128,67 @@ class TreeGUI(Frame):
         # Create the rest of the frames
         self.set_opt_speed()
         self.set_opt_density()
-        c = Button(self.opt_frame, text='3rd', font=('courier', 25), bg='khaki')
-        c.grid(row=3, column=0, sticky=N + S + E + W)
-        d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold')
-        d.grid(row=4, column=0, sticky=N + S + E + W)
+        c = Button(self.opt_frame, text='3rd', font=('courier', 25), bg='khaki', command=self._c)
+        c.grid(row=3, column=0, sticky=E + W)
+        d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', command=self._c)
+        d.grid(row=4, column=0, sticky=E + W)
+
+    def _c(self):
+        print('*' * 35)
 
     def set_opt_speed(self):
         self.opt_speed = Scale(self.opt_frame, label='Speed', font=('courier', 25), bg='#aaaaaa', fg='#3d008e',
                                from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL,
                                activebackground='#00ff80', troughcolor='#aaaaaa', command=self.set_speed)
         self.opt_speed.set(self.int_speed)
-        self.opt_speed.grid(row=1, column=0, sticky=N + S + E + W)
+        self.opt_speed.grid(row=1, column=0, sticky=W + E)
 
     def set_opt_density(self):
         self.opt_density = Scale(self.opt_frame, label='Density', font=('courier', 25), bg='#333333', fg='#00d165',
                                  from_=1, to=4, bd=0, showvalue=0, orient=HORIZONTAL,
                                  activebackground='#3d008e', troughcolor='#333333', command=self.set_density)
         self.opt_density.set(self.int_density)
-        self.opt_density.grid(row=2, column=0, sticky=N + S + E + W)
+        self.opt_density.grid(row=2, column=0, sticky=W + E)
 
     def set_options(self):
         if self.opt_frame:
             self.opt_frame.destroy()
         self.opt_frame = Frame(self, width=65, height=26)
         self.opt_frame['bg'] = '#000000'
-        self.opt_frame.place(relx=1, rely=0, x=-2, y=2, anchor="ne")
+        self.opt_frame.place(relx=1, rely=0, x=-2, y=2, anchor=NE)
         self.set_opt_button()
         self.opt_bool = False
 
     def set_speed(self, value):
+        value = int(value)
         args = self.tree.arg_dict
         speeds = ['slow', 'average', 'fast', 'ultra']
-        self.int_speed = int(value)
+        self.int_speed = value
         self.curr_speed = speeds[self.int_speed - 1]
-
         args['speed'] = self.curr_speed
         self.reset_tree(args)
+        print('speed', self.curr_speed)
 
     def set_density(self, value):
-        args = self.tree.arg_dict
-        densities = ['thin', 'average', 'heavy', 'ultra']
-        self.int_density = int(value)
-        self.curr_density = densities[self.int_density - 1]
-
-        args['density'] = self.curr_density
-        self.reset_tree(args)
+        value = int(value)
+        if self.int_density is not value:
+            args = self.tree.arg_dict
+            densities = ['thin', 'average', 'heavy', 'ultra']
+            self.int_density = value
+            self.curr_density = densities[self.int_density - 1]
+            args['density'] = self.curr_density
+            self.reset_tree(args)
+            print('density', self.curr_density)
 
     def reset_tree(self, args):
+        print('reset')
         self.textbox.place_forget()
         self.set_text_box()
 
         self.tree.arg_dict = args
         self.tree.set_parameters()
         self.print_init()
-        self.run_gui(self.textbox, 6)
+        # self.run_gui(self.textbox, 6)
 
     def window_change(self, event):
         self.w_dim = self.winfo_width()
@@ -202,7 +208,7 @@ class TreeGUI(Frame):
 
     def run_gui(self, textbox, index):
         """Recursive loop that prints the tree at the top of the GUI"""
-        print(self.w_dim, self.h_dim, self.x_dim, self.y_dim)
+        print(f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}')
 
         textbox.insert('0.0', self.tree.list[index] + '\n')
         # pause execution for the time specified in the speed argument provided.
