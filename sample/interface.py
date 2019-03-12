@@ -1,11 +1,38 @@
+import time
 from tkinter import *
 
 from sample import Tree, parameters
 
-# TODO: refactor 'options' into separate class! It will act as a Modal in js
+
+def run_interface():
+    my_tree = Tree.Tree(parameters.retrieve())
+    if my_tree.arg_dict['interface']:
+        root = Tk()
+        GUI(root)
+        root.mainloop()
+    else:
+        app = CLI(my_tree)
+        app.print_indefinitely()
 
 
-class TreeGUI(Frame):
+class CLI:
+    def __init__(self, my_tree):
+        self.tree = my_tree
+
+    def print_indefinitely(self):
+        # print the first 6 upon execution to immediately fill the screen with snowy trees
+        for curr_tree in range(6):
+            print(self.tree.list[curr_tree])
+
+        # continuous loop that iterates through the list of trees
+        while True:
+            for curr_tree in range(self.tree.length):
+                print(self.tree.list[curr_tree])
+                # pause execution for the time specified in the --speed argument provided.
+                time.sleep(self.tree.sleep_time)
+
+
+class GUI(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent)
         self.pack(fill=BOTH, expand=True)
@@ -15,6 +42,7 @@ class TreeGUI(Frame):
         self.textbox = Text()
         self.set_text_box()
 
+        # TODO: refactor window_manager_frame into a separate class
         self.window_manager_frame = None
         self.window_close = None
         self.window_minimize = None
@@ -22,6 +50,7 @@ class TreeGUI(Frame):
         self.maximized_bool = False
         self.set_win_man_frame()
 
+        # TODO: refactor opt_frame into a separate class
         self.opt_frame = None
         self.opt_bool = None
         self.opt_button = None
@@ -148,7 +177,7 @@ class TreeGUI(Frame):
 
     def set_opt_speed(self):
         self.opt_speed_label = Label(self.opt_frame, text='Refresh Speed', bg='#aaaaaa', fg='#3d008e',
-                                     highlightthickness=0, font=('courier', 25), relief=FLAT)
+                                     highlightthickness=0, font=('courier', 25), relief=FLAT, width=16)
         self.opt_speed_label.grid(row=1, column=0, sticky=W + E)
 
         self.opt_speed = Scale(self.opt_frame, label=None, font=('courier', 25), bg='#aaaaaa', fg='#3d008e',
@@ -186,12 +215,10 @@ class TreeGUI(Frame):
 
         self.ornaments_bool = (False, True)[self.tree.arg_dict['ornaments']]
 
-        self.set_opt_ornaments_buttons()
+        self.set_opt_ornaments_frame()
 
-    def set_opt_ornaments_buttons(self):
-        if self.opt_ornaments_frame:
-            self.opt_ornaments_frame.grid_forget()
-        self.opt_ornaments_frame = Frame(self.opt_frame)
+    def set_opt_ornaments_frame(self):
+        self.opt_ornaments_frame = Frame(self.opt_frame, bg='#ffffff')
         self.opt_ornaments_frame.grid(row=8, column=0, sticky=W + E)
 
         button_on = (FLAT, RIDGE)[self.ornaments_bool]
@@ -201,12 +228,12 @@ class TreeGUI(Frame):
                                        font=('courier', 25), relief=button_on, bg='#333333', fg='#00d165',
                                        activebackground='#333333', activeforeground='#00d165',
                                        command=lambda: self.set_ornaments(True))
-        self.opt_ornaments_on.pack(side=LEFT, fill=BOTH)
+        self.opt_ornaments_on.grid(row=0, column=0, sticky=N + E + W + S, ipadx=1)
         self.opt_ornaments_off = Button(self.opt_ornaments_frame, text='Off', highlightthickness=0, width=6,
                                         font=('courier', 25), relief=button_off, bg='#333333', fg='#00d165',
                                         activebackground='#333333', activeforeground='#00d165',
                                         command=lambda: self.set_ornaments(False))
-        self.opt_ornaments_off.pack(side=RIGHT, fill=BOTH)
+        self.opt_ornaments_off.grid(row=0, column=1, sticky=N + E + W + S, ipadx=1)
 
     def set_options(self):
         if self.opt_frame:
@@ -256,13 +283,18 @@ class TreeGUI(Frame):
 
     def set_ornaments(self, arg_bool):
         if not self.busy and arg_bool is not self.ornaments_bool:
+
             self.busy = True
             before = self.ornaments_bool
             args = self.tree.arg_dict
             args['ornaments'] = arg_bool
             self.reset_tree(args)
             self.ornaments_bool = arg_bool
-            self.set_opt_ornaments_buttons()
+            # self.opt_ornaments_on.pack_forget()
+            # self.opt_ornaments_off.pack_forget()
+            # self.opt_ornaments_frame.grid_forget()
+            self.opt_ornaments_frame.destroy()
+            self.set_opt_ornaments_frame()
             print_change('Ornaments', before, self.ornaments_bool)
 
     def set_screen_width(self):
@@ -307,7 +339,7 @@ class TreeGUI(Frame):
         textbox.insert('0.0', self.tree.list[index] + '\n')
         # pause execution for the time specified in the speed argument provided.
         textbox.after(int(self.tree.sleep_time * 1000),
-                      self.run_gui, textbox, (index + 1) % self.tree.list_len)
+                      self.run_gui, textbox, (index + 1) % self.tree.length)
 
 
 def print_change(type_of, before, after):

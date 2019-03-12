@@ -77,9 +77,18 @@ def retrieve():
                               'TIERS of tree: (default = 4)                                '
                               '   4 => Tree has 4 triangular tiers'))
 
+    parser.add_argument('-l', '--length',
+                        type=length_list_type,
+                        default=25,
+                        metavar='',
+                        help=('LENGTH of the Tree list to print. (default=25)              '
+                              'Must be >= 25. This will save your device from wasting      '
+                              'electricity to generate all the random numbers.'))
+
     ornaments = parser.add_mutually_exclusive_group(required=False)
     ornaments.add_argument('-y', '--yes',
                            action='store_true',
+                           default=True,
                            dest='ornaments',
                            help='YES, display the ornaments on the tree')
 
@@ -88,8 +97,20 @@ def retrieve():
                            dest='ornaments',
                            help='NO ornaments. Ornaments will not be displayed on the tree')
 
+    interface = parser.add_mutually_exclusive_group(required=False)
+    interface.add_argument('-g', '--gui',
+                           action='store_true',
+                           default=True,
+                           dest='interface',
+                           help='Display the Tree in a GUI interface.')
+
+    interface.add_argument('-c', '--cli',
+                           action='store_false',
+                           dest='interface',
+                           help='Display the Tree in the boring, old CLI interface.')
+
     vrs_description = ('                                                    \n'
-                       '              *   snowy-trees v0.1   *              \n'
+                       '              *   snowy-trees v0.2   *              \n'
                        'Check out if there are any new releases for this at:\n'
                        '\thttps://github.com/Mas9311/snowy-trees/releases')
     parser.add_argument('-v', '--version',
@@ -107,7 +128,8 @@ def retrieve():
                 'density': known_args.density,
                 'tiers': known_args.tiers,
                 'ornaments': known_args.ornaments,
-                'list_len': 25}
+                'interface': known_args.interface,
+                'length': known_args.length}
 
     if unknown_args:
         # user added unknown args, so print the --help screen
@@ -128,6 +150,13 @@ def retrieve():
     return arg_dict
 
 
+def length_list_type(length_input):
+    length_input = int(length_input)
+    if length_input < 25:
+        print('List argument must be >= 25. Resorting to default of 25.')
+    return length_input
+
+
 def print_welcome(parser, arg_dict):
     """This function is called when the user does not include any additional arguments.
     This almost seems counter-productive, but at the very least, the default width
@@ -139,7 +168,7 @@ def print_welcome(parser, arg_dict):
     demo_flags = d_option + ' ' * (27 - len(py_cmd + d_option))
 
     print('╭┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┲━━━━━━┱┈┈┈╮\n'
-          '┊                     ╔═════════════════════════════╗             ┃ v0.1 ┃   ┊\n'
+          '┊                     ╔═════════════════════════════╗             ┃ v0.2 ┃   ┊\n'
           '┊                     ║   Welcome to snowy-trees!   ║             ┗━━━━━━┛   ┊\n'
           '┊                     ╚═════════════════════════════╝                        ┊\n'
           '┊                                                                            ┊\n'
