@@ -13,7 +13,7 @@ class Tree:
         self.sleep_time = None
         self.max_snow = None
         self.ornaments = None
-        self.list_len = 0
+        self.length = 0
         self.list = []
         self.set_parameters(True)
 
@@ -33,7 +33,7 @@ class Tree:
         self.screen_width = self.arg_dict['width']
         self.sleep_time = self.speeds[self.arg_dict['speed']]
         self.max_snow = self.densities[self.arg_dict['density']]
-        self.list_len = max(self.arg_dict['list_len'], 25)
+        self.length = max(self.arg_dict['length'], 25)
         self.ornaments = ([], ['⍟', 'x', '♦'])[self.arg_dict['ornaments']]
         # Additional ornaments  ● x ♦ ○ * ★ ⍟
 
@@ -117,7 +117,7 @@ class Tree:
 
     def build_list(self):
         """Generates the list of randomly arranged snow and ornament locations to be printed."""
-        self.list = [str(self) for _ in range(self.list_len)]
+        self.list = [str(self) for _ in range(self.length)]
 
     def __str__(self):
         return (f'{self._tree_topper()}'
