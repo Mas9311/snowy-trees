@@ -222,13 +222,13 @@ class GUI(Frame):
         self.opt_ornaments_frame.grid(row=8, column=0, sticky=W + E)
 
         button_on = (FLAT, RIDGE)[self.ornaments_bool]
-        button_off = (RIDGE, FLAT)[self.ornaments_bool]
-
         self.opt_ornaments_on = Button(self.opt_ornaments_frame, text='On', highlightthickness=0, width=6,
                                        font=('courier', 25), relief=button_on, bg='#333333', fg='#00d165',
                                        activebackground='#333333', activeforeground='#00d165',
                                        command=lambda: self.set_ornaments(True))
         self.opt_ornaments_on.grid(row=0, column=0, sticky=N + E + W + S, ipadx=1)
+
+        button_off = (RIDGE, FLAT)[self.ornaments_bool]
         self.opt_ornaments_off = Button(self.opt_ornaments_frame, text='Off', highlightthickness=0, width=6,
                                         font=('courier', 25), relief=button_off, bg='#333333', fg='#00d165',
                                         activebackground='#333333', activeforeground='#00d165',
@@ -283,7 +283,6 @@ class GUI(Frame):
 
     def set_ornaments(self, arg_bool):
         if not self.busy and arg_bool is not self.ornaments_bool:
-
             self.busy = True
             before = self.ornaments_bool
             args = self.tree.arg_dict
@@ -307,7 +306,6 @@ class GUI(Frame):
             print_change('Window Width', before, self.tree.screen_width)
 
     def reset_tree(self, args):
-        # print('reset')
         self.textbox.place_forget()
         self.set_text_box()
 
