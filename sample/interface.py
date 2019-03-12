@@ -10,6 +10,7 @@ class TreeGUI(Frame):
         Frame.__init__(self, parent)
         self.pack(fill=BOTH, expand=True)
         self.root = parent
+        self.root.configure(bd=0)
 
         self.textbox = Text()
         self.set_text_box()
@@ -34,11 +35,16 @@ class TreeGUI(Frame):
         self.opt_speed = None
         self.curr_speed = None
         self.int_speed = None
+
         self.opt_density_label = None
         self.opt_density = None
         self.curr_density = None
         self.int_density = None
-        self.curr_tiers = None
+
+        self.opt_tiers_label = None
+        self.opt_tiers = None
+        self.int_tiers = None
+
         self.init_options()
 
         # self.update()
@@ -55,7 +61,9 @@ class TreeGUI(Frame):
         self.print_init()
 
         # continue execution
+        self.busy = False
         self.run_gui(self.textbox, 6)
+        # self.set_screen_width()
 
     def init_options(self):
         speeds = ['slow', 'average', 'fast', 'ultra']
@@ -66,13 +74,13 @@ class TreeGUI(Frame):
         self.int_density = densities.index(self.tree.arg_dict['density']) + 1
         self.curr_density = densities[self.int_density - 1]
 
-        self.curr_tiers = self.tree.tree_tiers
+        self.int_tiers = self.tree.tree_tiers
 
     def set_root(self):
         self.root.bind('<Configure>', self.window_change)
         self.root.title('Snowy Trees')
         self.root.resizable(width=True, height=True)
-        self.root.configure(borderwidth='0')
+        # self.root.configure(bd=0)
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def set_text_box(self):
@@ -124,18 +132,18 @@ class TreeGUI(Frame):
         self.opt_button['activeforeground'] = '#cccccc'
         self.opt_button['bg'] = '#000000'
         self.opt_button['fg'] = '#ffffff'
-        self.opt_button.grid(row=0, column=0, sticky=E)
+        self.opt_button.grid(row=0, column=0, sticky=N + E + S)
 
     def set_sub_options(self):
         # Create the rest of the frame
         self.set_opt_speed()
         self.set_opt_density()
-        c = Button(self.opt_frame, text='3rd', font=('courier', 25), bg='khaki', highlightthickness=0, command=self._c)
-        c.grid(row=5, column=0, sticky=W + E)
-        d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', highlightthickness=0, command=self._c)
-        d.grid(row=6, column=0, sticky=W + E)
+        self.set_opt_tiers()
 
-    def _c(self):
+        d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', highlightthickness=0, command=self._d)
+        d.grid(row=7, column=0, sticky=W + E)
+
+    def _d(self):
         print('*' * 35)
 
     def set_opt_speed(self):
@@ -160,6 +168,17 @@ class TreeGUI(Frame):
         self.opt_density.set(self.int_density)
         self.opt_density.grid(row=4, column=0, sticky=W + E)
 
+    def set_opt_tiers(self):
+        self.opt_tiers_label = Label(self.opt_frame, text='Tree Tiers', bg='#aaaaaa', fg='#3d008e',
+                                     highlightthickness=0, font=('courier', 25), relief=FLAT)
+        self.opt_tiers_label.grid(row=5, column=0, sticky=W + E)
+
+        self.opt_tiers = Scale(self.opt_frame, label=None, font=('courier', 25), bg='#aaaaaa', fg='#3d008e',
+                               from_=1, to=13, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT, highlightthickness=0,
+                               activebackground='#00ff80', troughcolor='#aaaaaa', command=self.set_tiers)
+        self.opt_tiers.set(self.int_tiers)
+        self.opt_tiers.grid(row=6, column=0, sticky=W + E)
+
     def set_options(self):
         if self.opt_frame:
             self.opt_frame.destroy()
@@ -170,18 +189,21 @@ class TreeGUI(Frame):
         self.opt_bool = False
 
     def set_speed(self, value):
-        value = int(value)
-        args = self.tree.arg_dict
-        speeds = ['slow', 'average', 'fast', 'ultra']
-        self.int_speed = value
-        self.curr_speed = speeds[self.int_speed - 1]
-        args['speed'] = self.curr_speed
-        self.reset_tree(args)
-        print('speed', self.curr_speed)
+        if not self.busy:
+            self.busy = True
+            value = int(value)
+            args = self.tree.arg_dict
+            speeds = ['slow', 'average', 'fast', 'ultra']
+            self.int_speed = value
+            self.curr_speed = speeds[self.int_speed - 1]
+            args['speed'] = self.curr_speed
+            self.reset_tree(args)
+            print('speed', self.curr_speed)
 
     def set_density(self, value):
         value = int(value)
-        if self.int_density is not value:
+        if self.int_density is not value and not self.busy:
+            self.busy = True
             args = self.tree.arg_dict
             densities = ['thin', 'average', 'heavy', 'ultra']
             self.int_density = value
@@ -190,11 +212,27 @@ class TreeGUI(Frame):
             self.reset_tree(args)
             print('density', self.curr_density)
 
+    def set_tiers(self, value):
+        if not self.busy:
+            self.busy = True
+            value = int(value)
+            args = self.tree.arg_dict
+            self.int_tiers = value
+            args['tiers'] = self.int_tiers
+            self.reset_tree(args)
+            print('tiers', self.int_tiers)
+            # if self.h_dim < 117 * self.tree.tree_tiers + 163:
+            #     print('should enlarge', self.h_dim, 117 * self.tree.tree_tiers + 163)
+            #     self.h_dim = 117 * self.tree.tree_tiers + 163
+            #     self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
+
     def set_screen_width(self):
-        args = self.tree.arg_dict
-        args['width'] = max(self.w_dim // 6, self.tree.tree_width)
-        self.reset_tree(args)
-        print('screen_width', self.tree.screen_width)
+        if not self.busy:
+            self.busy = True
+            args = self.tree.arg_dict
+            args['width'] = max(self.w_dim // 6 - 2, self.tree.tree_width + 1)
+            self.reset_tree(args)
+            print('screen_width', self.tree.screen_width)
 
     def reset_tree(self, args):
         print('reset')
@@ -204,22 +242,23 @@ class TreeGUI(Frame):
         self.tree.arg_dict = args
         self.tree.set_parameters()
         self.print_init()
+        self.busy = False
 
     def window_change(self, event):
         self.w_dim = self.winfo_width()
-        if self.tree.screen_width is not self.w_dim // 6 and self.w_dim // 6 > self.tree.tree_width + 1:
+        if self.tree.screen_width is not self.w_dim // 6 - 2 and self.w_dim // 6 - 2 > self.tree.tree_width + 1:
             self.set_screen_width()
         self.h_dim = self.winfo_height()
         self.x_dim = self.winfo_rootx()
         self.y_dim = self.winfo_rooty()
-        self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
+        self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
 
     def print_init(self):
         """Print the initial 6 Trees to the GUI"""
         initial_tree_str = ''
         for curr_tree in range(6):
             initial_tree_str += self.tree.list[curr_tree] + '\n'
-        self.textbox.insert('0.0', initial_tree_str)
+        self.textbox.insert('0.0', initial_tree_str + '\n')
 
     def run_gui(self, textbox, index):
         """Recursive loop that prints the tree at the top of the GUI"""
