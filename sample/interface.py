@@ -146,9 +146,6 @@ class TreeGUI(Frame):
         self.set_opt_tiers()
         self.set_opt_ornaments()
 
-        d = Button(self.opt_frame, text='4th', font=('courier', 25), bg='gold', highlightthickness=0)
-        d.grid(row=9, column=0, sticky=W + E)
-
     def set_opt_speed(self):
         self.opt_speed_label = Label(self.opt_frame, text='Refresh Speed', bg='#aaaaaa', fg='#3d008e',
                                      highlightthickness=0, font=('courier', 25), relief=FLAT)
@@ -203,12 +200,12 @@ class TreeGUI(Frame):
         self.opt_ornaments_on = Button(self.opt_ornaments_frame, text='On', highlightthickness=0, width=6,
                                        font=('courier', 25), relief=button_on, bg='#333333', fg='#00d165',
                                        activebackground='#333333', activeforeground='#00d165',
-                                       command=self.set_ornaments_on)
+                                       command=lambda: self.set_ornaments(True))
         self.opt_ornaments_on.pack(side=LEFT, fill=BOTH)
         self.opt_ornaments_off = Button(self.opt_ornaments_frame, text='Off', highlightthickness=0, width=6,
                                         font=('courier', 25), relief=button_off, bg='#333333', fg='#00d165',
                                         activebackground='#333333', activeforeground='#00d165',
-                                        command=self.set_ornaments_off)
+                                        command=lambda: self.set_ornaments(False))
         self.opt_ornaments_off.pack(side=RIGHT, fill=BOTH)
 
     def set_options(self):
@@ -256,12 +253,6 @@ class TreeGUI(Frame):
             args['tiers'] = self.int_tiers
             self.reset_tree(args)
             print_change('Tiers', before, self.int_tiers)
-
-    def set_ornaments_on(self):
-        self.set_ornaments(True)
-
-    def set_ornaments_off(self):
-        self.set_ornaments(False)
 
     def set_ornaments(self, arg_bool):
         if not self.busy and arg_bool is not self.ornaments_bool:
