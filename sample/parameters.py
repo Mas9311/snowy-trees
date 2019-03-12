@@ -18,19 +18,18 @@ def retrieve():
     If no arguments are passed, then print the intro Welcome screen."""
     if '--config' in sys.argv:
         config_argument()
-        return
+        sys.exit()
     cmd_description = ('             ╔══════════════════════════════════════════════════╗            ┃\n'
                        '             ║   Loops a snowy tree much like a gif wallpaper   ║            ┃\n'
                        '             ╚══════════════════════════════════════════════════╝            ┃\n'
                        '                                                                             ┃\n'
-                       'If you are unsure about what value to set an optional argument to, watch the ┃\n'
-                       '    demonstration by typing --config after any one of the optional arguments.┃\n'
+                       ' If you are unsure about what value to set an optional argument to, watch the┃\n'
+                       '    demonstration by typing --config after a configurable* argument.         ┃\n'
                        '                                                                             ┃\n'
-                       '─ I recommend that everyone starts with configuring the width which can be   ┃\n'
-                       '    executed with the command:                                               ┃\n'
-                       '$ ' + py_cmd + ' -w --config                                                 ┃\n'
+                       ' Configurable* arguments include {width, speed, density, tiers}              ┃\n'
+                       '    To see the demo, type --config after one of the configurable arguments   ┃\n'
                        '                                                                             ┃\n'
-                       '─ Or you can just chain them together as shown in:                           ┃\n'
+                       ' Note: Configurable options can be chained together as shown with:           ┃\n'
                        '$ ' + py_cmd + ' -w --config -s --config -d --config -t --config             ┃\n'
                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛')
 
@@ -82,7 +81,7 @@ def retrieve():
                         default=25,
                         metavar='',
                         help=('LENGTH of the Tree list to print. (default=25)              '
-                              'Must be >= 25. This will save your device from wasting      '
+                              'Must be >= 25. This will save your device from wasting      '
                               'electricity to generate all the random numbers.'))
 
     ornaments = parser.add_mutually_exclusive_group(required=False)
@@ -167,22 +166,22 @@ def print_welcome(parser, arg_dict):
     help_flags = h_option + ' ' * (27 - len(py_cmd + h_option))
     demo_flags = d_option + ' ' * (27 - len(py_cmd + d_option))
 
-    print('╭┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┲━━━━━━┱┈┈┈╮\n'
-          '┊                     ╔═════════════════════════════╗             ┃ v0.2 ┃   ┊\n'
-          '┊                     ║   Welcome to snowy-trees!   ║             ┗━━━━━━┛   ┊\n'
-          '┊                     ╚═════════════════════════════╝                        ┊\n'
+    print('╭┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┲━━━━━━┱┈┈┈┈╮\n'
+          '┊                     ╔════════════════════════════╗             ┃ v0.2 ┃    ┊\n'
+          '┊                     ║   Welcome to Snowy Trees   ║             ┗━━━━━━┛    ┊\n'
+          '┊                     ╚════════════════════════════╝                         ┊\n'
           '┊                                                                            ┊\n'
           '┊ You do not have any additional arguments, so this is intended to inform    ┊\n'
-          '┊    you how to access the configurable options.                             ┊\n'
+          '┊    you how to access the *Configurable* options.                           ┊\n'
           '┊                                                                            ┊\n'
           '┊ If you ever need help, just type -h or --help, such as                     ┊\n'
-          '┊    $ ' + py_cmd + help_flags + '                                           ┊\n'
+          '┊$ ' + py_cmd + help_flags + '                                               ┊\n'
           '┊                                                                            ┊\n'
-          '┊ If you are uncertain about what value to put after an argument, i.e. width ┊\n'
-          '┊    you can type --config after any argument such as:                       ┊\n'
-          '┊    $ ' + py_cmd + demo_flags + '                                           ┊\n'
+          '┊ *Configurable* arguments include {width, speed, density, tiers}            ┊\n'
+          '┊    To see the demo, type --config after one of the configurable arguments  ┊\n'
+          '┊$ ' + py_cmd + demo_flags + '                                               ┊\n'
           '┊                                                                            ┊\n'
-          '┊ The --config argument will give you a short demonstration in order to      ┊\n'
+          '┊    The --config argument will give you a short demonstration in order to   ┊\n'
           '┊    better prepare you for the intended argument\'s configurable value.      ┊\n'
           '╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯')
     input('\nPress [Enter] to print --help:\n>')
@@ -260,7 +259,7 @@ def width_demo():
             print(str(line_len) + ' ' + line)
         answer = input('Did you find the number? Enter [Y]/[N]\n>').lower().strip()
         if answer and answer[0] == 'y':
-            input(f'\nPerfect. Now run it with\n\t$ {py_cmd} -w ###\nPress [Enter] to continue.\n>')
+            input(f'\nGlad to hear it. Now run it with\n\t$ {py_cmd} -w <###>\nPress [Enter] to continue.\n> ')
             break
 
 
@@ -279,10 +278,14 @@ def speed_demo():
           '└────────────────────────────────────────────────────────────────────────────┘')
 
     speed_list = ['a \'slow\'', 'an \'average\'', 'a \'fast\'', 'an \'ultra\'']
-    trees = [Tree.Tree({'speed': 'slow', 'width': 150, 'density': 'average', 'tiers': 4, 'ornaments': False}),
-             Tree.Tree({'speed': 'average', 'width': 150, 'density': 'average', 'tiers': 4, 'ornaments': False}),
-             Tree.Tree({'speed': 'fast', 'width': 150, 'density': 'average', 'tiers': 4, 'ornaments': False}),
-             Tree.Tree({'speed': 'ultra', 'width': 150, 'density': 'average', 'tiers': 4, 'ornaments': False})]
+    tree_dict = {'density': 'average', 'width': 125, 'speed': 'slow', 'tiers': 4,
+                 'ornaments': False, 'length': 25, 'interface': False}
+    options = ['slow', 'average', 'fast', 'ultra']
+    trees = []
+    for option in options:
+        tree_dict['speed'] = option
+        trees.append(Tree.Tree(tree_dict))
+
     first_round = True
     while True:
         for curr in range(4):
@@ -299,7 +302,8 @@ def speed_demo():
         first_round = False
         answer = input('Do you understand the speeds? [Y]/[N]\n>').lower().strip()
         if answer and answer[0] == 'y':
-            input(f'\nGlad to hear it. Now run it with\n\t$ {py_cmd} -s desired_speed\nPress [Enter] to continue.\n> ')
+            input(f'\nGlad to hear it. Now run it with:\n\t$ {py_cmd} -s <desired_speed>'
+                  '\nPress [Enter] to continue.\n> ')
             break
 
 
@@ -319,10 +323,13 @@ def density_demo():
           '└────────────────────────────────────────────────────────────────────────────┘')
 
     density_list = ['a \'thin\'', 'an \'average\'', 'a \'heavy\'', 'an \'ultra\'']
-    trees = [Tree.Tree({'density': 'thin', 'width': 150, 'speed': 'average', 'tiers': 4, 'ornaments': False}),
-             Tree.Tree({'density': 'average', 'width': 150, 'speed': 'average', 'tiers': 4, 'ornaments': False}),
-             Tree.Tree({'density': 'heavy', 'width': 150, 'speed': 'average', 'tiers': 4, 'ornaments': False}),
-             Tree.Tree({'density': 'ultra', 'width': 150, 'speed': 'average', 'tiers': 4, 'ornaments': False})]
+    tree_dict = {'density': 'average', 'width': 125, 'speed': 'average', 'tiers': 4,
+                 'ornaments': False, 'length': 25, 'interface': False}
+    options = ['thin', 'average', 'heavy', 'ultra']
+    trees = []
+    for option in options:
+        tree_dict['density'] = option
+        trees.append(Tree.Tree(tree_dict))
     input('Press [Enter] to start printing snowfall with density from \'thin\' to \'ultra\'.\n>')
     while True:
         for curr in range(4):
@@ -331,12 +338,13 @@ def density_demo():
             start = calendar.timegm(time.gmtime())
             while calendar.timegm(time.gmtime()) - start < 5:
                 print(curr_tree)
-                print('This is ' + density_list[curr] + ' speed')
+                print('This is ' + density_list[curr] + ' density')
                 time.sleep(curr_tree.sleep_time)
 
         answer = input('Do you understand the densities? [Y]/[N]\n>').lower().strip()
         if answer and answer[0] == 'y':
-            input(f'\nGlad to hear it. Now run it with\n\t$ {py_cmd} -s desired_density\nPress [Enter] to continue.\n> ')
+            input(f'\nGlad to hear it. Now run it with:\n\t$ {py_cmd} -d <desired_density>'
+                  '\nPress [Enter] to continue.\n> ')
             break
 
 
@@ -354,33 +362,24 @@ def tiers_demo():
           '│ After it has finished, you can redo the demo if you indicate you do not    │\n'
           '│     understand the tiers.                                                  │\n'
           '└────────────────────────────────────────────────────────────────────────────┘')
-
-    trees = [Tree.Tree({'tiers': 1, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 2, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 3, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 4, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 5, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 6, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 7, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 8, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 9, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 10, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 11, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 12, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True}),
-             Tree.Tree({'tiers': 13, 'width': 150, 'speed': 'fast', 'density': 'average', 'ornaments': True})]
+    tree_dict = {'density': 'average', 'width': 125, 'speed': 'average', 'tiers': 4,
+                 'ornaments': False, 'length': 25, 'interface': False}
+    options = range(1, 14)
+    trees = []
+    for option in options:
+        tree_dict['tiers'] = option
+        trees.append(Tree.Tree(tree_dict))
     input('Press [Enter] to start printing the tiers from 1 to 13.\n>')
     while True:
-        for curr in range(0, 13):
-            curr_tree = trees[curr]
-
+        for curr_tree in trees:
             start = calendar.timegm(time.gmtime())
             while calendar.timegm(time.gmtime()) - start < 3:
                 print(curr_tree)
-                print(f'This tree has {curr + 1} tiers')
+                print(f'This tree has {curr_tree.tree_tiers} tier{("", "s")[curr_tree.tree_tiers != 1]}')
                 time.sleep(curr_tree.sleep_time)
         answer = input('Do you understand the tiers? [Y]/[N]\n>').lower().strip()
         if answer and answer[0] == 'y':
-            input(f'\nAwesome. Now run it with\n\t$ {py_cmd} -t #\nPress [Enter] to quit.\n> ')
+            input(f'\nGlad to hear it. Now run it with\n\t$ {py_cmd} -t <##>\nPress [Enter] to quit.\n> ')
             break
 
 
