@@ -11,6 +11,27 @@ from sample import Tree
 py_cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
 
 
+def retrieve_default_settings():
+    return {'width': 125, 'speed': 'slow', 'density': 'average', 'tiers': 4,
+            'ornaments': True, 'length': 5, 'interface': True}
+
+
+def retrieve_speed_dict():
+    return {'slow': 0.9810000, 'average': 0.7265000, 'fast': 0.465000, 'ultra': 0.1}
+
+
+def retrieve_speed_choices():
+    return [s for s in retrieve_speed_dict().keys()]
+
+
+def retrieve_density_dict():
+    return {'thin': 36, 'average': 128, 'thick': 512, 'ultra': 733}
+
+
+def retrieve_density_choices():
+    return [d for d in retrieve_density_dict().keys()]
+
+
 def retrieve():
     """Retrieves the parameters from the console if provided.
     Returns the parameters in dict format.
@@ -19,6 +40,9 @@ def retrieve():
     if '--config' in sys.argv:
         config_argument()
         sys.exit()
+
+    defaults = retrieve_default_settings()
+
     cmd_description = ('             ╔══════════════════════════════════════════════════╗            ┃\n'
                        '             ║   Loops a snowy tree much like a gif wallpaper   ║            ┃\n'
                        '             ╚══════════════════════════════════════════════════╝            ┃\n'
@@ -41,8 +65,8 @@ def retrieve():
     parser.add_argument('-w', '--width',
                         type=int,
                         metavar='',
-                        default=125,
-                        help=('WIDTH of the terminal window: (default = 125)               '
+                        default=defaults['width'],
+                        help=(f'WIDTH of the terminal window: (default=%(default)s)                 '
                               '   271 => characters printed on a single line on a 32-inch  '
                               '          monitor in landscape orientation                  '
                               '   151 => characters printed on a single line on a 32-inch  '
@@ -50,63 +74,67 @@ def retrieve():
 
     parser.add_argument('-s', '--speed',
                         type=str,
-                        default='slow',
+                        default=defaults['speed'],
                         metavar='',
-                        choices=['ultra', 'fast', 'average', 'slow'],
-                        help=('valid choices=[ultra, fast, average, slow]                  '
-                              'SPEED of the refresh: (default = slow)                      '
-                              '   slow => the snow falling will print every second'))
+                        choices=retrieve_speed_choices(),
+                        help=('SPEED of the refresh: (default=%(default)s)                        '
+                              '   slow => the snow falling will print every second.        '
+                              'Valid choices are [%(choices)s]'))
 
     parser.add_argument('-d', '--density',
                         type=str,
-                        default='average',
+                        default=defaults['density'],
                         metavar='',
-                        choices=['ultra', 'heavy', 'average', 'thin'],
-                        help=('valid choices=[ultra, fast, average, slow] which equates    '
-                              'to percent of [ 75.0, 51.2,    12.8,  3.6] chance of snow.  '
-                              'DENSITY of the snow: (default = average)                    '
-                              '   average => 12.8 percent chance of snow'))
+                        choices=retrieve_density_choices(),
+                        help=('DENSITY of the snow: (default=%(default)s)                      '
+                              '   average => 12.8 percent chance of snow.                  '
+                              'Valid choices are [%(choices)s]'))
 
     parser.add_argument('-t', '--tiers',
                         type=int,
-                        default=4,
+                        default=defaults['tiers'],
                         metavar='',
                         choices=range(1, 14),
-                        help=('valid range of [1, 13] inclusive                            '
-                              'TIERS of tree: (default = 4)                                '
-                              '   4 => Tree has 4 triangular tiers'))
+                        help=('TIERS of tree: (default=%(default)s)                                  '
+                              '   4 => Tree has 4 triangular tiers.                        '
+                              'Valid choices are %(choices)s'))
 
     parser.add_argument('-l', '--length',
                         type=length_list_type,
-                        default=25,
+                        default=defaults['length'],
                         metavar='',
-                        help=('LENGTH of the Tree list to print. (default=25)              '
-                              'Must be >= 25. This will save your device from wasting      '
-                              'electricity to generate all the random numbers.'))
+                        help=('LENGTH of the tree list to print: (default=%(default)s)              '
+                              'Saves your device from wasting electricity to generate all  '
+                              'the random numbers for snow and ornament arrangement.       '
+                              'Valid choice must be >= %(default)s'))
 
     ornaments = parser.add_mutually_exclusive_group(required=False)
     ornaments.add_argument('-y', '--yes',
                            action='store_true',
-                           default=True,
+                           default=defaults['ornaments'],
                            dest='ornaments',
-                           help='YES, display the ornaments on the tree')
+                           help='YES ornaments: (default=%(default)s)                               '
+                                'Ornaments will be displayed on the tree.')
 
     ornaments.add_argument('-n', '--no',
                            action='store_false',
+                           default=not defaults['ornaments'],
                            dest='ornaments',
-                           help='NO ornaments. Ornaments will not be displayed on the tree')
+                           help=('NO ornaments: (default=%(default)s)                               '
+                                 'Ornaments will not be displayed on the tree.'))
 
     interface = parser.add_mutually_exclusive_group(required=False)
     interface.add_argument('-g', '--gui',
                            action='store_true',
-                           default=True,
+                           default=defaults['interface'],
                            dest='interface',
-                           help='Display the Tree in a GUI interface.')
+                           help='GUI printing of the tree. (default=%(default)s)')
 
     interface.add_argument('-c', '--cli',
                            action='store_false',
+                           default=not defaults['interface'],
                            dest='interface',
-                           help='Display the Tree in the boring, old CLI interface.')
+                           help='CLI printing of the tree. (default=%(default)s)')
 
     vrs_description = ('                                                    \n'
                        '              *   snowy-trees v0.2   *              \n'
@@ -144,19 +172,20 @@ def retrieve():
 
     if len(sys.argv) == 1:
         # no arguments were provided, print the welcome screen
-        print_welcome(parser, arg_dict)
+        print_welcome(parser)
 
     return arg_dict
 
 
 def length_list_type(length_input):
     length_input = int(length_input)
-    if length_input < 25:
-        print('List argument must be >= 25. Resorting to default of 25.')
+    length_min = retrieve_default_settings()['length']
+    if length_input < length_min:
+        print(f'List argument must be >= {length_min}. Resorting to the default of {length_min}.')
     return length_input
 
 
-def print_welcome(parser, arg_dict):
+def print_welcome(parser):
     """This function is called when the user does not include any additional arguments.
     This almost seems counter-productive, but at the very least, the default width
     should not be used. Instead, the user is informed how to run the --config demo.
@@ -188,7 +217,7 @@ def print_welcome(parser, arg_dict):
 
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓')
     parser.print_help()
-    input(f'\nPress [Enter] to run with the options set to:\n{arg_dict}\n>')
+    input(f'\nPress [Enter] to run with the options set to:\n{retrieve_default_settings()}\n>')
     print()
 
 
@@ -272,19 +301,17 @@ def speed_demo():
           '│                                                                            │\n'
           '│ The goal is to find what refresh rate you are most comfortable with.       │\n'
           '├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┤\n'
-          '│ They will be printed in order of slowest to fastest for a total of 5       │\n'
-          '│     seconds each.                                                          │\n'
-          '│ It can keep looping if you indicate you do not understand the speeds.      │\n'
+          '│ They will be printed in order of slowest to fastest for a 5 sec each       │\n'
+          '│     Demo will repeat if you indicate you do not understand the speeds.     │\n'
           '└────────────────────────────────────────────────────────────────────────────┘')
 
     speed_list = ['a \'slow\'', 'an \'average\'', 'a \'fast\'', 'an \'ultra\'']
-    tree_dict = {'density': 'average', 'width': 125, 'speed': 'slow', 'tiers': 4,
-                 'ornaments': False, 'length': 25, 'interface': False}
-    options = ['slow', 'average', 'fast', 'ultra']
+    defaults = retrieve_default_settings()
+    options = retrieve_speed_choices()
     trees = []
     for option in options:
-        tree_dict['speed'] = option
-        trees.append(Tree.Tree(tree_dict))
+        defaults['speed'] = option
+        trees.append(Tree.Tree(defaults))
 
     first_round = True
     while True:
@@ -322,23 +349,25 @@ def density_demo():
           '│     understand the densities.                                              │\n'
           '└────────────────────────────────────────────────────────────────────────────┘')
 
-    density_list = ['a \'thin\'', 'an \'average\'', 'a \'heavy\'', 'an \'ultra\'']
-    tree_dict = {'density': 'average', 'width': 125, 'speed': 'average', 'tiers': 4,
-                 'ornaments': False, 'length': 25, 'interface': False}
-    options = ['thin', 'average', 'heavy', 'ultra']
+    density_list = [' \'thin\'', 'n \'average\'', ' \'thick\'', 'n \'ultra\'']
+    defaults_dict = retrieve_default_settings()
+    defaults_dict['speed'] = 'average'
+    options = retrieve_density_choices()
+
     trees = []
     for option in options:
-        tree_dict['density'] = option
-        trees.append(Tree.Tree(tree_dict))
+        defaults_dict['density'] = option
+        trees.append(Tree.Tree(defaults_dict))
+
     input('Press [Enter] to start printing snowfall with density from \'thin\' to \'ultra\'.\n>')
     while True:
-        for curr in range(4):
+        for curr in range(len(density_list)):
             curr_tree = trees[curr]
 
-            start = calendar.timegm(time.gmtime())
-            while calendar.timegm(time.gmtime()) - start < 5:
+            start_time = calendar.timegm(time.gmtime())
+            while calendar.timegm(time.gmtime()) - start_time < 5:
                 print(curr_tree)
-                print('This is ' + density_list[curr] + ' density')
+                print('This is a' + density_list[curr] + ' density')
                 time.sleep(curr_tree.sleep_time)
 
         answer = input('Do you understand the densities? [Y]/[N]\n>').lower().strip()
@@ -362,13 +391,15 @@ def tiers_demo():
           '│ After it has finished, you can redo the demo if you indicate you do not    │\n'
           '│     understand the tiers.                                                  │\n'
           '└────────────────────────────────────────────────────────────────────────────┘')
-    tree_dict = {'density': 'average', 'width': 125, 'speed': 'average', 'tiers': 4,
-                 'ornaments': False, 'length': 25, 'interface': False}
+    defaults_dict = retrieve_default_settings()
+    defaults_dict['speed'] = 'average'
     options = range(1, 14)
+
     trees = []
     for option in options:
-        tree_dict['tiers'] = option
-        trees.append(Tree.Tree(tree_dict))
+        defaults_dict['tiers'] = option
+        trees.append(Tree.Tree(defaults_dict))
+
     input('Press [Enter] to start printing the tiers from 1 to 13.\n>')
     while True:
         for curr_tree in trees:
