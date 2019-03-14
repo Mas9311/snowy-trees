@@ -289,11 +289,12 @@ class GUI(Frame):
             args['ornaments'] = arg_bool
             self.reset_tree(args)
             self.ornaments_bool = arg_bool
-            # self.opt_ornaments_on.pack_forget()
-            # self.opt_ornaments_off.pack_forget()
-            # self.opt_ornaments_frame.grid_forget()
-            self.opt_ornaments_frame.destroy()
-            self.set_opt_ornaments_frame()
+
+            button_on = (FLAT, RIDGE)[self.ornaments_bool]
+            self.opt_ornaments_on.configure(relief=button_on)
+            button_off = (RIDGE, FLAT)[self.ornaments_bool]
+            self.opt_ornaments_off.configure(relief=button_off)
+
             print_change('Ornaments', before, self.ornaments_bool)
 
     def set_screen_width(self):
@@ -306,9 +307,8 @@ class GUI(Frame):
             print_change('Window Width', before, self.tree.screen_width)
 
     def reset_tree(self, args):
-        self.textbox.place_forget()
-        self.set_text_box()
-
+        # self.textbox.place_forget()
+        # self.set_text_box()
         self.tree.arg_dict = args
         self.tree.set_parameters()
         self.print_init()
@@ -330,7 +330,7 @@ class GUI(Frame):
         initial_tree_str = ''
         for curr_tree in range(6):
             initial_tree_str += self.tree.list[curr_tree] + '\n'
-        self.textbox.insert('0.0', initial_tree_str + '\n')
+        self.textbox.insert('0.0', initial_tree_str)
 
     def run_gui(self, textbox, index):
         """Recursive loop that prints the tree at the top of the GUI"""
