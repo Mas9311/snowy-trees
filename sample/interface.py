@@ -120,8 +120,10 @@ class GUI(Frame):
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def set_text_box(self):
-        self.textbox = Text(self, fg='green', background='#000000',
-                            wrap='none', font='fixed', highlightthickness=0)
+        text_font = 'fixed'  # ('fixed', {24, 19, 18, 17, -15 -11 -4 -3 -2 0})  # 'fixed'
+        # print(font.Font.metrics(font.Font(family=text_font)))  # TODO: look on windows and mac to see the difference
+        self.textbox = Text(self, fg='green', background='black',
+                            wrap='none', font=text_font, highlightthickness=0)
         self.textbox.pack(fill=BOTH, expand=True)
 
     def click_options(self):
@@ -165,12 +167,9 @@ class GUI(Frame):
         self.root.state('iconic')
 
     def set_opt_button(self):
-        self.opt_button = Button(self.opt_frame, text='options', font=('courier', 25),
+        self.opt_button = Button(self.opt_frame, text='options', font=self.options_font, bg='#000000', fg='#ffffff',
+                                 activebackground='#444444', activeforeground='#cccccc',
                                  highlightthickness=0, command=self.click_options)
-        self.opt_button['activebackground'] = '#444444'
-        self.opt_button['activeforeground'] = '#cccccc'
-        self.opt_button['bg'] = '#000000'
-        self.opt_button['fg'] = '#ffffff'
         self.opt_button.grid(row=0, column=0, sticky=N + E + S)
 
     def set_sub_options(self):
@@ -243,8 +242,7 @@ class GUI(Frame):
             self.opt_frame.destroy()
         self.options_font = font.Font(family='courier', size=25)
 
-        self.opt_frame = Frame(self, width=65, height=26, highlightthickness=0)
-        self.opt_frame['bg'] = '#000000'
+        self.opt_frame = Frame(self, width=65, height=26, bg='black', highlightthickness=0)
         self.opt_frame.place(relx=1, rely=0, x=-2, y=2, anchor=NE)
         self.set_opt_button()
         self.opt_bool = False
@@ -309,7 +307,7 @@ class GUI(Frame):
     def print_trees_now(self):
         """Prints the (minimum + 1) number of trees in order to fill the height of the GUI window"""
         initial_tree_str = ''
-        num_trees = (self.h_dim // 13 // self.tree.screen_height) + 1
+        num_trees = (self.h_dim // 13 // self.tree.screen_height) + 2
         for _ in range(num_trees):
             initial_tree_str += self.tree.list[self.tree.increment_index()] + '\n'
         self.textbox.insert('0.0', initial_tree_str)
@@ -325,4 +323,3 @@ def print_change(type_of, before, after):
     """Prints the changed option to the console with before and after values"""
     if str(before) != str(after):
         print(f'{type_of}: {before} => {after}')
-
