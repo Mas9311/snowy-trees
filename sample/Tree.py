@@ -6,6 +6,7 @@ from sample import parameters
 class Tree:
     def __init__(self, arg_dict):
         self.arg_dict = arg_dict
+        self.curr_index = 0
 
         self.tree_tiers = 0
         self.tree_width = 0
@@ -114,6 +115,12 @@ class Tree:
         base_str = self.base_char * width
         spaces = (self.screen_width - self.tree_width + 2) // 2
         return self._gen_snow(spaces) + buffer + base_str + buffer + self._gen_snow(spaces + self.make_even) + '\n'
+
+    def increment_index(self):
+        value = self.curr_index
+        self.curr_index = (self.curr_index + 1) % self.length
+        # print('tree index #', value)
+        return value
 
     def __str__(self):
         return (f'{self._tree_topper()}'

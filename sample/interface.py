@@ -21,16 +21,15 @@ class CLI:
         self.tree = my_tree
 
     def print_indefinitely(self):
-        # print the first 6 upon execution to immediately fill the screen with snowy trees
-        for curr_tree in range(6):
-            print(self.tree.list[curr_tree])
+        # immediately prints all trees too fill the CLI window with snowy trees
+        for _ in range(min(self.tree.length, 50)):
+            print(self.tree.list[self.tree.increment_index()])
 
         # continuous loop that iterates through the list of trees
         while True:
-            for curr_tree in range(self.tree.length):
-                print(self.tree.list[curr_tree])
-                # pause execution for the time specified in the --speed argument provided.
-                time.sleep(self.tree.sleep_time)
+            print(self.tree.list[self.tree.increment_index()])
+            # pause execution for the time specified in the --speed argument provided.
+            time.sleep(self.tree.sleep_time)
 
 
 class GUI(Frame):
@@ -61,6 +60,7 @@ class GUI(Frame):
 
         # creates the template of the Tree to print; snow & ornaments are unique upon printing.
         self.tree = Tree.Tree(parameters.retrieve())
+        self.curr_tree_index = 0
 
         # Assigns values to the options Frame sliders
         self.opt_speed_label = None
@@ -98,7 +98,7 @@ class GUI(Frame):
         self.print_trees_now()
 
         # continue execution
-        self.run_gui(self.textbox, 0)
+        self.run_gui()
 
     def init_options(self):
         speeds = parameters.retrieve_speed_choices()
@@ -304,26 +304,25 @@ class GUI(Frame):
         self.x_dim = self.winfo_rootx()
         self.y_dim = self.winfo_rooty()
         self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
-        # print_change('Dimensions', before, f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}')
+        # print_change('\tDimensions', before, f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}')
 
     def print_trees_now(self):
-        """Prints the Trees to the GUI"""
+        """Prints the (minimum + 1) number of trees in order to fill the height of the GUI window"""
         initial_tree_str = ''
-        for curr_tree in range((self.h_dim // 13 // self.tree.screen_height) + 1):
-            initial_tree_str += self.tree.list[curr_tree % self.tree.length] + '\n'
-            # print('printing tree #', curr_tree + 1)
+        num_trees = (self.h_dim // 13 // self.tree.screen_height) + 1
+        for _ in range(num_trees):
+            initial_tree_str += self.tree.list[self.tree.increment_index()] + '\n'
         self.textbox.insert('0.0', initial_tree_str)
 
-    def run_gui(self, textbox, index):
+    def run_gui(self):
         """Recursive loop that prints the tree at the top of the GUI"""
-        textbox.insert('0.0', self.tree.list[index] + '\n')
+        self.textbox.insert('0.0', self.tree.list[self.tree.increment_index()] + '\n')
         # pause execution for the time specified in the speed argument provided.
-        textbox.after(int(self.tree.sleep_time * 1000), self.run_gui,
-                      textbox, (index + 1) % self.tree.length)
+        self.textbox.after(int(self.tree.sleep_time * 1000), self.run_gui)
 
 
 def print_change(type_of, before, after):
     """Prints the changed option to the console with before and after values"""
     if str(before) != str(after):
-        indent = (' * ', '')[type_of != 'Dimensions']
-        print(f'{indent}{type_of}: {before} => {after}')
+        print(f'{type_of}: {before} => {after}')
+
