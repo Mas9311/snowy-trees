@@ -17,7 +17,7 @@ def retrieve_default_settings():
 
 
 def retrieve_speed_dict():
-    return {'slow': 0.9810000, 'average': 0.7265000, 'fast': 0.465000, 'ultra': 0.1}
+    return {'slow': 0.9810000, 'average': 0.7265000, 'fast': 0.465000, 'ultra': 0.1}  # ultra=0.05 minimum
 
 
 def retrieve_speed_choices():
