@@ -1,6 +1,5 @@
 import time
 from tkinter import font
-import tkinter as tk
 from tkinter import *
 
 from sample import Tree, parameters
@@ -131,9 +130,11 @@ class OptionsFrame(Frame):
 
     def click_options(self):
         if self.opt_bool:
+            print('Closed')
             self.destroy()
             self.parent.create_options_frame()
         else:
+            print('Open')
             self.opt_bool = True
             self.set_sub_options()
 
@@ -215,24 +216,30 @@ class OptionsFrame(Frame):
         self.opt_bool = False
 
     def set_speed(self, value):
-        before = self.curr_speed
-        self.int_speed = int(value)
-        self.curr_speed = parameters.retrieve_speed_choices()[self.int_speed - 1]
-        self.parent.reset_tree('speed', self.curr_speed)
-        print_change('Speed', before, self.curr_speed)
+        value = int(value)
+        if self.int_speed != value:
+            before = self.curr_speed
+            self.int_speed = value
+            self.curr_speed = parameters.retrieve_speed_choices()[self.int_speed - 1]
+            self.parent.reset_tree('speed', self.curr_speed)
+            print_change('Speed', before, self.curr_speed)
 
     def set_density(self, value):
-        before = self.curr_density
-        self.int_density = int(value)
-        self.curr_density = parameters.retrieve_density_choices()[self.int_density - 1]
-        self.parent.reset_tree('density', self.curr_density)
-        print_change('Density', before, self.curr_density)
+        value = int(value)
+        if self.int_density != value:
+            before = self.curr_density
+            self.int_density = value
+            self.curr_density = parameters.retrieve_density_choices()[self.int_density - 1]
+            self.parent.reset_tree('density', self.curr_density)
+            print_change('Density', before, self.curr_density)
 
     def set_tiers(self, value):
-        before = self.int_tiers
-        self.int_tiers = int(value)
-        self.parent.reset_tree('tiers',  self.int_tiers)
-        print_change('Tiers', before, self.int_tiers)
+        value = int(value)
+        if self.int_tiers != value:
+            before = self.int_tiers
+            self.int_tiers = value
+            self.parent.reset_tree('tiers',  self.int_tiers)
+            print_change('Tiers', before, self.int_tiers)
 
     def set_ornaments(self, arg_bool):
         """Does not update if the currently-activated button is clicked again"""
@@ -256,13 +263,12 @@ class GUI(Frame):
         self.root = parent
         self.root.configure(bd=0)
 
-        self.textbox = None
-        self.window_manager_frame = None
-        self.options_frame = None
-
         # creates the template of the Tree to print; snow & ornaments are unique upon printing.
         self.tree = Tree.Tree(parameters.retrieve())
 
+        self.textbox = None
+        self.window_manager_frame = None
+        self.options_frame = None
         self.create_sub_frames()
 
         # self.update()
@@ -329,7 +335,7 @@ class GUI(Frame):
         initial_tree_str = ''
         num_trees = (self.h_dim // 13 // self.tree.screen_height) + 2
         for _ in range(num_trees):
-            initial_tree_str += self.tree.list[self.tree.increment_index()] + '\n'
+            initial_tree_str = self.tree.list[self.tree.increment_index()] + '\n' + initial_tree_str
         self.textbox.insert('0.0', initial_tree_str)
 
     def run_gui(self):
