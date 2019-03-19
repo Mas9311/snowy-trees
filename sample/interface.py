@@ -49,7 +49,9 @@ class WindowManagerFrame(Frame):
         self.create_frame()
 
     def create_frame(self):
-        self.window_manager_font = font.Font(family='times new roman', size=18, weight='bold')
+        self.window_manager_font = font.Font(family='Times New Roman', size=18, weight='bold')
+        # self.window_manager_font = font.Font(family='Courier New', size=10, weight='bold')
+        # print('win_man:\t', self.window_manager_font.metrics())  # TODO
 
         self.window_close = Button(self, text='×', highlightthickness=0,
                                    font=self.window_manager_font, command=self._close)
@@ -130,11 +132,11 @@ class OptionsFrame(Frame):
 
     def click_options(self):
         if self.opt_bool:
-            print('Closed')
+            '''Close the open OptionsFrame, and create a new one with only the options Button showing.'''
             self.destroy()
             self.parent.create_options_frame()
         else:
-            print('Open')
+            '''Open the closed OptionsFrame. Create the sub options Scales and Buttons.'''
             self.opt_bool = True
             self.set_sub_options()
 
@@ -210,7 +212,9 @@ class OptionsFrame(Frame):
         self.opt_ornaments_off.grid(row=0, column=1, sticky=N + E + W + S, ipadx=1)
 
     def set_options(self):
-        self.options_font = font.Font(family='courier', size=25)
+        self.options_font = font.Font(family='courier', size=25, weight='bold')
+        # other font.Font(family='Courier new', size=10, weight='bold')
+        # print('options:\t', self.options_font.metrics())  # TODO
 
         self.set_opt_button()
         self.opt_bool = False
@@ -301,8 +305,8 @@ class GUI(Frame):
         self.options_frame = OptionsFrame(self)
 
     def set_text_box(self):
-        text_font = 'fixed'  # ('fixed', {24, 19, 18, 17, -15 -11 -4 -3 -2 0})  # 'fixed'
-        # print(font.Font.metrics(font.Font(family=text_font)))  # TODO: look on windows and mac to see the difference
+        text_font = 'fixed'  # ('fixed', -11) {24, 19, 18, 17, -15 -11 -4 -3 -2 0})
+        # print('textbox:\t', font.Font.metrics(font.Font(family=text_font)))  # TODO
         self.textbox = Text(self, fg='green', background='black',
                             wrap='none', font=text_font, highlightthickness=0)
         self.textbox.pack(fill=BOTH, expand=True)
@@ -313,8 +317,6 @@ class GUI(Frame):
         print_change('Window Width', before, self.tree.screen_width)
 
     def reset_tree(self, key, value):
-        # self.textbox.place_forget()
-        # self.set_text_box()
         self.tree.arg_dict[key] = value
         self.tree.update_parameters()
         self.print_trees_now()
@@ -322,7 +324,7 @@ class GUI(Frame):
     def window_change(self, event):
         # before = f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}'
         self.w_dim = self.winfo_width()
-        if self.tree.screen_width is not self.w_dim // 6 - 2 and self.w_dim // 6 - 2 > self.tree.tree_width + 1:
+        if self.tree.screen_width is not self.w_dim // 6 - 2 and self.w_dim // 6 - 2 > self.tree.tree_width + 1:  # TODO
             self.set_screen_width()
         self.h_dim = self.winfo_height()
         self.x_dim = self.winfo_rootx()
@@ -347,5 +349,5 @@ class GUI(Frame):
 
 def print_change(type_of, before, after):
     """Prints the changed option to the console with before and after values"""
-    if str(before) != str(after):
-        print(f'{type_of}: {before} => {after}')
+    # if str(before) != str(after):
+    print(f'{type_of}: {before} => {after}')
