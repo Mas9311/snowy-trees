@@ -33,26 +33,31 @@ class CLI:
 
 
 class WindowManagerFrame(Frame):
+    """Creates a Frame for the [Minimize, Maximize, Close] buttons in the top-right corner of the GUI"""
     def __init__(self, parent):
         Frame.__init__(self, parent, highlightthickness=0)
-        self.place(relx=0, rely=0, anchor="nw")
+        self.place(relx=1, rely=0, anchor=NE)
 
         self.parent = parent
         self.root = self.parent.root
 
         self.maximized_bool = False
-        self.buttons = {}         # close, maximize, minimize
-        self.configurations = {}  # font, close, maximize, minimize
+        self.buttons = {}         # Contains: close, maximize, minimize, border
+        self.configurations = {}  # Contains: font, close, maximize, minimize
         self.create_frame()
 
     def create_frame(self):
         self.set_font()
         self.create_button_dict()
-        for curr in ['close', 'maximize', 'minimize']:
-            curr_button_configs = self.configurations[curr]
-            self.buttons[curr] = self.create_button(curr_button_configs)
-            self.buttons[curr].grid(row=0, column=curr_button_configs['col'])
-            # print(f'WindowManagerFrame: Created the \'{curr}\' button.')
+
+        _font = self.configurations['font']
+        _buttons = ['minimize', 'maximize', 'close']
+        for curr in zip(_buttons, range(len(_buttons))):
+            _text = self.configurations[curr[0]]['text_char']
+            _command = self.configurations[curr[0]]['command']
+            self.buttons[curr[0]] = Button(self, font=_font, highlightthickness=0, text=_text, command=_command)
+            self.buttons[curr[0]].grid(row=0, column=curr[1])
+            # print(f'WMF: Created the \'{curr}\' button.')
 
     def set_font(self):  # TODO
         self.configurations['font'] = font.Font(family='Times New Roman', size=18, weight='bold')
@@ -60,36 +65,29 @@ class WindowManagerFrame(Frame):
         # print('win_man:\t', self.window_manager_font.metrics())
 
     def create_button_dict(self):
-        self.configurations['close'] = {'char': '×', 'col': 0, 'command': self._close}
-        self.configurations['maximize'] = {'char': '+', 'col': 1, 'command': self._maximize}
-        self.configurations['minimize'] = {'char': '−', 'col': 2, 'command': self._minimize}
-
-    def create_button(self, curr_config):
-        return Button(self, text=curr_config['char'], highlightthickness=0,
-                      font=self.configurations['font'], command=curr_config['command'])
+        self.configurations['close'] = {'text_char': '×', 'command': self._close}
+        self.configurations['maximize'] = {'text_char': '+', 'command': self._maximize}
+        self.configurations['minimize'] = {'text_char': '−', 'command': self._minimize}
 
     def _close(self):
         self.root.destroy()
 
     def _maximize(self):
-        if not self.maximized_bool:
-            self.root.overrideredirect(1)
-            self.root.call("wm", "attributes", ".", "-fullscreen", "true")
-        else:
-            self.root.overrideredirect(0)
-            self.root.call("wm", "attributes", ".", "-fullscreen", "false")
         self.maximized_bool = not self.maximized_bool
+        self.root.overrideredirect(self.maximized_bool)  # No borders or title bar
+        self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.maximized_bool}')
 
     def _minimize(self):
         if self.maximized_bool:
             self._maximize()
+        #     # print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
         self.root.state('iconic')
 
 
 class OptionsFrame(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent, width=65, height=26, bg='black', highlightthickness=0)
-        self.place(relx=1, rely=0, x=-2, y=2, anchor=NE)
+        self.place(relx=0, rely=0, anchor=NW)
 
         self.parent = parent
         self.root = self.parent.root
@@ -136,12 +134,14 @@ class OptionsFrame(Frame):
         self.ornaments_bool = self.parent.tree.arg_dict['ornaments']
 
     def set_options(self):
-        self.options_font = font.Font(family='Courier', size=25)
-        # self.options_font = font.Font(family='Courier New', size=10, weight='bold')
-        # print('options:\t', self.options_font.metrics())  # TODO
-
+        self.set_font()
         self.set_opt_button()
         self.opt_bool = False
+
+    def set_font(self):  # TODO
+        self.options_font = font.Font(family='Courier', size=25)
+        # self.options_font = font.Font(family='Courier New', size=10, weight='bold')
+        # print('options:\t', self.options_font.metrics())
 
     def click_options(self):
         if self.opt_bool:
@@ -157,7 +157,7 @@ class OptionsFrame(Frame):
         self.opt_button = Button(self, text='options', font=self.options_font, bg='#000000', fg='#ffffff',
                                  activebackground='#444444', activeforeground='#cccccc',
                                  highlightthickness=0, command=self.click_options)
-        self.opt_button.grid(row=0, column=0, sticky=N + E + S)
+        self.opt_button.grid(row=0, column=0, sticky=N + W + S)
 
     def set_sub_options(self):
         # Create the rest of the options frame
@@ -354,5 +354,5 @@ class GUI(Frame):
 
 def print_change(type_of, before, after):
     """Prints the changed option to the console with before and after values"""
-    # if str(before) != str(after):
-    print(f'{type_of}: {before} => {after}')
+    if str(before) != str(after):
+        print(f'{type_of}: {before} => {after}')
