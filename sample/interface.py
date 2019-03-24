@@ -40,49 +40,33 @@ class WindowManagerFrame(Frame):
         self.parent = parent
         self.root = self.parent.root
 
-        self.window_manager_font = None
-
         self.maximized_bool = False
-        self.close_button = None
-        self.maximize_button = None
-        self.minimize_button = None
-        self.button_dict = {'close': self.close_button,
-                            'maximize': self.maximize_button,
-                            'minimize': self.minimize_button}
+        self.buttons = {}         # close, maximize, minimize
+        self.configurations = {}  # font, close, maximize, minimize
         self.create_frame()
 
     def create_frame(self):
         self.set_font()
-        self.create_button('close')
-        self.create_button('maximize')
-        self.create_button('minimize')
-
-    def create_button(self, button):
-        if button == 'close':
-            character = '×'
-            _command = self._close
-            c = 0
-        elif button == 'maximize':
-            character = '+'
-            _command = self._maximize
-            c = 1
-        elif button == 'minimize':
-            character = '−'
-            _command = self._minimize
-            c = 2
-        else:
-            print(f'Window Manager Frame:\n'
-                  '\tThe button \'{button}\' is not recognized yet.')
-            sys.exit()
-
-        self.button_dict[button] = Button(self, text=character, highlightthickness=0,
-                                          font=self.window_manager_font, command=_command).grid(row=0, column=c)
-        # print(button, 'button has been created')
+        self.create_button_dict()
+        for curr in ['close', 'maximize', 'minimize']:
+            curr_button_configs = self.configurations[curr]
+            self.buttons[curr] = self.create_button(curr_button_configs)
+            self.buttons[curr].grid(row=0, column=curr_button_configs['col'])
+            # print(f'WindowManagerFrame: Created the \'{curr}\' button.')
 
     def set_font(self):  # TODO
-        self.window_manager_font = font.Font(family='Times New Roman', size=18, weight='bold')
-        # self.window_manager_font = font.Font(family='Courier New', size=10, weight='bold')
+        self.configurations['font'] = font.Font(family='Times New Roman', size=18, weight='bold')
+        # self.configurations['font'] = font.Font(family='Courier New', size=10, weight='bold')
         # print('win_man:\t', self.window_manager_font.metrics())
+
+    def create_button_dict(self):
+        self.configurations['close'] = {'char': '×', 'col': 0, 'command': self._close}
+        self.configurations['maximize'] = {'char': '+', 'col': 1, 'command': self._maximize}
+        self.configurations['minimize'] = {'char': '−', 'col': 2, 'command': self._minimize}
+
+    def create_button(self, curr_config):
+        return Button(self, text=curr_config['char'], highlightthickness=0,
+                      font=self.configurations['font'], command=curr_config['command'])
 
     def _close(self):
         self.root.destroy()
