@@ -42,26 +42,47 @@ class WindowManagerFrame(Frame):
 
         self.window_manager_font = None
 
-        self.window_close = None
-        self.window_maximize = None
-        self.window_minimize = None
         self.maximized_bool = False
+        self.close_button = None
+        self.maximize_button = None
+        self.minimize_button = None
+        self.button_dict = {'close': self.close_button,
+                            'maximize': self.maximize_button,
+                            'minimize': self.minimize_button}
         self.create_frame()
 
     def create_frame(self):
+        self.set_font()
+        self.create_button('close')
+        self.create_button('maximize')
+        self.create_button('minimize')
+
+    def create_button(self, button):
+        if button == 'close':
+            character = '×'
+            _command = self._close
+            c = 0
+        elif button == 'maximize':
+            character = '+'
+            _command = self._maximize
+            c = 1
+        elif button == 'minimize':
+            character = '−'
+            _command = self._minimize
+            c = 2
+        else:
+            print(f'Window Manager Frame:\n'
+                  '\tThe button \'{button}\' is not recognized yet.')
+            sys.exit()
+
+        self.button_dict[button] = Button(self, text=character, highlightthickness=0,
+                                          font=self.window_manager_font, command=_command).grid(row=0, column=c)
+        # print(button, 'button has been created')
+
+    def set_font(self):  # TODO
         self.window_manager_font = font.Font(family='Times New Roman', size=18, weight='bold')
         # self.window_manager_font = font.Font(family='Courier New', size=10, weight='bold')
-        # print('win_man:\t', self.window_manager_font.metrics())  # TODO
-
-        self.window_close = Button(self, text='×', highlightthickness=0,
-                                   font=self.window_manager_font, command=self._close)
-        self.window_close.grid(row=0, column=0)
-        self.window_maximize = Button(self, text='+', highlightthickness=0,
-                                      font=self.window_manager_font, command=self._maximize)
-        self.window_maximize.grid(row=0, column=1)
-        self.window_minimize = Button(self, text='−', highlightthickness=0,
-                                      font=self.window_manager_font, command=self._minimize)
-        self.window_minimize.grid(row=0, column=2)
+        # print('win_man:\t', self.window_manager_font.metrics())
 
     def _close(self):
         self.root.destroy()
@@ -129,6 +150,14 @@ class OptionsFrame(Frame):
         self.int_tiers = self.parent.tree.tree_tiers
 
         self.ornaments_bool = self.parent.tree.arg_dict['ornaments']
+
+    def set_options(self):
+        self.options_font = font.Font(family='Courier', size=25)
+        # self.options_font = font.Font(family='Courier New', size=10, weight='bold')
+        # print('options:\t', self.options_font.metrics())  # TODO
+
+        self.set_opt_button()
+        self.opt_bool = False
 
     def click_options(self):
         if self.opt_bool:
@@ -210,14 +239,6 @@ class OptionsFrame(Frame):
                                         activebackground='#333333', activeforeground='#00d165',
                                         command=lambda: self.set_ornaments(False))
         self.opt_ornaments_off.grid(row=0, column=1, sticky=N + E + W + S, ipadx=1)
-
-    def set_options(self):
-        self.options_font = font.Font(family='courier', size=25, weight='bold')
-        # other font.Font(family='Courier new', size=10, weight='bold')
-        # print('options:\t', self.options_font.metrics())  # TODO
-
-        self.set_opt_button()
-        self.opt_bool = False
 
     def set_speed(self, value):
         value = int(value)
