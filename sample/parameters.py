@@ -82,7 +82,7 @@ def retrieve():
         sys.exit()
 
     defaults = default_settings()
-
+                                                        # TODO
     cmd_description = ('             ╔══════════════════════════════════════════════════╗            ┃\n'
                        '             ║   Loops a snowy tree much like a gif wallpaper   ║            ┃\n'
                        '             ╚══════════════════════════════════════════════════╝            ┃\n'
@@ -269,7 +269,7 @@ def print_welcome(parser):
     d_option = ' -w --config'
     help_flags = h_option + ' ' * (27 - len(py_cmd + h_option))
     demo_flags = d_option + ' ' * (27 - len(py_cmd + d_option))
-
+                                            # TODO
     print('╭┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┲━━━━━━┱┈┈┈┈╮\n'
           '┊                     ╔════════════════════════════╗             ┃ v1.0 ┃    ┊\n'
           '┊                     ║   Welcome to Snowy Trees   ║             ┗━━━━━━┛    ┊\n'
