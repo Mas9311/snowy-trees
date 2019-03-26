@@ -12,8 +12,18 @@ py_cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
 
 
 def default_settings():
-    return {'width': 125, 'speed': 'slow', 'density': 'average', 'tiers': 4,
-            'ornaments': True, 'length': 5, 'font': 'medium', 'interface': True}
+    return {
+        'width': 125,
+        'speed': 'slow',
+        'density': 'average',
+        'tiers': 4,
+        'ornaments': True,
+        'length': 5,
+        'textbox': 'medium',
+        'toolbar': 'large',
+        'windows': 'large',
+        'interface': True
+    }
 
 
 def speed_dict():
@@ -33,18 +43,33 @@ def density_choices():
 
 
 def font_dict():
-    return {'small': ('fixed', -11), 'medium': 'fixed', 'large': ('fixed', -15)}
-    # return {'textbox': {'small': ('fixed', -11), 'medium': 'fixed', 'large': ('fixed', -15)},
-    #         'buttons': {'small': ('fixed', -11), 'medium': 'fixed', 'large': ('fixed', -15)}}
+    return {
+        'textbox': {
+            'small': ('fixed', -11),
+            'medium': 'fixed',
+            'large': ('fixed', -15)
+        },
+        'toolbar': {
+            'small': ('Courier New', 10, 'bold'),
+            'large': ('Courier', 25)
+        },
+        'windows': {
+            'small': ('Courier New', 10, 'bold'),
+            'large': ('Times New Roman', 18, 'bold')
+        }
+    }
 
 
-def font_choices():
-    return [t for t in font_dict().keys()]
-    # return [t for t in font_dict()['textbox'].keys()]
+def textbox_font_choices():
+    return [t for t in font_dict()['textbox'].keys()]
 
 
-# def retrieve_button_font_choices():
-#     return [b for b in font_dict()['buttons'].keys()]
+def toolbar_font_choices():
+    return [b for b in font_dict()['toolbar'].keys()]
+
+
+def windows_font_choices():
+    return [w for w in font_dict()['windows'].keys()]
 
 
 def retrieve():
@@ -81,10 +106,10 @@ def retrieve():
                         type=int,
                         metavar='',
                         default=defaults['width'],
-                        help=(f'WIDTH of the terminal window: (default=%(default)s)                 '
-                              '   271 => characters printed on a single line on a 32-inch  '
-                              '          monitor in landscape orientation                  '
-                              '   151 => characters printed on a single line on a 32-inch  '
+                        help=(f'WIDTH of the terminal window: (default=%(default)s)                '
+                              '   271 => characters printed on a single line on a 32-inch '
+                              '          monitor in landscape orientation                 '
+                              '   151 => characters printed on a single line on a 32-inch '
                               '          monitor in portrait orientation'))
 
     parser.add_argument('-s', '--speed',
@@ -92,8 +117,8 @@ def retrieve():
                         default=defaults['speed'],
                         metavar='',
                         choices=speed_choices(),
-                        help=('SPEED of the refresh: (default=%(default)s)                        '
-                              '   slow => the snow falling will print every second.        '
+                        help=('SPEED of the refresh: (default=%(default)s)                       '
+                              '   slow => the snow falling will print every second.       '
                               'Valid choices are [%(choices)s]'))
 
     parser.add_argument('-d', '--density',
@@ -101,8 +126,8 @@ def retrieve():
                         default=defaults['density'],
                         metavar='',
                         choices=density_choices(),
-                        help=('DENSITY of the snow: (default=%(default)s)                      '
-                              '   average => 12.8 percent chance of snow.                  '
+                        help=('DENSITY of the snow: (default=%(default)s)                     '
+                              '   average => 12.8 percent chance of snow.                 '
                               'Valid choices are [%(choices)s]'))
 
     parser.add_argument('-t', '--tiers',
@@ -110,25 +135,48 @@ def retrieve():
                         default=defaults['tiers'],
                         metavar='',
                         choices=range(1, 14),
-                        help=('TIERS of tree: (default=%(default)s)                                  '
-                              '   4 => Tree has 4 triangular tiers.                        '
-                              'Valid choices are %(choices)s'))
+                        help=('TIERS of tree: (default=%(default)s)                                 '
+                              '   4 => Tree has 4 triangular tiers.                       '
+                              'Valid choices can only be:                                 '
+                              '               [%(choices)s]'))
 
     parser.add_argument('-l', '--length',
                         type=length_list_type,
                         default=defaults['length'],
                         metavar='',
-                        help=('LENGTH of the tree list to print: (default=%(default)s)               '
-                              'Saves your device from wasting electricity to generate all  '
-                              'the random numbers for snow and ornament arrangement.       '
-                              'Valid choice must be >= %(default)s'))
+                        help=('LENGTH of the tree list to print: (default=%(default)s)              '
+                              'Saves your device from wasting electricity to generate all '
+                              'the random numbers for snow and ornament arrangement.      '
+                              'Valid choices are only whole numbers >= %(default)s.'))
 
-    parser.add_argument('-f', '--font',
+    parser.add_argument('-tf', '--textbox',
                         type=str,
-                        default=defaults['font'],
+                        default=defaults['textbox'],
                         metavar='',
-                        choices=font_choices(),
-                        help=('FONT size of the textbox and toolbar: (default=%(default)s)         '
+                        dest='textbox',
+                        choices=textbox_font_choices(),
+                        help=('TEXTBOX font size: (default=%(default)s)                        '
+                              'The textbox is location of the Tree to be displayed.       '
+                              'Valid choices are [%(choices)s]'))
+
+    parser.add_argument('-bf', '--toolbar',
+                        type=str,
+                        default=defaults['toolbar'],
+                        metavar='',
+                        dest='toolbar',
+                        choices=toolbar_font_choices(),
+                        help=('TOOLBAR buttons font size: (default=%(default)s)                 '
+                              'These are the toolbar buttons located at the top-left.     '
+                              'Valid choices are [%(choices)s]'))
+
+    parser.add_argument('-wf', '--window',
+                        type=str,
+                        default=defaults['windows'],
+                        metavar='',
+                        dest='windows',
+                        choices=windows_font_choices(),
+                        help=('WINDOW manager buttons font size: (default=%(default)s)          '
+                              'These are the − + × buttons located at the top-right.      '
                               'Valid choices are [%(choices)s]'))
 
     ornaments = parser.add_mutually_exclusive_group(required=False)
@@ -136,14 +184,14 @@ def retrieve():
                            action='store_true',
                            default=defaults['ornaments'],
                            dest='ornaments',
-                           help='YES ornaments: (default=%(default)s)                               '
+                           help='YES ornaments: (default=%(default)s)                              '
                                 'Ornaments will be displayed on the tree.')
 
     ornaments.add_argument('-n', '--no',
                            action='store_false',
                            default=not defaults['ornaments'],
                            dest='ornaments',
-                           help=('NO ornaments: (default=%(default)s)                               '
+                           help=('NO ornaments: (default=%(default)s)                              '
                                  'Ornaments will not be displayed on the tree.'))
 
     interface = parser.add_mutually_exclusive_group(required=False)
@@ -160,7 +208,7 @@ def retrieve():
                            help='CLI printing of the tree. (default=%(default)s)')
 
     vrs_description = ('                                                    \n'
-                       '              *   snowy-trees v0.2   *              \n'
+                       '              *   snowy-trees v1.0   *              \n'
                        'Check out if there are any new releases for this at:\n'
                        '\thttps://github.com/Mas9311/snowy-trees/releases')
     parser.add_argument('-v', '--version',
@@ -173,6 +221,7 @@ def retrieve():
 
     known_args, unknown_args = parser.parse_known_args()
 
+    # converts the arguments from a Namespace type => dictionary
     arg_dict = {'width': known_args.width,
                 'speed': known_args.speed,
                 'density': known_args.density,
@@ -180,7 +229,9 @@ def retrieve():
                 'ornaments': known_args.ornaments,
                 'interface': known_args.interface,
                 'length': known_args.length,
-                'font': known_args.font}
+                'textbox': known_args.textbox,
+                'toolbar': known_args.toolbar,
+                'windows': known_args.windows}
 
     if unknown_args:
         # user added unknown args, so print the --help screen
@@ -220,7 +271,7 @@ def print_welcome(parser):
     demo_flags = d_option + ' ' * (27 - len(py_cmd + d_option))
 
     print('╭┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┲━━━━━━┱┈┈┈┈╮\n'
-          '┊                     ╔════════════════════════════╗             ┃ v0.2 ┃    ┊\n'
+          '┊                     ╔════════════════════════════╗             ┃ v1.0 ┃    ┊\n'
           '┊                     ║   Welcome to Snowy Trees   ║             ┗━━━━━━┛    ┊\n'
           '┊                     ╚════════════════════════════╝                         ┊\n'
           '┊                                                                            ┊\n'
@@ -241,7 +292,10 @@ def print_welcome(parser):
 
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓')
     parser.print_help()
-    input(f'\nPress [Enter] to run with the options set to:\n{default_settings()}\n>')
+    run_with = ''
+    for k in ['width', 'speed', 'density', 'tiers', 'ornaments', 'length']:
+        run_with += f'\t{k}: {default_settings()[k]}\n'
+    input(f'\nPress [Enter] to run with cli with the default Tree of:\n{run_with}\n>')
     print()
 
 

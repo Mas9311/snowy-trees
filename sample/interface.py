@@ -1,5 +1,5 @@
 import time
-from tkinter import font
+# from tkinter.font import Font
 from tkinter import *
 
 from sample import Tree, parameters
@@ -38,24 +38,24 @@ class WindowManagerFrame(Frame):
         Frame.__init__(self, parent, highlightthickness=0)
         self.place(relx=1, rely=0, anchor=NE)
 
-        self.parent = parent
-        self.root = self.parent.root
+        self.gui = parent
+        self.root = self.gui.root
 
         self.maximized_bool = False
-        self.buttons = {}         # Contains: close, maximize, minimize, border
-        self.configurations = {}  # Contains: font, close, maximize, minimize
+        self._font = None
+        self._defined = ['minimize', 'maximize', 'close']
+        self.buttons = {}         # Contains: close, maximize, minimize           # ?maybe: border
+        self.configurations = {}  # Contains: close, maximize, minimize
         self._create()
 
     def _create(self):
         self.set_configurations()
 
-        _font = self.configurations['font']
-        _buttons = ['minimize', 'maximize', 'close']
-        for curr in zip(_buttons, range(len(_buttons))):
-            _text = self.configurations[curr[0]]['text_char']
-            _command = self.configurations[curr[0]]['command']
-            self.buttons[curr[0]] = Button(self, font=_font, highlightthickness=0, text=_text, command=_command)
-            self.buttons[curr[0]].grid(row=0, column=curr[1])
+        for (curr, _col) in zip(self._defined, range(len(self._defined))):
+            _text = self.configurations[curr]['text_char']
+            _command = self.configurations[curr]['command']
+            self.buttons[curr] = Button(self, font=self._font, highlightthickness=0, text=_text, command=_command)
+            self.buttons[curr].grid(row=0, column=_col)
             # print(f'WMF: Created the \'{curr}\' button.')
 
     def set_configurations(self):
@@ -64,10 +64,15 @@ class WindowManagerFrame(Frame):
         self.configurations['maximize'] = {'text_char': '+', 'command': self._maximize}
         self.configurations['minimize'] = {'text_char': '−', 'command': self._minimize}
 
-    def set_font(self):  # TODO
-        self.configurations['font'] = font.Font(family='Times New Roman', size=18, weight='bold')
-        # self.configurations['font'] = font.Font(family='Courier New', size=10, weight='bold')
-        # print('win_man:\t', self.window_manager_font.metrics())
+    def set_font(self, value=None):
+        new_font_key = (value, self.gui.tree.arg_dict['windows'])[value is None]
+        self._font = parameters.font_dict()['windows'][new_font_key]
+        # print('WindowManager metrics:\t', self._font.metrics())                  # TODO: test on [windows 10, mac OSX]
+        if value is not None:
+            self.gui.tree.arg_dict['windows'] = new_font_key
+            for key in self.buttons.keys():
+                self.buttons[key].config(font=self._font)
+                # print('WindowManager: Changed font on', key, 'button')
 
     def _close(self):
         self.root.destroy()
@@ -93,10 +98,10 @@ class ToolbarFrame(Frame):
 
         self._font = None
         self._defined = ['options', 'view']
-        self.buttons = {}         # Contains: options, view
-        self.configurations = {}  # Contains: options, view
-        self.frames = {}          # Contains: options, view
-        self.bools = {}           # contains: options, view
+        self.buttons = {}
+        self.configurations = {}
+        self.frames = {}
+        self.bools = {}
 
         self._create()
 
@@ -123,10 +128,15 @@ class ToolbarFrame(Frame):
                 self.frames[key].grid_forget()
             self.bools[key] = False
 
-    def set_font(self):
-        self._font = font.Font(family='Courier', size=25)
-        # self.options_font = font.Font(family='Courier New', size=10, weight='bold')
-        # print('options:\t', self.options_font.metrics())
+    def set_font(self, value=None):
+        new_font_key = (value, self.gui.tree.arg_dict['toolbar'])[value is None]
+        self._font = parameters.font_dict()['toolbar'][new_font_key]
+        # print('Toolbar metrics:\t', self._font.metrics())                        # TODO: test on [windows 10, mac OSX]
+        if value is not None:
+            self.gui.tree.arg_dict['toolbar'] = new_font_key
+            for key in self.buttons.keys():
+                self.buttons[key].config(font=self._font)
+            self.frames['view'].update_font(new_font_key)
 
     def get_font(self):
         return self._font
@@ -160,41 +170,112 @@ class ViewFrame(Frame):
 
         self._font = self.parent.get_font()
 
-        self.text_label = None
-        self.text_scale = None
-        self.curr_text = None
-        self.int_text = None
+        self.curr_textbox = None
+        self.int_textbox = None
+        self.textbox_label = None
+        self.textbox_scale = None
+
+        self.int_toolbar = None
+        self.curr_toolbar = None
+        self.toolbar_label = None
+        self.toolbar_scale = None
+
+        self.int_windows = None
+        self.curr_windows = None
+        self.windows_label = None
+        self.windows_scale = None
 
         self._create()
 
     def _create(self):
-        fonts = parameters.font_choices()
-        self.int_text = fonts.index(self.gui.tree.arg_dict['font']) + 1  # TODO
-        self.curr_text = fonts[self.int_text - 1]
+        fonts = parameters.textbox_font_choices()
+        self.int_textbox = fonts.index(self.gui.tree.arg_dict['textbox']) + 1
+        self.curr_textbox = fonts[self.int_textbox - 1]
 
-        self.set_view_text()
+        fonts = parameters.toolbar_font_choices()
+        self.int_toolbar = fonts.index(self.gui.tree.arg_dict['toolbar']) + 1
+        self.curr_toolbar = fonts[self.int_toolbar - 1]
 
-    def set_view_text(self):
-        self.text_label = Label(self, text='Text Size', bg='#aaaaaa', fg='#3d008e',
-                                highlightthickness=0, font=self._font, relief=FLAT, width=16)
-        self.text_label.grid(row=1, column=0, sticky=W + E)
+        fonts = parameters.windows_font_choices()
+        self.int_windows = fonts.index(self.gui.tree.arg_dict['windows']) + 1
+        self.curr_windows = fonts[self.int_windows - 1]
 
-        self.text_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
-                                bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
-                                showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
-                                to=len(parameters.font_choices()), command=self.set_text)
-        self.text_scale.set(self.int_text)
-        self.text_scale.grid(row=2, column=0, sticky=W + E)
+        self.set_view_textbox(1)
+        self.set_view_toolbar(3)
+        self.set_view_windows(5)
 
-    def set_text(self, value):
+    def update_font(self, new_font_key):
+        self._font = parameters.font_dict()['toolbar'][new_font_key]
+        self.textbox_label.config(font=self._font)
+        self.textbox_scale.config(font=self._font)
+        self.toolbar_label.config(font=self._font)
+        self.toolbar_scale.config(font=self._font)
+        self.windows_label.config(font=self._font)
+        self.windows_scale.config(font=self._font)
+        # print('ViewFrame: Changed font on all buttons in sight')
+
+    def set_view_textbox(self, _row):
+        self.textbox_label = Label(self, text='Textbox Font Size', bg='#aaaaaa', fg='#3d008e',
+                                   highlightthickness=0, font=self._font, relief=FLAT)
+        self.textbox_label.grid(row=_row, column=0, sticky=W + E)
+
+        self.textbox_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
+                                   bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
+                                   showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
+                                   to=len(parameters.textbox_font_choices()), command=self.set_textbox)
+        self.textbox_scale.set(self.int_textbox)
+        self.textbox_scale.grid(row=_row + 1, column=0, sticky=W + E)
+
+    def set_view_toolbar(self, _row):
+        self.toolbar_label = Label(self, text='Toolbar Font Size', bg='#333333', fg='#00d165',
+                                   highlightthickness=0, font=self._font, relief=FLAT)
+        self.toolbar_label.grid(row=_row, column=0, sticky=W + E)
+
+        self.toolbar_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
+                                   bg='#333333', fg='#00d165', activebackground='#3d008e', troughcolor='#333333',
+                                   showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
+                                   to=len(parameters.toolbar_font_choices()), command=self.set_toolbar)
+        self.toolbar_scale.set(self.int_toolbar)
+        self.toolbar_scale.grid(row=_row + 1, column=0, sticky=W + E)
+
+    def set_view_windows(self, _row):
+        self.windows_label = Label(self, text='Windows Font Size', bg='#aaaaaa', fg='#3d008e',
+                                   highlightthickness=0, font=self._font, relief=FLAT)
+        self.windows_label.grid(row=_row, column=0, sticky=W + E)
+
+        self.windows_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
+                                   bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
+                                   showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
+                                   to=len(parameters.windows_font_choices()), command=self.set_windows)
+        self.windows_scale.set(self.int_windows)
+        self.windows_scale.grid(row=_row + 1, column=0, sticky=W + E)
+
+    def set_textbox(self, value):
         value = int(value)
-        if self.int_text != value:
-            before = self.curr_text
-            self.int_text = value
-            self.curr_text = parameters.font_choices()[self.int_text - 1]
-            print('*** chan:', self.int_text, self.curr_text)
-            self.gui.textbox.set_text_font(self.curr_text)
-            print_change('Textbox Font Size', before, self.curr_text)
+        if self.int_textbox != value:
+            before = self.curr_textbox
+            self.int_textbox = value
+            self.curr_textbox = parameters.textbox_font_choices()[self.int_textbox - 1]
+            self.gui.textbox.set_font(self.curr_textbox)
+            print_change('Textbox Font Size', before, self.curr_textbox)
+
+    def set_toolbar(self, value):
+        value = int(value)
+        if self.int_toolbar != value:
+            before = self.curr_toolbar
+            self.int_toolbar = value
+            self.curr_toolbar = parameters.toolbar_font_choices()[self.int_toolbar - 1]
+            self.gui.toolbar_frame.set_font(self.curr_toolbar)
+            print_change('Toolbar Font Size', before, self.curr_toolbar)
+
+    def set_windows(self, value):
+        value = int(value)
+        if self.int_windows != value:
+            before = self.curr_windows
+            self.int_windows = value
+            self.curr_windows = parameters.windows_font_choices()[self.int_windows - 1]
+            self.gui.window_manager_frame.set_font(self.curr_windows)
+            print_change('Windows Font Size', before, self.curr_windows)
 
 
 class OptionsFrame(Frame):
@@ -244,61 +325,62 @@ class OptionsFrame(Frame):
         self.ornaments_bool = self.gui.tree.arg_dict['ornaments']
 
         # Create the rest of the options frame
-        self.set_opt_speed()
-        self.set_opt_density()
-        self.set_opt_tiers()
-        self.set_opt_ornaments()
+        self.set_opt_speed(1)
+        self.set_opt_density(3)
+        self.set_opt_tiers(5)
+        self.set_opt_ornaments(7)
 
     def set_font(self):  # TODO
-        self._font = font.Font(family='Courier', size=25)
-        # self.options_font = font.Font(family='Courier New', size=10, weight='bold')
+        pass
+        # self._font = Font(family='Courier', size=25)
+        # self.options_font = Font(family='Courier New', size=10, weight='bold')
         # print('options:\t', self.options_font.metrics())
 
-    def set_opt_speed(self):
+    def set_opt_speed(self, _row):
         self.opt_speed_label = Label(self, text='Refresh Speed', bg='#aaaaaa', fg='#3d008e',
                                      highlightthickness=0, font=self._font, relief=FLAT, width=16)
-        self.opt_speed_label.grid(row=1, column=0, sticky=W + E)
+        self.opt_speed_label.grid(row=_row, column=0, sticky=W + E)
 
         self.opt_speed = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
                                showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
                                to=len(parameters.speed_choices()), command=self.set_speed)
         self.opt_speed.set(self.int_speed)
-        self.opt_speed.grid(row=2, column=0, sticky=W + E)
+        self.opt_speed.grid(row=_row + 1, column=0, sticky=W + E)
 
-    def set_opt_density(self):
+    def set_opt_density(self, _row):
         self.opt_density_label = Label(self, text='Snow Density', bg='#333333', fg='#00d165',
                                        highlightthickness=0, font=self._font, relief=FLAT)
-        self.opt_density_label.grid(row=3, column=0, sticky=W + E)
+        self.opt_density_label.grid(row=_row, column=0, sticky=W + E)
 
         self.opt_density = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                  bg='#333333', fg='#00d165', activebackground='#3d008e', troughcolor='#333333',
                                  showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
                                  to=len(parameters.speed_choices()), command=self.set_density)
         self.opt_density.set(self.int_density)
-        self.opt_density.grid(row=4, column=0, sticky=W + E)
+        self.opt_density.grid(row=_row + 1, column=0, sticky=W + E)
 
-    def set_opt_tiers(self):
+    def set_opt_tiers(self, _row):
         self.opt_tiers_label = Label(self, text='Tree Tiers', bg='#aaaaaa', fg='#3d008e',
                                      highlightthickness=0, font=self._font, relief=FLAT)
-        self.opt_tiers_label.grid(row=5, column=0, sticky=W + E)
+        self.opt_tiers_label.grid(row=_row, column=0, sticky=W + E)
 
         self.opt_tiers = Scale(self, label=None, font=self._font, bg='#aaaaaa', fg='#3d008e',
                                from_=1, to=13, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT, highlightthickness=0,
                                activebackground='#00ff80', troughcolor='#aaaaaa', command=self.set_tiers)
         self.opt_tiers.set(self.int_tiers)
-        self.opt_tiers.grid(row=6, column=0, sticky=W + E)
+        self.opt_tiers.grid(row=_row + 1, column=0, sticky=W + E)
 
-    def set_opt_ornaments(self):
+    def set_opt_ornaments(self, _row):
         self.opt_ornaments_label = Label(self, text='Ornaments', bg='#333333', fg='#00d165',
                                          highlightthickness=0, font=self._font, relief=FLAT)
-        self.opt_ornaments_label.grid(row=7, column=0, sticky=W + E)
+        self.opt_ornaments_label.grid(row=_row, column=0, sticky=W + E)
 
-        self.set_opt_ornaments_frame()
+        self.set_opt_ornaments_frame(_row + 1)
 
-    def set_opt_ornaments_frame(self):
+    def set_opt_ornaments_frame(self, _row):
         self.opt_ornaments_frame = Frame(self, bg='#ffffff')
-        self.opt_ornaments_frame.grid(row=8, column=0, sticky=W + E)
+        self.opt_ornaments_frame.grid(row=_row, column=0, sticky=W + E)
 
         button_on = (FLAT, RIDGE)[self.ornaments_bool]
         self.opt_ornaments_on = Button(self.opt_ornaments_frame, text='On', highlightthickness=0, width=6,
@@ -358,28 +440,34 @@ class OptionsFrame(Frame):
 class Textbox(Text):
     def __init__(self, parent):
         Text.__init__(self, parent, fg='green', background='black', wrap='none', highlightthickness=0,
-                      font=parameters.font_dict()[parent.tree.arg_dict['font']])
+                      font=parameters.font_dict()['textbox'][parent.tree.arg_dict['textbox']])
         self.pack(fill=BOTH, expand=True)
 
         self.gui = parent
 
-        self.curr_text = None
-        self.text_font = None
+    def set_font(self, value=None):  # TODO {24, 19, 18, 17  |  0  |  -15 -11 -4 -3 -2})
+        new_font_key = (value, self.gui.tree.arg_dict['textbox'])[value is None]
+        self.gui.textbox.configure(font=parameters.font_dict()['textbox'][new_font_key])
+        self.gui.tree.arg_dict['textbox'] = new_font_key
+        # self.curr_text = (value, self.gui.tree.arg_dict['textbox'])[value is None]
+        # self.text_font = parameters.font_dict()['textbox'][self.curr_text]
+        # if value is not None:
+        #     self.gui.textbox.configure(font=self.text_font)
+        #     self.gui.tree.arg_dict['textbox'] = self.curr_text
 
-        self._create()
+    def print_trees_now(self):
+        """Prints the (minimum + 1) number of trees in order to fill the height of the GUI window"""
+        initial_tree_str = ''
+        num_trees = (self.gui.h_dim // 13 // self.gui.tree.screen_height) + 2
+        for _ in range(num_trees):
+            initial_tree_str = self.gui.tree.list[self.gui.tree.increment_index()] + '\n' + initial_tree_str
+        self.insert('0.0', initial_tree_str)
 
-    def _create(self):
-        self.set_text_font()
-
-    def set_text_font(self, value=None):  # TODO
-        # {24, 19, 18, 17  |  0  |  -15 -11 -4 -3 -2})
-
-        self.curr_text = (value, self.gui.tree.arg_dict['font'])[value is None]
-        self.text_font = parameters.font_dict()[self.curr_text]
-        # self.text_font = parameters.font_dict()['textbox']['medium']  # TODO
-        if value is not None:
-            self.gui.textbox.configure(font=self.text_font)
-            self.gui.tree.arg_dict['font'] = self.curr_text
+    def run_gui(self):
+        """Recursive loop that prints the tree at the top of the GUI"""
+        self.insert('0.0', self.gui.tree.list[self.gui.tree.increment_index()] + '\n')
+        # pause execution for the time specified in the speed argument provided.
+        self.after(int(self.gui.tree.sleep_time * 1000), self.run_gui)
 
 
 class GUI(Frame):
@@ -397,7 +485,6 @@ class GUI(Frame):
         self.toolbar_frame = None
         self._create()
 
-        # self.update()
         self.update_idletasks()
         self.w_dim = (self.tree.screen_width + self.tree.make_even + 2) * 6
         self.h_dim = int(self.tree.screen_height * 13 * 2)  # prints 2 trees
@@ -406,22 +493,19 @@ class GUI(Frame):
 
         self.set_root()
 
-        # immediately fills the current GUI window with trees
-        self.print_trees_now()
+        self.textbox.print_trees_now()  # immediately fills the current GUI window with trees
+        self.textbox.run_gui()  # continue execution
 
-        # continue execution
-        self.run_gui()
+    def _create(self):
+        self.textbox = Textbox(self)
+        self.window_manager_frame = WindowManagerFrame(self)
+        self.toolbar_frame = ToolbarFrame(self)
 
     def set_root(self):
         self.root.bind('<Configure>', self.window_change)
         self.root.title('Snowy Trees')
         self.root.resizable(width=True, height=True)
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
-
-    def _create(self):
-        self.textbox = Textbox(self)
-        self.window_manager_frame = WindowManagerFrame(self)
-        self.toolbar_frame = ToolbarFrame(self)
 
     def set_screen_width(self):
         before = self.tree.screen_width
@@ -431,7 +515,7 @@ class GUI(Frame):
     def reset_tree(self, key, value):
         self.tree.arg_dict[key] = value
         self.tree.update_parameters()
-        self.print_trees_now()
+        self.textbox.print_trees_now()
 
     def window_change(self, event):
         # before = f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}'
@@ -443,20 +527,6 @@ class GUI(Frame):
         self.y_dim = self.winfo_rooty()
         self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
         # print_change('\tDimensions', before, f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}')
-
-    def print_trees_now(self):
-        """Prints the (minimum + 1) number of trees in order to fill the height of the GUI window"""
-        initial_tree_str = ''
-        num_trees = (self.h_dim // 13 // self.tree.screen_height) + 2
-        for _ in range(num_trees):
-            initial_tree_str = self.tree.list[self.tree.increment_index()] + '\n' + initial_tree_str
-        self.textbox.insert('0.0', initial_tree_str)
-
-    def run_gui(self):
-        """Recursive loop that prints the tree at the top of the GUI"""
-        self.textbox.insert('0.0', self.tree.list[self.tree.increment_index()] + '\n')
-        # pause execution for the time specified in the speed argument provided.
-        self.textbox.after(int(self.tree.sleep_time * 1000), self.run_gui)
 
 
 def print_change(type_of, before, after):
