@@ -136,7 +136,7 @@ class ToolbarFrame(Frame):
         is_open = not self.bools[_curr]
         self.close_frames()
         if is_open:
-            '''Create the unopened OptionsFrame.'''
+            # opens the OptionsFrame and sets the 'options' boolean to True
             self.frames[_curr] = OptionsFrame(self)
             self.bools[_curr] = True
 
@@ -145,7 +145,7 @@ class ToolbarFrame(Frame):
         is_open = not self.bools[_curr]
         self.close_frames()
         if is_open:
-            '''F => T. Create the ViewFrame.'''
+            # opens the ViewFrame and sets the 'view' boolean to True
             self.frames[_curr] = ViewFrame(self)
             self.bools[_curr] = True
 
