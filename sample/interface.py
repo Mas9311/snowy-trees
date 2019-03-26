@@ -330,12 +330,6 @@ class OptionsFrame(Frame):
         self.set_opt_tiers(5)
         self.set_opt_ornaments(7)
 
-    def set_font(self):  # TODO
-        pass
-        # self._font = Font(family='Courier', size=25)
-        # self.options_font = Font(family='Courier New', size=10, weight='bold')
-        # print('options:\t', self.options_font.metrics())
-
     def set_opt_speed(self, _row):
         self.opt_speed_label = Label(self, text='Refresh Speed', bg='#aaaaaa', fg='#3d008e',
                                      highlightthickness=0, font=self._font, relief=FLAT, width=16)
@@ -449,11 +443,6 @@ class Textbox(Text):
         new_font_key = (value, self.gui.tree.arg_dict['textbox'])[value is None]
         self.gui.textbox.configure(font=parameters.font_dict()['textbox'][new_font_key])
         self.gui.tree.arg_dict['textbox'] = new_font_key
-        # self.curr_text = (value, self.gui.tree.arg_dict['textbox'])[value is None]
-        # self.text_font = parameters.font_dict()['textbox'][self.curr_text]
-        # if value is not None:
-        #     self.gui.textbox.configure(font=self.text_font)
-        #     self.gui.tree.arg_dict['textbox'] = self.curr_text
 
     def print_trees_now(self):
         """Prints the (minimum + 1) number of trees in order to fill the height of the GUI window"""
@@ -518,6 +507,7 @@ class GUI(Frame):
         self.textbox.print_trees_now()
 
     def window_change(self, event):
+        # TODO -v --verbose => prints the dimensions upon adjusting
         # before = f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}'
         self.w_dim = self.winfo_width()
         if self.tree.screen_width is not self.w_dim // 6 - 2 and self.w_dim // 6 - 2 > self.tree.tree_width + 1:  # TODO
