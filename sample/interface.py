@@ -476,7 +476,10 @@ class GUI(Frame):
 
         self.update_idletasks()
         self.w_dim = (self.tree.screen_width + self.tree.make_even + 2) * 6
-        self.h_dim = int(self.tree.screen_height * 13 * 2)  # prints 2 trees
+        if self.tree.arg_dict['textbox'] == 'small':
+            self.h_dim = ((48 * self.tree.tree_tiers) + 53) * 2
+        elif self.tree.arg_dict['textbox'] == 'medium':
+            self.h_dim = int(self.tree.screen_height * 13 * 2)  # prints 2 trees
         self.x_dim = self.winfo_x()
         self.y_dim = self.winfo_y()
 

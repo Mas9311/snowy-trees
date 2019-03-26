@@ -54,7 +54,7 @@ def font_dict():
             'large': ('Courier', 25)
         },
         'windows': {
-            'small': ('Courier New', 10, 'bold'),
+            'small': ('Times Roman', 9, 'bold'),
             'large': ('Times New Roman', 18, 'bold')
         }
     }
