@@ -11,25 +11,40 @@ from sample import Tree
 py_cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
 
 
-def retrieve_default_settings():
+def default_settings():
     return {'width': 125, 'speed': 'slow', 'density': 'average', 'tiers': 4,
-            'ornaments': True, 'length': 5, 'interface': True}
+            'ornaments': True, 'length': 5, 'font': 'medium', 'interface': True}
 
 
-def retrieve_speed_dict():
+def speed_dict():
     return {'slow': 0.9810000, 'average': 0.7265000, 'fast': 0.465000, 'ultra': 0.1}  # ultra=0.05 minimum
 
 
-def retrieve_speed_choices():
-    return [s for s in retrieve_speed_dict().keys()]
+def speed_choices():
+    return [s for s in speed_dict().keys()]
 
 
-def retrieve_density_dict():
+def density_dict():
     return {'thin': 36, 'average': 128, 'thick': 512, 'ultra': 733}
 
 
-def retrieve_density_choices():
-    return [d for d in retrieve_density_dict().keys()]
+def density_choices():
+    return [d for d in density_dict().keys()]
+
+
+def font_dict():
+    return {'small': ('fixed', -11), 'medium': 'fixed', 'large': ('fixed', -15)}
+    # return {'textbox': {'small': ('fixed', -11), 'medium': 'fixed', 'large': ('fixed', -15)},
+    #         'buttons': {'small': ('fixed', -11), 'medium': 'fixed', 'large': ('fixed', -15)}}
+
+
+def font_choices():
+    return [t for t in font_dict().keys()]
+    # return [t for t in font_dict()['textbox'].keys()]
+
+
+# def retrieve_button_font_choices():
+#     return [b for b in font_dict()['buttons'].keys()]
 
 
 def retrieve():
@@ -41,7 +56,7 @@ def retrieve():
         config_argument()
         sys.exit()
 
-    defaults = retrieve_default_settings()
+    defaults = default_settings()
 
     cmd_description = ('             ╔══════════════════════════════════════════════════╗            ┃\n'
                        '             ║   Loops a snowy tree much like a gif wallpaper   ║            ┃\n'
@@ -76,7 +91,7 @@ def retrieve():
                         type=str,
                         default=defaults['speed'],
                         metavar='',
-                        choices=retrieve_speed_choices(),
+                        choices=speed_choices(),
                         help=('SPEED of the refresh: (default=%(default)s)                        '
                               '   slow => the snow falling will print every second.        '
                               'Valid choices are [%(choices)s]'))
@@ -85,7 +100,7 @@ def retrieve():
                         type=str,
                         default=defaults['density'],
                         metavar='',
-                        choices=retrieve_density_choices(),
+                        choices=density_choices(),
                         help=('DENSITY of the snow: (default=%(default)s)                      '
                               '   average => 12.8 percent chance of snow.                  '
                               'Valid choices are [%(choices)s]'))
@@ -103,10 +118,18 @@ def retrieve():
                         type=length_list_type,
                         default=defaults['length'],
                         metavar='',
-                        help=('LENGTH of the tree list to print: (default=%(default)s)              '
+                        help=('LENGTH of the tree list to print: (default=%(default)s)               '
                               'Saves your device from wasting electricity to generate all  '
                               'the random numbers for snow and ornament arrangement.       '
                               'Valid choice must be >= %(default)s'))
+
+    parser.add_argument('-f', '--font',
+                        type=str,
+                        default=defaults['font'],
+                        metavar='',
+                        choices=font_choices(),
+                        help=('FONT size of the textbox and toolbar: (default=%(default)s)         '
+                              'Valid choices are [%(choices)s]'))
 
     ornaments = parser.add_mutually_exclusive_group(required=False)
     ornaments.add_argument('-y', '--yes',
@@ -156,7 +179,8 @@ def retrieve():
                 'tiers': known_args.tiers,
                 'ornaments': known_args.ornaments,
                 'interface': known_args.interface,
-                'length': known_args.length}
+                'length': known_args.length,
+                'font': known_args.font}
 
     if unknown_args:
         # user added unknown args, so print the --help screen
@@ -179,7 +203,7 @@ def retrieve():
 
 def length_list_type(length_input):
     length_input = int(length_input)
-    length_min = retrieve_default_settings()['length']
+    length_min = default_settings()['length']
     if length_input < length_min:
         print(f'List argument must be >= {length_min}. Resorting to the default of {length_min}.')
     return length_input
@@ -217,7 +241,7 @@ def print_welcome(parser):
 
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓')
     parser.print_help()
-    input(f'\nPress [Enter] to run with the options set to:\n{retrieve_default_settings()}\n>')
+    input(f'\nPress [Enter] to run with the options set to:\n{default_settings()}\n>')
     print()
 
 
@@ -306,8 +330,8 @@ def speed_demo():
           '└────────────────────────────────────────────────────────────────────────────┘')
 
     speed_list = ['a \'slow\'', 'an \'average\'', 'a \'fast\'', 'an \'ultra\'']
-    defaults = retrieve_default_settings()
-    options = retrieve_speed_choices()
+    defaults = default_settings()
+    options = speed_choices()
     trees = []
     for option in options:
         defaults['speed'] = option
@@ -350,9 +374,9 @@ def density_demo():
           '└────────────────────────────────────────────────────────────────────────────┘')
 
     density_list = [' \'thin\'', 'n \'average\'', ' \'thick\'', 'n \'ultra\'']
-    defaults_dict = retrieve_default_settings()
+    defaults_dict = default_settings()
     defaults_dict['speed'] = 'average'
-    options = retrieve_density_choices()
+    options = density_choices()
 
     trees = []
     for option in options:
@@ -391,7 +415,7 @@ def tiers_demo():
           '│ After it has finished, you can redo the demo if you indicate you do not    │\n'
           '│     understand the tiers.                                                  │\n'
           '└────────────────────────────────────────────────────────────────────────────┘')
-    defaults_dict = retrieve_default_settings()
+    defaults_dict = default_settings()
     defaults_dict['speed'] = 'average'
     options = range(1, 14)
 

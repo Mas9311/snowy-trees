@@ -15,10 +15,10 @@ class Tree:
         self.screen_width = 0
         self.screen_height = 0
         self.make_even = 0
-        self.sleep_time = None
-        self.max_snow = None
+        self.sleep_time = 0
+        self.max_snow = 0
         self.ornaments = ['⍟', 'x', '♦']  # ⍟ x ♦ ● ○ * ★ ⍟
-        self.ornament_bool = False
+        self.ornament_bool = 0
         self.length = 0
         self.list = []
 
@@ -38,8 +38,8 @@ class Tree:
         self.screen_width = max(self.arg_dict['width'], self.tree_width)
         self.screen_height = 1 + (1 + (6 + (4 * (self.tree_tiers - 1)) + self.base_height)) + 1
         self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
-        self.sleep_time = parameters.retrieve_speed_dict()[self.arg_dict['speed']]
-        self.max_snow = parameters.retrieve_density_dict()[self.arg_dict['density']]
+        self.sleep_time = parameters.speed_dict()[self.arg_dict['speed']]
+        self.max_snow = parameters.density_dict()[self.arg_dict['density']]
         self.ornament_bool = self.arg_dict['ornaments']
         self.length = max(self.arg_dict['length'], 5)
 
