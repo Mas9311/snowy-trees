@@ -90,14 +90,6 @@ def retrieve():
                        '                                                                             ┃\n'
                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛')
 
-    version_description = ('           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           \n'
-                           '           ☐               ☐   snowy-trees v0.2   ☐               ☐           \n'
-                           '           ☐               ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐               ☐           \n'
-                           '           ☐                                                      ☐           \n'
-                           '           ☐ Check out if there are any new releases for this at: ☐           \n'
-                           '           ☐     https://github.com/Mas9311/snowy-trees/releases  ☐           \n'
-                           '           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           ')
-
     parser = argparse.ArgumentParser(usage=py_cmd + ' [options]                                              ┃',
                                      description=cmd_description,
                                      add_help=False,
@@ -218,6 +210,14 @@ def retrieve():
                               'Use this only to debug. Prints out (in pixels) which       '
                               'dimension of the GUI (width, height, x, y) was altered.    '
                               'No additional argument needed => Sets the verbose to True.'))
+
+    version_description = ('           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           \n'
+                           '           ☐               ☐   snowy-trees v0.2   ☐               ☐           \n'
+                           '           ☐               ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐               ☐           \n'
+                           '           ☐                                                      ☐           \n'
+                           '           ☐ Check out if there are any new releases for this at: ☐           \n'
+                           '           ☐     https://github.com/Mas9311/snowy-trees/releases  ☐           \n'
+                           '           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           ')
 
     parser.add_argument('-v', '--version',
                         action='version',
