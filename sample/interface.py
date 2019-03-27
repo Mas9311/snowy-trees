@@ -2,7 +2,7 @@ import time
 # from tkinter.font import Font
 from tkinter import *
 
-from sample import Tree, parameters
+from sample import file_helper, parameters, Tree
 
 
 def run_interface():
@@ -98,14 +98,14 @@ class ToolbarFrame(Frame):
 
         self._font = None
         self.toolbar_buttons = None
-        self._defined = ['options', 'fonts']
+        self._defined = ['options', 'fonts', 'save']
         self.opened_frame = None
 
         self._create()
 
     def _create(self):
         self.set_font()
-        self._toolbar = ToolbarButtonsFrame(self)
+        self.toolbar_buttons = ToolbarButtonsFrame(self)
 
     def set_font(self, value=None):
         new_font_key = (value, self.gui.tree.arg_dict['toolbar'])[value is None]
@@ -114,6 +114,7 @@ class ToolbarFrame(Frame):
         if value is not None:
             self.gui.tree.arg_dict['toolbar'] = new_font_key
             self.opened_frame.update_font(new_font_key)
+            self.toolbar_buttons.set_font(new_font_key)
 
     def close_frame(self):
         if self.opened_frame is not None:
@@ -154,13 +155,16 @@ class ToolbarButtonsFrame(Frame):
                                         highlightthickness=0, text=_text, command=_command)
             self.buttons[curr].grid(row=0, column=index, sticky=NW + SE)
 
-    def set_font(self):
+    def set_font(self, value=None):
+        new_font_key = (value, self.gui.tree.arg_dict['toolbar'])[value is None]
+        self._font = parameters.font_dict()['toolbar'][new_font_key]
         for key in self.buttons.keys():
             self.buttons[key].config(font=self._font)
 
     def set_configurations(self):
         self.configurations['options'] = {'text_string': 'Options', 'command': self.click_options}
         self.configurations['fonts'] = {'text_string': 'Fonts', 'command': self.click_view}
+        self.configurations['save'] = {'text_string': 'Save', 'command': self.click_save}
 
     def click_options(self):
         is_closed = False if type(self.parent.opened_frame) is OptionsFrame else True
@@ -175,6 +179,13 @@ class ToolbarButtonsFrame(Frame):
         if is_closed:
             # opens the FontsFrame and sets the 'view' boolean to True
             self.parent.opened_frame = FontsFrame(self)
+
+    def click_save(self):
+        is_closed = False if type(self.parent.opened_frame) is SaveFrame else True
+        self.parent.close_frame()
+        if is_closed:
+            # opens the FontsFrame and sets the 'view' boolean to True
+            self.parent.opened_frame = SaveFrame(self)
 
 
 class FontsFrame(Frame):
@@ -298,7 +309,7 @@ class FontsFrame(Frame):
 class OptionsFrame(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
-        self.pack(side=BOTTOM, fill=X, expand=True)  #.grid(row=1, column=0, sticky=NW + SE, fill=X, expand=True)
+        self.pack(side=BOTTOM, fill=X, expand=True)  # .grid(row=1, column=0, sticky=NW + SE, fill=X, expand=True)
 
         self.parent = parent
         self.gui = self.parent.gui
@@ -448,6 +459,37 @@ class OptionsFrame(Frame):
             print_change('Ornaments', before, self.ornaments_bool)
 
 
+class SaveFrame(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
+        self.pack(side=BOTTOM, fill=X, expand=True)  # .grid(row=1, column=0, sticky=NW + SE, fill=X, expand=True)
+
+        self.parent = parent
+        self.gui = self.parent.gui
+
+        self._font = self.gui.toolbar_frame.get_font()
+        self.save_label = None
+        self.save_entry = None
+
+        self.create()
+
+    def create(self):
+        self.create_save_label(1)
+        self.create_save_text(2)
+
+    def create_save_label(self, _row):
+        self.save_label = Label(self, text='Save the current configs as:', bg='#aaaaaa', fg='#3d008e',
+                                highlightthickness=0, font=self._font)
+        self.save_label.grid(row=_row, column=0, sticky=NW + SE)
+
+    def create_save_text(self, _row):
+        self.save_entry = Entry(self, bg='#aaaaaa', fg='#3d008e', width=18,
+                                highlightthickness=0, font=self._font)
+        self.save_entry.bind("<Return>", (lambda event:
+                                          file_helper.export_file_as(self.save_entry.get(), self.gui.tree.arg_dict)))
+        self.save_entry.grid(row=_row, column=0, sticky=NW)
+
+
 class Textbox(Text):
     def __init__(self, parent):
         Text.__init__(self, parent, fg='green', background='black', wrap='none', highlightthickness=0)
@@ -487,6 +529,7 @@ class GUI(Frame):
         self.pack(fill=BOTH, expand=True)
         self.root = parent
         self.root.configure(bd=0)
+        self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='./assets/icons/tree_icon.png'))
 
         # creates the template of the Tree to print; snow & ornaments are unique upon printing.
         self.tree = Tree.Tree(parameters.retrieve())
