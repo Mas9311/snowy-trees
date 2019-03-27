@@ -534,8 +534,8 @@ class GUI(Frame):
         self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
 
         if self.tree.arg_dict['verbose']:
-            print_change('\tgui width', before_w, self.w_dim)
-            print_change('\tgui height', before_h, self.h_dim)
+            print_change('\t   gui width', before_w, self.w_dim)
+            print_change('\t  gui height', before_h, self.h_dim)
             print_change('\tgui x offset', before_x, self.x_dim)
             print_change('\tgui y offset', before_y, self.y_dim)
 
