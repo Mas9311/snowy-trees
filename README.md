@@ -1,5 +1,6 @@
 # Random Snow and Happy Trees #
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![image](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/downloads/)
 
 I originally made this little loop to minimize the light emitted from a monitor at night.<br>
