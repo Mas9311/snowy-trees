@@ -98,7 +98,7 @@ class ToolbarFrame(Frame):
 
         self._font = None
         self.toolbar_buttons = None
-        self._defined = ['options', 'view']
+        self._defined = ['options', 'fonts']
         self.opened_frame = None
 
         self._create()
@@ -117,8 +117,8 @@ class ToolbarFrame(Frame):
 
     def close_frame(self):
         if self.opened_frame is not None:
-            self.opened_frame.grid_forget()
-            # self.opened_frame.pack_forget()
+            # self.opened_frame.grid_forget()
+            self.opened_frame.pack_forget()
             self.opened_frame = None
 
     def get_font(self):
@@ -131,13 +131,12 @@ class ToolbarFrame(Frame):
 class ToolbarButtonsFrame(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent, bg='black', highlightthickness=0)
-        self.grid(row=0, column=0, sticky=NW + SE)
+        self.pack(side=TOP, fill=X, expand=True)  # .grid(row=0, column=0, sticky=NW + SE)
 
         self.parent = parent
         self.gui = self.parent.gui
 
         self._font = self.parent.get_font()
-        self._defined = self.parent.get_defined()
         self.buttons = {}
         self.configurations = {}
 
@@ -147,7 +146,7 @@ class ToolbarButtonsFrame(Frame):
         self.set_font()
         self.set_configurations()
 
-        for index, curr in enumerate(self._defined):
+        for index, curr in enumerate(self.parent.get_defined()):
             _text = self.configurations[curr]['text_string']
             _command = self.configurations[curr]['command']
             self.buttons[curr] = Button(self, font=self._font, bg='#000000', fg='#ffffff',
@@ -160,28 +159,28 @@ class ToolbarButtonsFrame(Frame):
             self.buttons[key].config(font=self._font)
 
     def set_configurations(self):
-        self.configurations['options'] = {'text_string': 'options', 'command': self.click_options}
-        self.configurations['view'] = {'text_string': 'view', 'command': self.click_view}
+        self.configurations['options'] = {'text_string': 'Options', 'command': self.click_options}
+        self.configurations['fonts'] = {'text_string': 'Fonts', 'command': self.click_view}
 
     def click_options(self):
-        is_open = False if type(self.parent.opened_frame) is OptionsFrame else True
+        is_closed = False if type(self.parent.opened_frame) is OptionsFrame else True
         self.parent.close_frame()
-        if is_open:
+        if is_closed:
             # opens the OptionsFrame and sets the 'options' boolean to True
             self.parent.opened_frame = OptionsFrame(self)
 
     def click_view(self):
-        is_open = False if type(self.parent.opened_frame) is ViewFrame else True
+        is_closed = False if type(self.parent.opened_frame) is FontsFrame else True
         self.parent.close_frame()
-        if is_open:
-            # opens the ViewFrame and sets the 'view' boolean to True
-            self.parent.opened_frame = ViewFrame(self)
+        if is_closed:
+            # opens the FontsFrame and sets the 'view' boolean to True
+            self.parent.opened_frame = FontsFrame(self)
 
 
-class ViewFrame(Frame):
+class FontsFrame(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
-        self.grid(row=1, column=0, sticky=NW + SE)
+        self.pack(side=BOTTOM, fill=X, expand=True)  # .grid(row=1, column=0, sticky=NW + SE, fill=X, expand=True)
 
         self.parent = parent
         self.gui = self.parent.gui
@@ -230,12 +229,12 @@ class ViewFrame(Frame):
         self.toolbar_scale.config(font=self._font)
         self.windows_label.config(font=self._font)
         self.windows_scale.config(font=self._font)
-        # print('ViewFrame: Changed font on all visible toolbar children')
+        # print('FontsFrame: Changed font on all visible toolbar children')
 
     def set_view_textbox(self, _row):
-        self.textbox_label = Label(self, text='Textbox Font Size', bg='#aaaaaa', fg='#3d008e',
+        self.textbox_label = Label(self, text='Textbox', bg='#aaaaaa', fg='#3d008e',
                                    highlightthickness=0, font=self._font, relief=FLAT)
-        self.textbox_label.grid(row=_row, column=0, sticky=NW + SE)
+        self.textbox_label.grid(row=_row, column=0, sticky=NW + SE)  # .pack(side=TOP, fill=X, expand=True)
 
         self.textbox_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                    bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
@@ -245,7 +244,7 @@ class ViewFrame(Frame):
         self.textbox_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_view_toolbar(self, _row):
-        self.toolbar_label = Label(self, text='Toolbar Font Size', bg='#333333', fg='#00d165',
+        self.toolbar_label = Label(self, text='Toolbar', bg='#333333', fg='#00d165',
                                    highlightthickness=0, font=self._font, relief=FLAT)
         self.toolbar_label.grid(row=_row, column=0, sticky=NW + SE)
 
@@ -257,7 +256,7 @@ class ViewFrame(Frame):
         self.toolbar_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_view_windows(self, _row):
-        self.windows_label = Label(self, text='Windows Font Size', bg='#aaaaaa', fg='#3d008e',
+        self.windows_label = Label(self, text='Window Manager', bg='#aaaaaa', fg='#3d008e',
                                    highlightthickness=0, font=self._font, relief=FLAT)
         self.windows_label.grid(row=_row, column=0, sticky=NW + SE)
 
@@ -299,7 +298,7 @@ class ViewFrame(Frame):
 class OptionsFrame(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
-        self.grid(row=1, column=0)  # .pack(side=BOTTOM)
+        self.pack(side=BOTTOM, fill=X, expand=True)  #.grid(row=1, column=0, sticky=NW + SE, fill=X, expand=True)
 
         self.parent = parent
         self.gui = self.parent.gui
