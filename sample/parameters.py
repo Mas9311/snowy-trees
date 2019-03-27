@@ -6,7 +6,7 @@ import time
 import numpy as np
 import sys
 
-from sample import Tree
+from sample import file_helper, Tree
 
 py_cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
 
@@ -202,6 +202,16 @@ def retrieve():
                               'These are the − + × buttons located at the top-right.      '
                               'Valid choices are [%(choices)s]'))
 
+    parser.add_argument('-f', '--file',
+                        type=str,
+                        default='',
+                        metavar='',
+                        dest='file',
+                        help=('FILE name to import configurations: (default=%(default)s)          '
+                              'Once you have saved the configurations to a file, you can  '
+                              'now import those instead of typing all the arguments.      '
+                              'Filename must be valid to be imported.'))
+
     parser.add_argument('--verbose',
                         action='store_true',
                         default=defaults['verbose'],
@@ -229,21 +239,26 @@ def retrieve():
                         help='HELP message is displayed (this is the message), then exits')
 
     known_args, unknown_args = parser.parse_known_args()
+    arg_dict = {}
 
-    # converts the arguments from a Namespace type => dictionary
-    arg_dict = {
-        'width': known_args.width,
-        'speed': known_args.speed,
-        'density': known_args.density,
-        'tiers': known_args.tiers,
-        'ornaments': known_args.ornaments,
-        'interface': known_args.interface,
-        'length': known_args.length,
-        'textbox': known_args.textbox,
-        'toolbar': known_args.toolbar,
-        'windows': known_args.windows,
-        'verbose': known_args.verbose
-    }
+    if known_args.file:
+        arg_dict = file_helper.import_from_file(known_args.file)
+
+    if not arg_dict:
+        # converts the arguments from a Namespace type => dictionary
+        arg_dict = {
+            'interface': known_args.interface,
+            'width': known_args.width,
+            'speed': known_args.speed,
+            'density': known_args.density,
+            'tiers': known_args.tiers,
+            'ornaments': known_args.ornaments,
+            'length': known_args.length,
+            'textbox': known_args.textbox,
+            'toolbar': known_args.toolbar,
+            'windows': known_args.windows,
+            'verbose': known_args.verbose
+        }
 
     if unknown_args:  # user added unknown args, so print the --help screen and exit
         parser.print_help()
