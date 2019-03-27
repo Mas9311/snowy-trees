@@ -231,7 +231,8 @@ def retrieve():
                 'length': known_args.length,
                 'textbox': known_args.textbox,
                 'toolbar': known_args.toolbar,
-                'windows': known_args.windows}
+                'windows': known_args.windows,
+                'verbose': False}
 
     if unknown_args:
         # user added unknown args, so print the --help screen

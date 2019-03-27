@@ -465,6 +465,7 @@ class GUI(Frame):
         self.pack(fill=BOTH, expand=True)
         self.root = parent
         self.root.configure(bd=0)
+        self.busy = False
 
         # creates the template of the Tree to print; snow & ornaments are unique upon printing.
         self.tree = Tree.Tree(parameters.retrieve())
@@ -475,7 +476,7 @@ class GUI(Frame):
         self._create()
 
         self.update_idletasks()
-        self.w_dim = (self.tree.screen_width + self.tree.make_even + 2) * 6
+        self.w_dim = self._convert_width_to_pixels()
         if self.tree.arg_dict['textbox'] == 'small':
             self.h_dim = ((48 * self.tree.tree_tiers) + 53) * 2
         elif self.tree.arg_dict['textbox'] == 'medium':
@@ -487,6 +488,16 @@ class GUI(Frame):
 
         self.textbox.print_trees_now()  # immediately fills the current GUI window with trees
         self.textbox.run_gui()  # continue execution
+
+    def _convert_width_to_pixels(self):
+        value = (self.tree.screen_width + self.tree.make_even) * 6
+        # print('pixels:', value)
+        return round(value)
+
+    def _convert_pixels_to_width(self):
+        value = self.w_dim // 6
+        # print('width:', value)
+        return value  # round(value)  # + self.tree.make_even
 
     def _create(self):
         self.textbox = Textbox(self)
@@ -500,26 +511,41 @@ class GUI(Frame):
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def set_screen_width(self):
-        before = self.tree.screen_width
-        self.reset_tree('width', max(self.w_dim // 6 - 2, self.tree.tree_width + 1))
-        print_change('Window Width', before, self.tree.screen_width)
+            before = self.tree.screen_width
+            self.reset_tree('width', self._convert_pixels_to_width())
+            print_change('Window Width', before, self.tree.screen_width)
 
     def reset_tree(self, key, value):
         self.tree.arg_dict[key] = value
         self.tree.update_parameters()
         self.textbox.print_trees_now()
 
-    def window_change(self, event):
+    def window_change(self, _):
         # TODO -v --verbose => prints the dimensions upon adjusting
-        # before = f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}'
+        if not self.busy:
+            self.busy = True
+        if self.tree.arg_dict['verbose']:
+            # print(event)
+            before_w = self.w_dim
+            before_h = self.h_dim
+            before_x = self.x_dim
+            before_y = self.y_dim
+
         self.w_dim = self.winfo_width()
-        if self.tree.screen_width is not self.w_dim // 6 - 2 and self.w_dim // 6 - 2 > self.tree.tree_width + 1:  # TODO
+        if self.tree.screen_width != self._convert_pixels_to_width():
             self.set_screen_width()
+
         self.h_dim = self.winfo_height()
         self.x_dim = self.winfo_rootx()
         self.y_dim = self.winfo_rooty()
         self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
-        # print_change('\tDimensions', before, f'{self.w_dim}x{self.h_dim}+{self.x_dim}+{self.y_dim}')
+
+        if self.tree.arg_dict['verbose']:
+            print_change('\tgui width', before_w, self.w_dim)
+            print_change('\tgui height', before_h, self.h_dim)
+            print_change('\tgui x offset', before_x, self.x_dim)
+            print_change('\tgui y offset', before_y, self.y_dim)
+        self.busy = False
 
 
 def print_change(type_of, before, after):

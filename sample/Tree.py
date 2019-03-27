@@ -37,7 +37,7 @@ class Tree:
         self.base_height = min(max(self.tree_tiers - 1, 1), 6)
         self.screen_width = max(self.arg_dict['width'], self.tree_width)
         self.screen_height = 1 + (1 + (6 + (4 * (self.tree_tiers - 1)) + self.base_height)) + 1
-        self.make_even = (1, 0)[(self.screen_width - self.tree_width) % 2 is 0]
+        self.make_even = 0 if (self.screen_width - self.tree_width) % 2 == 0 else 1
         self.sleep_time = parameters.speed_dict()[self.arg_dict['speed']]
         self.max_snow = parameters.density_dict()[self.arg_dict['density']]
         self.ornament_bool = self.arg_dict['ornaments']
