@@ -22,7 +22,8 @@ def default_settings():
         'textbox': 'medium',
         'toolbar': 'large',
         'windows': 'large',
-        'interface': True
+        'interface': True,
+        'verbose': False
     }
 
 
@@ -96,6 +97,14 @@ def retrieve():
                        ' Note: Configurable options can be chained together as shown with:           ┃\n'
                        '$ ' + py_cmd + ' -w --config -s --config -d --config -t --config             ┃\n'
                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛')
+
+    version_description = ('☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐\n'
+                           '☐               ☐   snowy-trees v0.2   ☐               ☐\n'
+                           '☐               ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐               ☐\n'
+                           '☐                                                      ☐\n'
+                           '☐ Check out if there are any new releases for this at: ☐\n'
+                           '☐     https://github.com/Mas9311/snowy-trees/releases  ☐\n'
+                           '☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐')
 
     parser = argparse.ArgumentParser(usage=py_cmd + ' [options]                                              ┃',
                                      description=cmd_description,
@@ -207,32 +216,39 @@ def retrieve():
                            dest='interface',
                            help='CLI printing of the tree. (default=%(default)s)')
 
-    vrs_description = ('                                                    \n'
-                       '              *   snowy-trees v1.0   *              \n'
-                       'Check out if there are any new releases for this at:\n'
-                       '\thttps://github.com/Mas9311/snowy-trees/releases')
+    parser.add_argument('--verbose',
+                        action='store_true',
+                        default=defaults['verbose'],
+                        dest='verbose',
+                        help=('VERBOSE GUI geometry changes: (default=%(default)s)              '
+                              'Use this only to debug. Prints out (in pixels) which       '
+                              'dimension of the GUI (width, height, x, y) was altered.    '
+                              'No additional argument needed => Sets the verbose to True.'))
+
     parser.add_argument('-v', '--version',
                         action='version',
-                        version=vrs_description)
+                        version=version_description)
 
     parser.add_argument('-h', '--help',
-                        metavar='',
-                        help='show this help message and exit')
+                        action='help',
+                        help='show this help message and exits')
 
     known_args, unknown_args = parser.parse_known_args()
 
     # converts the arguments from a Namespace type => dictionary
-    arg_dict = {'width': known_args.width,
-                'speed': known_args.speed,
-                'density': known_args.density,
-                'tiers': known_args.tiers,
-                'ornaments': known_args.ornaments,
-                'interface': known_args.interface,
-                'length': known_args.length,
-                'textbox': known_args.textbox,
-                'toolbar': known_args.toolbar,
-                'windows': known_args.windows,
-                'verbose': False}
+    arg_dict = {
+        'width': known_args.width,
+        'speed': known_args.speed,
+        'density': known_args.density,
+        'tiers': known_args.tiers,
+        'ornaments': known_args.ornaments,
+        'interface': known_args.interface,
+        'length': known_args.length,
+        'textbox': known_args.textbox,
+        'toolbar': known_args.toolbar,
+        'windows': known_args.windows,
+        'verbose': known_args.verbose
+    }
 
     if unknown_args:
         # user added unknown args, so print the --help screen
@@ -272,7 +288,7 @@ def print_welcome(parser):
     demo_flags = d_option + ' ' * (27 - len(py_cmd + d_option))
                                             # TODO
     print('╭┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┲━━━━━━┱┈┈┈┈╮\n'
-          '┊                     ╔════════════════════════════╗             ┃ v1.0 ┃    ┊\n'
+          '┊                     ╔════════════════════════════╗             ┃ v0.2 ┃    ┊\n'
           '┊                     ║   Welcome to Snowy Trees   ║             ┗━━━━━━┛    ┊\n'
           '┊                     ╚════════════════════════════╝                         ┊\n'
           '┊                                                                            ┊\n'
