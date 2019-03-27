@@ -9,7 +9,7 @@ def run_interface():
     my_tree = Tree.Tree(parameters.retrieve())
     if my_tree.arg_dict['interface']:
         root = Tk()
-        GUI(root)
+        GUI(root, my_tree)
         root.mainloop()
     else:
         app = CLI(my_tree)
@@ -98,7 +98,7 @@ class ToolbarFrame(Frame):
 
         self._font = None
         self.toolbar_buttons = None
-        self._defined = ['options', 'fonts', 'save']
+        self._defined = ['file', 'options', 'fonts']
         self.opened_frame = None
 
         self._create()
@@ -162,9 +162,16 @@ class ToolbarButtonsFrame(Frame):
             self.buttons[key].config(font=self._font)
 
     def set_configurations(self):
+        self.configurations['file'] = {'text_string': 'File', 'command': self.click_file}
         self.configurations['options'] = {'text_string': 'Options', 'command': self.click_options}
         self.configurations['fonts'] = {'text_string': 'Fonts', 'command': self.click_view}
-        self.configurations['save'] = {'text_string': 'Save', 'command': self.click_save}
+
+    def click_file(self):
+        is_closed = False if type(self.parent.opened_frame) is FileFrame else True
+        self.parent.close_frame()
+        if is_closed:
+            # opens the FontsFrame and sets the 'view' boolean to True
+            self.parent.opened_frame = FileFrame(self)
 
     def click_options(self):
         is_closed = False if type(self.parent.opened_frame) is OptionsFrame else True
@@ -180,12 +187,46 @@ class ToolbarButtonsFrame(Frame):
             # opens the FontsFrame and sets the 'view' boolean to True
             self.parent.opened_frame = FontsFrame(self)
 
-    def click_save(self):
-        is_closed = False if type(self.parent.opened_frame) is SaveFrame else True
-        self.parent.close_frame()
-        if is_closed:
-            # opens the FontsFrame and sets the 'view' boolean to True
-            self.parent.opened_frame = SaveFrame(self)
+
+class FileFrame(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
+        self.pack(side=BOTTOM, fill=X, expand=True)  # .grid(row=1, column=0, sticky=NW + SE, fill=X, expand=True)
+
+        self.parent = parent
+        self.gui = self.parent.gui
+
+        self._font = self.gui.toolbar_frame.get_font()
+        self._defined = ['save', 'open']
+        self.buttons = {}
+        self.opened_frame = None
+        self.save_description = None
+        self.save_label = None
+        self.save_entry = None
+
+        self.create()
+
+    def create(self):
+        self.create_save_label(1)
+        self.create_save_description(2)
+        self.create_save_text(3)
+
+    def create_save_label(self, _row):
+        self.save_label = Label(self, text='Save your configurations as:', bg='#aaaaaa', fg='#3d008e',
+                                highlightthickness=0, font=self._font)
+        self.save_label.grid(row=_row, column=0, sticky=NW + SE)
+
+    def create_save_description(self, _row):
+        self.save_description = Label(self, text='(omit filename extension)', bg='#aaaaaa', fg='#3d008e',
+                                      highlightthickness=0, font=self._font)
+        self.save_description.grid(row=_row, column=0, sticky=NW + SE)
+
+    def create_save_text(self, _row):
+        self.save_entry = Entry(self, bg='#aaaaaa', fg='#3d008e', width=28,
+                                highlightthickness=0, font=self._font)
+        self.save_entry.bind("<Return>", (lambda event:
+                                          file_helper.export_file_as(self.save_entry.get(), self.gui.tree.arg_dict)))
+        self.save_entry.grid(row=_row, column=0, sticky=NW)
 
 
 class FontsFrame(Frame):
@@ -459,37 +500,6 @@ class OptionsFrame(Frame):
             print_change('Ornaments', before, self.ornaments_bool)
 
 
-class SaveFrame(Frame):
-    def __init__(self, parent):
-        Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
-        self.pack(side=BOTTOM, fill=X, expand=True)  # .grid(row=1, column=0, sticky=NW + SE, fill=X, expand=True)
-
-        self.parent = parent
-        self.gui = self.parent.gui
-
-        self._font = self.gui.toolbar_frame.get_font()
-        self.save_label = None
-        self.save_entry = None
-
-        self.create()
-
-    def create(self):
-        self.create_save_label(1)
-        self.create_save_text(2)
-
-    def create_save_label(self, _row):
-        self.save_label = Label(self, text='Save the current configs as:', bg='#aaaaaa', fg='#3d008e',
-                                highlightthickness=0, font=self._font)
-        self.save_label.grid(row=_row, column=0, sticky=NW + SE)
-
-    def create_save_text(self, _row):
-        self.save_entry = Entry(self, bg='#aaaaaa', fg='#3d008e', width=18,
-                                highlightthickness=0, font=self._font)
-        self.save_entry.bind("<Return>", (lambda event:
-                                          file_helper.export_file_as(self.save_entry.get(), self.gui.tree.arg_dict)))
-        self.save_entry.grid(row=_row, column=0, sticky=NW)
-
-
 class Textbox(Text):
     def __init__(self, parent):
         Text.__init__(self, parent, fg='green', background='black', wrap='none', highlightthickness=0)
@@ -524,15 +534,16 @@ class Textbox(Text):
 
 
 class GUI(Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, my_tree):
         Frame.__init__(self, parent)
         self.pack(fill=BOTH, expand=True)
         self.root = parent
         self.root.configure(bd=0)
+        # self.root.image = PhotoImage(file='./assets/icons/transparent.png')  # Prepare for Toolbar to be transparent
         self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='./assets/icons/tree_icon.png'))
 
         # creates the template of the Tree to print; snow & ornaments are unique upon printing.
-        self.tree = Tree.Tree(parameters.retrieve())
+        self.tree = my_tree
 
         self.textbox = None
         self.window_manager_frame = None
