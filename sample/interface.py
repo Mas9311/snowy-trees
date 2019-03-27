@@ -399,14 +399,14 @@ class OptionsFrame(Frame):
                                        font=self._font, relief=button_on, bg='#333333', fg='#00d165',
                                        activebackground='#333333', activeforeground='#00d165',
                                        command=lambda: self.set_ornaments(True))
-        self.opt_ornaments_on.grid(row=0, column=0, sticky=NW + SE, ipadx=1)
+        self.opt_ornaments_on.pack(side=LEFT, fill=X, expand=True)
 
         button_off = (RIDGE, FLAT)[self.ornaments_bool]
         self.opt_ornaments_off = Button(self.opt_ornaments_frame, text='Off', highlightthickness=0, width=6,
                                         font=self._font, relief=button_off, bg='#333333', fg='#00d165',
                                         activebackground='#333333', activeforeground='#00d165',
                                         command=lambda: self.set_ornaments(False))
-        self.opt_ornaments_off.grid(row=0, column=1, sticky=NW + SE, ipadx=1)
+        self.opt_ornaments_off.pack(side=LEFT, fill=X, expand=True)
 
     def set_speed(self, value):
         value = int(value)
