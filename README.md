@@ -1,6 +1,15 @@
-# Random Snow and Happy Trees #
+# Random Snow and Happy Trees
 
-[![image](https://img.shields.io/badge/python-3.x-blue.svg)](https://www.python.org/downloads/)
+<p align="center">
+  <a href="https://www.gnu.org/licenses/gpl-3.0">
+    <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"
+         alt="[License: GPL v3]" />
+  </a>
+  <a href="https://www.python.org/downloads/">
+    <img src="https://img.shields.io/badge/python-3.x-blue.svg"
+         alt="[python: 3.x]" />
+  </a>
+</p>
 
 I originally made this little loop to minimize the light emitted from a monitor at night.<br>
 The [CHRISTMA EXEC](https://en.wikipedia.org/wiki/Christmas_Tree_EXEC) worm from 1987 was the inspiration for the design and I have  added snow for effect.
