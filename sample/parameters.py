@@ -210,7 +210,8 @@ def retrieve():
                         help=('FILE name to import configurations: (default=%(default)s)          '
                               'Once you have saved the configurations to a file, you can  '
                               'now import those instead of typing all the arguments.      '
-                              'Filename must be valid to be imported.'))
+                              'Filename must be valid to be successfully imported.        '
+                              'Capitalization and extensions (.txt) are superfluous.'))
 
     parser.add_argument('--verbose',
                         action='store_true',
@@ -290,7 +291,6 @@ def print_welcome(parser):
     This almost seems counter-productive, but at the very least, the default width
     should not be used. Instead, the user is informed how to run the --config demo.
     After the Welcome screen is printed, it will print the --help option."""
-    demo_flags = py_cmd + ' --width --config'
 
     print('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┱──────────────────────────────────────╔══════╗─╮\n'
           '┃   Welcome to Snowy Trees   ┃                                      ║ v0.2 ║ │\n'
@@ -309,12 +309,16 @@ def print_welcome(parser):
           '│   arguments to help you find the "perfect" output.                         │\n'
           '│   They are {width, speed, density, tiers}                                  │\n'
           '│ To see the demo, type --config after one of the configurable arguments:    │\n'
-          '│$ ' + demo_flags + '                                           │\n'
+          '│$ ' + py_cmd + ' --width --config                                           │\n'
           '│   Note: demos can be chained together as shown in:                         │\n'
           '│$ ' + py_cmd + ' -w --config -s --config -d --config -t --config            │\n'
           '│                                                                            │\n'
           '│ The {textbox, toolbar, windows} fonts are for the GUI implementation only. │\n'
           '│                                                                            │\n'
+          '│                                                                            │\n'
+          '│ You can now SAVE your configurations into a file and load it during the    │\n'
+          '│   program execution, i.e.:                                                 │\n'
+          '│$ ' + py_cmd + ' -f tall_monitor                                            │\n'
           '╰────────────────────────────────────────────────────────────────────────────╯\n')
     input('Press [Enter] to print --help:\n>')
 
