@@ -22,7 +22,7 @@ def default_settings():
         'textbox': 'medium',
         'toolbar': 'large',
         'windows': 'large',
-        'interface': True,
+        'interface': False,
         'verbose': False
     }
 
@@ -83,33 +83,40 @@ def retrieve():
         sys.exit()
 
     defaults = default_settings()
-                                                        # TODO
+
     cmd_description = ('             ╔══════════════════════════════════════════════════╗            ┃\n'
                        '             ║   Loops a snowy tree much like a gif wallpaper   ║            ┃\n'
                        '             ╚══════════════════════════════════════════════════╝            ┃\n'
                        '                                                                             ┃\n'
-                       ' If you are unsure about what value to set an optional argument to, watch the┃\n'
-                       '    demonstration by typing --config after a configurable* argument.         ┃\n'
-                       '                                                                             ┃\n'
-                       ' Configurable* arguments include {width, speed, density, tiers}              ┃\n'
-                       '    To see the demo, type --config after one of the configurable arguments   ┃\n'
-                       '                                                                             ┃\n'
-                       ' Note: Configurable options can be chained together as shown with:           ┃\n'
-                       '$ ' + py_cmd + ' -w --config -s --config -d --config -t --config             ┃\n'
                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛')
 
-    version_description = ('☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐\n'
-                           '☐               ☐   snowy-trees v0.2   ☐               ☐\n'
-                           '☐               ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐               ☐\n'
-                           '☐                                                      ☐\n'
-                           '☐ Check out if there are any new releases for this at: ☐\n'
-                           '☐     https://github.com/Mas9311/snowy-trees/releases  ☐\n'
-                           '☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐')
+    version_description = ('           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           \n'
+                           '           ☐               ☐   snowy-trees v0.2   ☐               ☐           \n'
+                           '           ☐               ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐               ☐           \n'
+                           '           ☐                                                      ☐           \n'
+                           '           ☐ Check out if there are any new releases for this at: ☐           \n'
+                           '           ☐     https://github.com/Mas9311/snowy-trees/releases  ☐           \n'
+                           '           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           ')
 
     parser = argparse.ArgumentParser(usage=py_cmd + ' [options]                                              ┃',
                                      description=cmd_description,
                                      add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    interface = parser.add_mutually_exclusive_group(required=False)
+    interface.add_argument('-g', '--gui',
+                           action='store_true',
+                           default=defaults['interface'],
+                           dest='interface',
+                           help='GUI printing of the tree. (default=%(default)s)                   '
+                                'No additional argument needed.')
+
+    interface.add_argument('-c', '--cli',
+                           action='store_false',
+                           default=not defaults['interface'],
+                           dest='interface',
+                           help='CLI printing of the tree. (default=%(default)s)                  '
+                                'No additional argument needed.')
 
     parser.add_argument('-w', '--width',
                         type=int,
@@ -158,6 +165,21 @@ def retrieve():
                               'the random numbers for snow and ornament arrangement.      '
                               'Valid choices are only whole numbers >= %(default)s.'))
 
+    ornaments = parser.add_mutually_exclusive_group(required=False)
+    ornaments.add_argument('-y', '--yes',
+                           action='store_true',
+                           default=defaults['ornaments'],
+                           dest='ornaments',
+                           help='YES ornaments: (default=%(default)s)                              '
+                                'Ornaments will be displayed on the tree.')
+
+    ornaments.add_argument('-n', '--no',
+                           action='store_false',
+                           default=not defaults['ornaments'],
+                           dest='ornaments',
+                           help=('NO ornaments: (default=%(default)s)                              '
+                                 'Ornaments will not be displayed on the tree.'))
+
     parser.add_argument('-tf', '--textbox',
                         type=str,
                         default=defaults['textbox'],
@@ -188,34 +210,6 @@ def retrieve():
                               'These are the − + × buttons located at the top-right.      '
                               'Valid choices are [%(choices)s]'))
 
-    ornaments = parser.add_mutually_exclusive_group(required=False)
-    ornaments.add_argument('-y', '--yes',
-                           action='store_true',
-                           default=defaults['ornaments'],
-                           dest='ornaments',
-                           help='YES ornaments: (default=%(default)s)                              '
-                                'Ornaments will be displayed on the tree.')
-
-    ornaments.add_argument('-n', '--no',
-                           action='store_false',
-                           default=not defaults['ornaments'],
-                           dest='ornaments',
-                           help=('NO ornaments: (default=%(default)s)                              '
-                                 'Ornaments will not be displayed on the tree.'))
-
-    interface = parser.add_mutually_exclusive_group(required=False)
-    interface.add_argument('-g', '--gui',
-                           action='store_true',
-                           default=defaults['interface'],
-                           dest='interface',
-                           help='GUI printing of the tree. (default=%(default)s)')
-
-    interface.add_argument('-c', '--cli',
-                           action='store_false',
-                           default=not defaults['interface'],
-                           dest='interface',
-                           help='CLI printing of the tree. (default=%(default)s)')
-
     parser.add_argument('--verbose',
                         action='store_true',
                         default=defaults['verbose'],
@@ -231,7 +225,8 @@ def retrieve():
 
     parser.add_argument('-h', '--help',
                         action='help',
-                        help='show this help message and exits')
+                        default=argparse.SUPPRESS,
+                        help='HELP message is displayed (this is the message), then exits')
 
     known_args, unknown_args = parser.parse_known_args()
 
@@ -250,8 +245,7 @@ def retrieve():
         'verbose': known_args.verbose
     }
 
-    if unknown_args:
-        # user added unknown args, so print the --help screen
+    if unknown_args:  # user added unknown args, so print the --help screen and exit
         parser.print_help()
         print()
         if len(unknown_args) is 1:
@@ -262,8 +256,7 @@ def retrieve():
         parser.parse_args()  # prints error message and stops execution
         raise Exception('Unknown arguments')  # redundantly raised an Exception to ensure failure
 
-    if len(sys.argv) == 1:
-        # no arguments were provided, print the welcome screen
+    if len(sys.argv) == 1:  # no arguments passed => print the welcome screen
         print_welcome(parser)
 
     return arg_dict
@@ -282,37 +275,41 @@ def print_welcome(parser):
     This almost seems counter-productive, but at the very least, the default width
     should not be used. Instead, the user is informed how to run the --config demo.
     After the Welcome screen is printed, it will print the --help option."""
-    h_option = ' --help'
-    d_option = ' -w --config'
-    help_flags = h_option + ' ' * (27 - len(py_cmd + h_option))
-    demo_flags = d_option + ' ' * (27 - len(py_cmd + d_option))
-                                            # TODO
-    print('╭┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┲━━━━━━┱┈┈┈┈╮\n'
-          '┊                     ╔════════════════════════════╗             ┃ v0.2 ┃    ┊\n'
-          '┊                     ║   Welcome to Snowy Trees   ║             ┗━━━━━━┛    ┊\n'
-          '┊                     ╚════════════════════════════╝                         ┊\n'
-          '┊                                                                            ┊\n'
-          '┊ You do not have any additional arguments, so this is intended to inform    ┊\n'
-          '┊    you how to access the *Configurable* options.                           ┊\n'
-          '┊                                                                            ┊\n'
-          '┊ If you ever need help, just type -h or --help, such as                     ┊\n'
-          '┊$ ' + py_cmd + help_flags + '                                               ┊\n'
-          '┊                                                                            ┊\n'
-          '┊ *Configurable* arguments include {width, speed, density, tiers}            ┊\n'
-          '┊    To see the demo, type --config after one of the configurable arguments  ┊\n'
-          '┊$ ' + py_cmd + demo_flags + '                                               ┊\n'
-          '┊                                                                            ┊\n'
-          '┊    The --config argument will give you a short demonstration in order to   ┊\n'
-          '┊    better prepare you for the intended argument\'s configurable value.      ┊\n'
-          '╰┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈╯')
-    input('\nPress [Enter] to print --help:\n>')
+    demo_flags = py_cmd + ' --width --config'
+
+    print('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┱──────────────────────────────────────╔══════╗─╮\n'
+          '┃   Welcome to Snowy Trees   ┃                                      ║ v0.2 ║ │\n'
+          '┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                      ╚══════╝ │\n'
+          '│                                                                            │\n'
+          '│                                                                            │\n'
+          '│ No additional arguments passed, so here is the intro welcome message!      │\n'
+          '│ The purpose is to show you how to configure the arguments.                 │\n'
+          '│ The next screen is the --help menu to show you the arguments available.    │\n'
+          '│                                                                            │\n'
+          '│ First, you have to decide if you want the GUI or CLI implementation.       │\n'
+          '│   - GUI is a configurable pop-up window (recommended).                     │\n'
+          '│   - CLI is in Terminal, so you will need to manually configure and rerun.  │\n'
+          '│                                                                            │\n'
+          '│ If you wish to use the CLI implementation, there are 4 configurable        │\n'
+          '│   arguments to help you find the "perfect" output.                         │\n'
+          '│   They are {width, speed, density, tiers}                                  │\n'
+          '│ To see the demo, type --config after one of the configurable arguments:    │\n'
+          '│$ ' + demo_flags + '                                           │\n'
+          '│   Note: demos can be chained together as shown in:                         │\n'
+          '│$ ' + py_cmd + ' -w --config -s --config -d --config -t --config            │\n'
+          '│                                                                            │\n'
+          '│ The {textbox, toolbar, windows} fonts are for the GUI implementation only. │\n'
+          '│                                                                            │\n'
+          '╰────────────────────────────────────────────────────────────────────────────╯\n')
+    input('Press [Enter] to print --help:\n>')
 
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓')
     parser.print_help()
+
     run_with = ''
     for k in ['width', 'speed', 'density', 'tiers', 'ornaments', 'length']:
         run_with += f'\t{k}: {default_settings()[k]}\n'
-    input(f'\nPress [Enter] to run with cli with the default Tree of:\n{run_with}\n>')
+    input(f'\nPress [Enter] to run with cli with the default Tree of:\n{run_with}>')
     print()
 
 
