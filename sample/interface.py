@@ -465,7 +465,6 @@ class GUI(Frame):
         self.pack(fill=BOTH, expand=True)
         self.root = parent
         self.root.configure(bd=0)
-        self.busy = False
 
         # creates the template of the Tree to print; snow & ornaments are unique upon printing.
         self.tree = Tree.Tree(parameters.retrieve())
@@ -490,14 +489,10 @@ class GUI(Frame):
         self.textbox.run_gui()  # continue execution
 
     def _convert_width_to_pixels(self):
-        value = (self.tree.screen_width + self.tree.make_even) * 6
-        # print('pixels:', value)
-        return round(value)
+        return (self.tree.screen_width + self.tree.make_even) * 6
 
     def _convert_pixels_to_width(self):
-        value = self.w_dim // 6
-        # print('width:', value)
-        return value  # round(value)  # + self.tree.make_even
+        return self.w_dim // 6
 
     def _create(self):
         self.textbox = Textbox(self)
@@ -522,8 +517,6 @@ class GUI(Frame):
 
     def window_change(self, _):
         # TODO -v --verbose => prints the dimensions upon adjusting
-        if not self.busy:
-            self.busy = True
         if self.tree.arg_dict['verbose']:
             # print(event)
             before_w = self.w_dim
@@ -545,7 +538,6 @@ class GUI(Frame):
             print_change('\tgui height', before_h, self.h_dim)
             print_change('\tgui x offset', before_x, self.x_dim)
             print_change('\tgui y offset', before_y, self.y_dim)
-        self.busy = False
 
 
 def print_change(type_of, before, after):
