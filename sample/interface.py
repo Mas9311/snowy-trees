@@ -433,16 +433,21 @@ class OptionsFrame(Frame):
 
 class Textbox(Text):
     def __init__(self, parent):
-        Text.__init__(self, parent, fg='green', background='black', wrap='none', highlightthickness=0,
-                      font=parameters.font_dict()['textbox'][parent.tree.arg_dict['textbox']])
+        Text.__init__(self, parent, fg='green', background='black', wrap='none', highlightthickness=0)
         self.pack(fill=BOTH, expand=True)
 
         self.gui = parent
 
+        self._font = None
+        self.set_font()
+
     def set_font(self, value=None):  # TODO {24, 19, 18, 17  |  0  |  -15 -11 -4 -3 -2})
         new_font_key = (value, self.gui.tree.arg_dict['textbox'])[value is None]
-        self.gui.textbox.configure(font=parameters.font_dict()['textbox'][new_font_key])
-        self.gui.tree.arg_dict['textbox'] = new_font_key
+        self._font = parameters.font_dict()['textbox'][new_font_key]
+        self.config(font=self._font)
+        # print('Textbox metrics:\t', self._font.metrics())                        # TODO: test on [windows 10, mac OSX]
+        if value is not None:
+            self.gui.tree.arg_dict['textbox'] = new_font_key
 
     def print_trees_now(self):
         """Prints the (minimum + 1) number of trees in order to fill the height of the GUI window"""
@@ -516,9 +521,8 @@ class GUI(Frame):
         self.textbox.print_trees_now()
 
     def window_change(self, _):
-        # TODO -v --verbose => prints the dimensions upon adjusting
         if self.tree.arg_dict['verbose']:
-            # print(event)
+            # print(_)
             before_w = self.w_dim
             before_h = self.h_dim
             before_x = self.x_dim
@@ -526,6 +530,7 @@ class GUI(Frame):
 
         self.w_dim = self.winfo_width()
         if self.tree.screen_width != self._convert_pixels_to_width():
+            # does not reset tree for every pixel change in width
             self.set_screen_width()
 
         self.h_dim = self.winfo_height()
