@@ -1,5 +1,7 @@
 import os
 
+from sample import parameters
+
 
 def get_folder():
     return os.path.join(os.getcwd(), 'config_files')
@@ -22,28 +24,60 @@ def file_exists(name):
 
 def export_file_as(name, arg_dict):
     make_sure_dir_exists()
-    print('Saving current configurations to file', name)
-    filepath = os.path.join(get_folder(), f'{name}.txt')
+
+    filename = format_filename(name)
+    filepath = os.path.join(get_folder(), filename)
     with open(filepath, 'w') as export_f:
         for key in arg_dict.keys():
             export_f.write(f'{key}\t{arg_dict[key]}\n')
         export_f.close()
+    # print(f'Saved current configurations to \n{filepath}')
+    print(f'You can now run:\n'
+          f'$ {parameters.py_cmd} -f {name}\n'
+          f'to load the current configurations.')
 
 
 def import_from_file(name):
     arg_dict = {}
 
-    filepath = os.path.join(get_folder(), f'{name}.txt')  # TODO: strip the extension, .txt,  and lower()
-    ints = ['width', 'tiers', 'length']
+    filename = format_filename(name)
+    filepath = os.path.join(get_folder(), filename)
+    # print(filepath)
     if file_exists(filepath):
         with open(filepath, 'r') as import_f:
             lines = import_f.read().splitlines()
             for line in lines:
-                print(line)
                 key, value = line.split('\t')
-                if key in ints:
-                    value = int(value)
-                arg_dict[key] = value
+                arg_dict[key] = str_to_type(key, value)
             import_f.close()
+        print(f'\'{filename}\' file successfully loaded!')
+    else:
+        input(f'\'{filename}\' file loading failed ]:\n'
+              f'Press [Enter] to restore defaults.\n>')
 
     return arg_dict
+
+
+def format_filename(name):
+    name, *_ = name.split('.')
+    filename = f'{name.lower()}.txt'
+    return filename
+
+
+def str_to_type(key, value):
+    """Returns the correct type of value based on the key given.
+    'width',  'True'  => True
+    'length', '5'     => 5
+    'density', 'thin' => 'thin' """
+    ints = ['width', 'tiers', 'length']
+    booleans = ['interface', 'ornaments', 'verbose']
+
+    if key in ints:
+        return int(value)
+    elif key in booleans:
+        if value == 'True':
+            return True
+        else:
+            return False
+    else:
+        return value
