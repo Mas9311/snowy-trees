@@ -97,36 +97,15 @@ class ToolbarFrame(Frame):
         self.gui = parent
 
         self._font = None
+        self.toolbar_buttons = None
         self._defined = ['options', 'view']
-        self.buttons = {}
-        self.configurations = {}
-        self.frames = {}
-        self.bools = {}
+        self.opened_frame = None
 
         self._create()
 
     def _create(self):
-        self.set_configurations()
-
-        for curr in zip(range(len(self._defined)), self._defined):
-            self.bools[curr[1]] = False
-            _text = self.configurations[curr[1]]['text_string']
-            _command = self.configurations[curr[1]]['command']
-            self.buttons[curr[0]] = Button(self, font=self._font, bg='#000000', fg='#ffffff',
-                                           activebackground='#444444', activeforeground='#cccccc',
-                                           highlightthickness=0, text=_text, command=_command)
-            self.buttons[curr[0]].grid(row=0, column=curr[0], sticky=N + W + S)
-
-    def set_configurations(self):
         self.set_font()
-        self.configurations['options'] = {'text_string': 'options', 'command': self.click_options}
-        self.configurations['view'] = {'text_string': 'view', 'command': self.click_view}
-
-    def close_frames(self):
-        for key in self._defined:
-            if self.bools[key]:
-                self.frames[key].grid_forget()
-            self.bools[key] = False
+        self._toolbar = ToolbarButtonsFrame(self)
 
     def set_font(self, value=None):
         new_font_key = (value, self.gui.tree.arg_dict['toolbar'])[value is None]
@@ -134,41 +113,80 @@ class ToolbarFrame(Frame):
         # print('Toolbar metrics:\t', self._font.metrics())                        # TODO: test on [windows 10, mac OSX]
         if value is not None:
             self.gui.tree.arg_dict['toolbar'] = new_font_key
-            for key in self.buttons.keys():
-                self.buttons[key].config(font=self._font)
-            self.frames['view'].update_font(new_font_key)
+            self.opened_frame.update_font(new_font_key)
+
+    def close_frame(self):
+        if self.opened_frame is not None:
+            self.opened_frame.grid_forget()
+            # self.opened_frame.pack_forget()
+            self.opened_frame = None
 
     def get_font(self):
         return self._font
 
-    def click_options(self):
-        _curr = 'options'
-        is_open = not self.bools[_curr]
-        self.close_frames()
-        if is_open:
-            # opens the OptionsFrame and sets the 'options' boolean to True
-            self.frames[_curr] = OptionsFrame(self)
-            self.bools[_curr] = True
-
-    def click_view(self):
-        _curr = 'view'
-        is_open = not self.bools[_curr]
-        self.close_frames()
-        if is_open:
-            # opens the ViewFrame and sets the 'view' boolean to True
-            self.frames[_curr] = ViewFrame(self)
-            self.bools[_curr] = True
+    def get_defined(self):
+        return self._defined
 
 
-class ViewFrame(Frame):
+class ToolbarButtonsFrame(Frame):
     def __init__(self, parent):
         Frame.__init__(self, parent, bg='black', highlightthickness=0)
-        self.grid(row=1, column=0)
+        self.grid(row=0, column=0, sticky=NW + SE)
 
         self.parent = parent
         self.gui = self.parent.gui
 
         self._font = self.parent.get_font()
+        self._defined = self.parent.get_defined()
+        self.buttons = {}
+        self.configurations = {}
+
+        self.create()
+
+    def create(self):
+        self.set_font()
+        self.set_configurations()
+
+        for index, curr in enumerate(self._defined):
+            _text = self.configurations[curr]['text_string']
+            _command = self.configurations[curr]['command']
+            self.buttons[curr] = Button(self, font=self._font, bg='#000000', fg='#ffffff',
+                                        activebackground='#444444', activeforeground='#cccccc',
+                                        highlightthickness=0, text=_text, command=_command)
+            self.buttons[curr].grid(row=0, column=index, sticky=NW + SE)
+
+    def set_font(self):
+        for key in self.buttons.keys():
+            self.buttons[key].config(font=self._font)
+
+    def set_configurations(self):
+        self.configurations['options'] = {'text_string': 'options', 'command': self.click_options}
+        self.configurations['view'] = {'text_string': 'view', 'command': self.click_view}
+
+    def click_options(self):
+        is_open = False if type(self.parent.opened_frame) is OptionsFrame else True
+        self.parent.close_frame()
+        if is_open:
+            # opens the OptionsFrame and sets the 'options' boolean to True
+            self.parent.opened_frame = OptionsFrame(self)
+
+    def click_view(self):
+        is_open = False if type(self.parent.opened_frame) is ViewFrame else True
+        self.parent.close_frame()
+        if is_open:
+            # opens the ViewFrame and sets the 'view' boolean to True
+            self.parent.opened_frame = ViewFrame(self)
+
+
+class ViewFrame(Frame):
+    def __init__(self, parent):
+        Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
+        self.grid(row=1, column=0, sticky=NW + SE)
+
+        self.parent = parent
+        self.gui = self.parent.gui
+
+        self._font = self.gui.toolbar_frame.get_font()
 
         self.curr_textbox = None
         self.int_textbox = None
@@ -212,43 +230,43 @@ class ViewFrame(Frame):
         self.toolbar_scale.config(font=self._font)
         self.windows_label.config(font=self._font)
         self.windows_scale.config(font=self._font)
-        # print('ViewFrame: Changed font on all buttons in sight')
+        # print('ViewFrame: Changed font on all visible toolbar children')
 
     def set_view_textbox(self, _row):
         self.textbox_label = Label(self, text='Textbox Font Size', bg='#aaaaaa', fg='#3d008e',
                                    highlightthickness=0, font=self._font, relief=FLAT)
-        self.textbox_label.grid(row=_row, column=0, sticky=W + E)
+        self.textbox_label.grid(row=_row, column=0, sticky=NW + SE)
 
         self.textbox_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                    bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
                                    showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
                                    to=len(parameters.textbox_font_choices()), command=self.set_textbox)
         self.textbox_scale.set(self.int_textbox)
-        self.textbox_scale.grid(row=_row + 1, column=0, sticky=W + E)
+        self.textbox_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_view_toolbar(self, _row):
         self.toolbar_label = Label(self, text='Toolbar Font Size', bg='#333333', fg='#00d165',
                                    highlightthickness=0, font=self._font, relief=FLAT)
-        self.toolbar_label.grid(row=_row, column=0, sticky=W + E)
+        self.toolbar_label.grid(row=_row, column=0, sticky=NW + SE)
 
         self.toolbar_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                    bg='#333333', fg='#00d165', activebackground='#3d008e', troughcolor='#333333',
                                    showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
                                    to=len(parameters.toolbar_font_choices()), command=self.set_toolbar)
         self.toolbar_scale.set(self.int_toolbar)
-        self.toolbar_scale.grid(row=_row + 1, column=0, sticky=W + E)
+        self.toolbar_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_view_windows(self, _row):
         self.windows_label = Label(self, text='Windows Font Size', bg='#aaaaaa', fg='#3d008e',
                                    highlightthickness=0, font=self._font, relief=FLAT)
-        self.windows_label.grid(row=_row, column=0, sticky=W + E)
+        self.windows_label.grid(row=_row, column=0, sticky=NW + SE)
 
         self.windows_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                    bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
                                    showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
                                    to=len(parameters.windows_font_choices()), command=self.set_windows)
         self.windows_scale.set(self.int_windows)
-        self.windows_scale.grid(row=_row + 1, column=0, sticky=W + E)
+        self.windows_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_textbox(self, value):
         value = int(value)
@@ -280,13 +298,13 @@ class ViewFrame(Frame):
 
 class OptionsFrame(Frame):
     def __init__(self, parent):
-        Frame.__init__(self, parent, bg='black', highlightthickness=0)
-        self.grid(row=1, column=0)
+        Frame.__init__(self, parent.parent, bg='black', highlightthickness=0)
+        self.grid(row=1, column=0)  # .pack(side=BOTTOM)
 
         self.parent = parent
         self.gui = self.parent.gui
 
-        self._font = self.parent.get_font()
+        self._font = self.gui.toolbar_frame.get_font()
 
         # Assigns values to the options Frame sliders
         self.opt_speed_label = None
@@ -333,62 +351,62 @@ class OptionsFrame(Frame):
     def set_opt_speed(self, _row):
         self.opt_speed_label = Label(self, text='Refresh Speed', bg='#aaaaaa', fg='#3d008e',
                                      highlightthickness=0, font=self._font, relief=FLAT, width=16)
-        self.opt_speed_label.grid(row=_row, column=0, sticky=W + E)
+        self.opt_speed_label.grid(row=_row, column=0, sticky=NW + SE)
 
         self.opt_speed = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
                                showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
                                to=len(parameters.speed_choices()), command=self.set_speed)
         self.opt_speed.set(self.int_speed)
-        self.opt_speed.grid(row=_row + 1, column=0, sticky=W + E)
+        self.opt_speed.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_opt_density(self, _row):
         self.opt_density_label = Label(self, text='Snow Density', bg='#333333', fg='#00d165',
                                        highlightthickness=0, font=self._font, relief=FLAT)
-        self.opt_density_label.grid(row=_row, column=0, sticky=W + E)
+        self.opt_density_label.grid(row=_row, column=0, sticky=NW + SE)
 
         self.opt_density = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                  bg='#333333', fg='#00d165', activebackground='#3d008e', troughcolor='#333333',
                                  showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
                                  to=len(parameters.speed_choices()), command=self.set_density)
         self.opt_density.set(self.int_density)
-        self.opt_density.grid(row=_row + 1, column=0, sticky=W + E)
+        self.opt_density.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_opt_tiers(self, _row):
         self.opt_tiers_label = Label(self, text='Tree Tiers', bg='#aaaaaa', fg='#3d008e',
                                      highlightthickness=0, font=self._font, relief=FLAT)
-        self.opt_tiers_label.grid(row=_row, column=0, sticky=W + E)
+        self.opt_tiers_label.grid(row=_row, column=0, sticky=NW + SE)
 
         self.opt_tiers = Scale(self, label=None, font=self._font, bg='#aaaaaa', fg='#3d008e',
                                from_=1, to=13, bd=0, showvalue=0, orient=HORIZONTAL, relief=FLAT, highlightthickness=0,
                                activebackground='#00ff80', troughcolor='#aaaaaa', command=self.set_tiers)
         self.opt_tiers.set(self.int_tiers)
-        self.opt_tiers.grid(row=_row + 1, column=0, sticky=W + E)
+        self.opt_tiers.grid(row=_row + 1, column=0, sticky=NW + SE)
 
     def set_opt_ornaments(self, _row):
         self.opt_ornaments_label = Label(self, text='Ornaments', bg='#333333', fg='#00d165',
                                          highlightthickness=0, font=self._font, relief=FLAT)
-        self.opt_ornaments_label.grid(row=_row, column=0, sticky=W + E)
+        self.opt_ornaments_label.grid(row=_row, column=0, sticky=NW + SE)
 
         self.set_opt_ornaments_frame(_row + 1)
 
     def set_opt_ornaments_frame(self, _row):
         self.opt_ornaments_frame = Frame(self, bg='#ffffff')
-        self.opt_ornaments_frame.grid(row=_row, column=0, sticky=W + E)
+        self.opt_ornaments_frame.grid(row=_row, column=0, sticky=NW + SE)
 
         button_on = (FLAT, RIDGE)[self.ornaments_bool]
         self.opt_ornaments_on = Button(self.opt_ornaments_frame, text='On', highlightthickness=0, width=6,
                                        font=self._font, relief=button_on, bg='#333333', fg='#00d165',
                                        activebackground='#333333', activeforeground='#00d165',
                                        command=lambda: self.set_ornaments(True))
-        self.opt_ornaments_on.grid(row=0, column=0, sticky=N + E + W + S, ipadx=1)
+        self.opt_ornaments_on.grid(row=0, column=0, sticky=NW + SE, ipadx=1)
 
         button_off = (RIDGE, FLAT)[self.ornaments_bool]
         self.opt_ornaments_off = Button(self.opt_ornaments_frame, text='Off', highlightthickness=0, width=6,
                                         font=self._font, relief=button_off, bg='#333333', fg='#00d165',
                                         activebackground='#333333', activeforeground='#00d165',
                                         command=lambda: self.set_ornaments(False))
-        self.opt_ornaments_off.grid(row=0, column=1, sticky=N + E + W + S, ipadx=1)
+        self.opt_ornaments_off.grid(row=0, column=1, sticky=NW + SE, ipadx=1)
 
     def set_speed(self, value):
         value = int(value)
