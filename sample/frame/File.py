@@ -1,6 +1,6 @@
-from tkinter import Frame, BOTTOM, X, Label, NW, SE, Entry
+from tkinter import *
 
-from sample import file_helper
+from sample.file_helper import export_file_as
 
 
 class FileFrame(Frame):
@@ -42,5 +42,5 @@ class FileFrame(Frame):
         for _enter_button in ['<Return>', '<KP_Enter>']:
             self.save_entry.bind(_enter_button,
                                  (lambda event:
-                                  file_helper.export_file_as(self.save_entry.get(), self.gui.tree.arg_dict)))
+                                  export_file_as(self.save_entry.get(), self.gui.tree.arg_dict)))
         self.save_entry.grid(row=_row, column=0, sticky=NW)

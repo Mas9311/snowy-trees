@@ -1,6 +1,7 @@
 from tkinter import *
 
-from sample import parameters, format
+from sample.format import print_change
+from sample.parameters import font_dict, textbox_font_choices, toolbar_font_choices, windows_font_choices
 
 
 class FontsFrame(Frame):
@@ -31,15 +32,15 @@ class FontsFrame(Frame):
         self._create()
 
     def _create(self):
-        fonts = parameters.textbox_font_choices()
+        fonts = textbox_font_choices()
         self.int_textbox = fonts.index(self.gui.tree.arg_dict['textbox']) + 1
         self.curr_textbox = fonts[self.int_textbox - 1]
 
-        fonts = parameters.toolbar_font_choices()
+        fonts = toolbar_font_choices()
         self.int_toolbar = fonts.index(self.gui.tree.arg_dict['toolbar']) + 1
         self.curr_toolbar = fonts[self.int_toolbar - 1]
 
-        fonts = parameters.windows_font_choices()
+        fonts = windows_font_choices()
         self.int_windows = fonts.index(self.gui.tree.arg_dict['windows']) + 1
         self.curr_windows = fonts[self.int_windows - 1]
 
@@ -48,7 +49,7 @@ class FontsFrame(Frame):
         self.set_view_windows(5)
 
     def update_font(self, new_font_key):
-        self._font = parameters.font_dict()['toolbar'][new_font_key]
+        self._font = font_dict()['toolbar'][new_font_key]
         self.textbox_label.config(font=self._font)
         self.textbox_scale.config(font=self._font)
         self.toolbar_label.config(font=self._font)
@@ -65,7 +66,7 @@ class FontsFrame(Frame):
         self.textbox_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                    bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
                                    showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
-                                   to=len(parameters.textbox_font_choices()), command=self.set_textbox)
+                                   to=len(textbox_font_choices()), command=self.set_textbox)
         self.textbox_scale.set(self.int_textbox)
         self.textbox_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
@@ -77,7 +78,7 @@ class FontsFrame(Frame):
         self.toolbar_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                    bg='#333333', fg='#00d165', activebackground='#3d008e', troughcolor='#333333',
                                    showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
-                                   to=len(parameters.toolbar_font_choices()), command=self.set_toolbar)
+                                   to=len(toolbar_font_choices()), command=self.set_toolbar)
         self.toolbar_scale.set(self.int_toolbar)
         self.toolbar_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
@@ -89,7 +90,7 @@ class FontsFrame(Frame):
         self.windows_scale = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                    bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
                                    showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
-                                   to=len(parameters.windows_font_choices()), command=self.set_windows)
+                                   to=len(windows_font_choices()), command=self.set_windows)
         self.windows_scale.set(self.int_windows)
         self.windows_scale.grid(row=_row + 1, column=0, sticky=NW + SE)
 
@@ -98,24 +99,24 @@ class FontsFrame(Frame):
         if self.int_textbox != value:
             before = self.curr_textbox
             self.int_textbox = value
-            self.curr_textbox = parameters.textbox_font_choices()[self.int_textbox - 1]
+            self.curr_textbox = textbox_font_choices()[self.int_textbox - 1]
             self.gui.textbox.set_font(self.curr_textbox)
-            format.print_change('Textbox Font Size', before, self.curr_textbox)
+            print_change('Textbox Font Size', before, self.curr_textbox)
 
     def set_toolbar(self, value):
         value = int(value)
         if self.int_toolbar != value:
             before = self.curr_toolbar
             self.int_toolbar = value
-            self.curr_toolbar = parameters.toolbar_font_choices()[self.int_toolbar - 1]
+            self.curr_toolbar = toolbar_font_choices()[self.int_toolbar - 1]
             self.gui.toolbar_frame.set_font(self.curr_toolbar)
-            format.print_change('Toolbar Font Size', before, self.curr_toolbar)
+            print_change('Toolbar Font Size', before, self.curr_toolbar)
 
     def set_windows(self, value):
         value = int(value)
         if self.int_windows != value:
             before = self.curr_windows
             self.int_windows = value
-            self.curr_windows = parameters.windows_font_choices()[self.int_windows - 1]
+            self.curr_windows = windows_font_choices()[self.int_windows - 1]
             self.gui.window_manager_frame.set_font(self.curr_windows)
-            format.print_change('Windows Font Size', before, self.curr_windows)
+            print_change('Windows Font Size', before, self.curr_windows)

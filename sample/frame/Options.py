@@ -1,6 +1,8 @@
 from tkinter import *
 
-from sample import parameters, format
+# from sample import parameters, format
+from sample.format import print_change
+from sample.parameters import density_choices, speed_choices
 
 
 class OptionsFrame(Frame):
@@ -37,11 +39,11 @@ class OptionsFrame(Frame):
         self._create()
 
     def _create(self):
-        speeds = parameters.speed_choices()
+        speeds = speed_choices()
         self.int_speed = speeds.index(self.gui.tree.arg_dict['speed']) + 1
         self.curr_speed = speeds[self.int_speed - 1]
 
-        densities = parameters.density_choices()
+        densities = density_choices()
         self.int_density = densities.index(self.gui.tree.arg_dict['density']) + 1
         self.curr_density = densities[self.int_density - 1]
 
@@ -63,7 +65,7 @@ class OptionsFrame(Frame):
         self.opt_speed = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                bg='#aaaaaa', fg='#3d008e', activebackground='#00ff80', troughcolor='#aaaaaa',
                                showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
-                               to=len(parameters.speed_choices()), command=self.set_speed)
+                               to=len(speed_choices()), command=self.set_speed)
         self.opt_speed.set(self.int_speed)
         self.opt_speed.grid(row=_row + 1, column=0, sticky=NW + SE)
 
@@ -75,7 +77,7 @@ class OptionsFrame(Frame):
         self.opt_density = Scale(self, label=None, font=self._font, orient=HORIZONTAL, bd=0,
                                  bg='#333333', fg='#00d165', activebackground='#3d008e', troughcolor='#333333',
                                  showvalue=0, relief=FLAT, highlightthickness=0, from_=1,
-                                 to=len(parameters.speed_choices()), command=self.set_density)
+                                 to=len(speed_choices()), command=self.set_density)
         self.opt_density.set(self.int_density)
         self.opt_density.grid(row=_row + 1, column=0, sticky=NW + SE)
 
@@ -120,18 +122,18 @@ class OptionsFrame(Frame):
         if self.int_speed != value:
             before = self.curr_speed
             self.int_speed = value
-            self.curr_speed = parameters.speed_choices()[self.int_speed - 1]
+            self.curr_speed = speed_choices()[self.int_speed - 1]
             self.gui.reset_tree('speed', self.curr_speed)
-            format.print_change('Speed', before, self.curr_speed)
+            print_change('Speed', before, self.curr_speed)
 
     def set_density(self, value):
         value = int(value)
         if self.int_density != value:
             before = self.curr_density
             self.int_density = value
-            self.curr_density = parameters.density_choices()[self.int_density - 1]
+            self.curr_density = density_choices()[self.int_density - 1]
             self.gui.reset_tree('density', self.curr_density)
-            format.print_change('Density', before, self.curr_density)
+            print_change('Density', before, self.curr_density)
 
     def set_tiers(self, value):
         value = int(value)
@@ -139,7 +141,7 @@ class OptionsFrame(Frame):
             before = self.int_tiers
             self.int_tiers = value
             self.gui.reset_tree('tiers',  self.int_tiers)
-            format.print_change('Tiers', before, self.int_tiers)
+            print_change('Tiers', before, self.int_tiers)
 
     def set_ornaments(self, arg_bool):
         """Does not update if the currently-activated button is clicked again"""
@@ -153,4 +155,4 @@ class OptionsFrame(Frame):
             self.opt_ornaments_off.configure(relief=button_off)
 
             self.gui.reset_tree('ornaments', arg_bool)
-            format.print_change('Ornaments', before, self.ornaments_bool)
+            print_change('Ornaments', before, self.ornaments_bool)
