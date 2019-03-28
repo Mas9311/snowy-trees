@@ -57,8 +57,14 @@ class FileFrame(Frame):
         if self.opened_frame is not None:
             if self.gui.tree.arg_dict['verbose']:
                 *_, f_type = str(self.opened_frame).split('.!')
-                f_type = f'{f_type[0].upper()}{f_type[1:-5]}{f_type[-5].upper()}{f_type[-4:]}'
+                try:
+                    int(f_type[-1])
+                    f_type = f_type[:-1]
+                except:
+                    pass
+                f_type = f'{f_type[0].upper()}{f_type[1:-5]} button\'s {f_type[-5].upper()}{f_type[-4:]}'
                 print(f'Closing the {f_type}')
+
             self.opened_frame.pack_forget()
             self.opened_frame = None
 
@@ -134,6 +140,7 @@ class OpenFrame(Frame):
     def create_buttons(self, _row):
         self._files = list_config_files()
         if self._files:
+            print(self._files)
             self.create_open_label(_row)
             for i, file in enumerate(self._files, start=_row + 1):
                 temp = Button(self, font=self._font, text=file, anchor=W, width=10, highlightthickness=0,
@@ -153,4 +160,4 @@ class OpenFrame(Frame):
             self.gui.tree.arg_dict = new_dict
             self.gui.reset_tree(key='new file')
         else:
-            print('  ...But it has the same configurations as the current GUI')
+            print('  ...But it has the same configurations as the current GUI\n')
