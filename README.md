@@ -1,5 +1,9 @@
 # Random Snow and Happy Trees
-
+<p align="center">
+  <img src="/assets/icons/tree_icon.png"
+       alt="Snowy Tree icon"
+       height="80" />
+</p>
 <p align="center">
   <a href="https://www.gnu.org/licenses/gpl-3.0">
     <img src="https://img.shields.io/badge/License-GPLv3-blue.svg"
@@ -46,16 +50,14 @@ The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest w
  
    - Command: <code>xfce4-terminal --geometry=154x65+0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e 'python3 run.py -w 154 -s slow -d thin -t 4 -n'</code>
    - Working Directory: _/full/path/to/snowy-trees_
-   - Icon: <img src="/resources/icons/tree_icon.png"
+   - Icon: <img src="/assets/icons/tree_icon.png"
                  alt="Snowy Tree icon" 
-                 width="30" 
-                 height="30" /> which can be found in */snowy-trees-0.1/resources/icons/tree_icon.png*
+                 height="30" /> which can be found in */snowy-trees-0.2/assets/icons/tree_icon.png*
    
  Landscape monitors: 
  
    - Command: <code>xfce4-terminal --geometry=274x34-0+0 --maximize --hide-menubar --hide-toolbar --hide-scrollbar -e "python3 run.py -w 274 -s average -d heavy -t 6 -y"</code>
    - Working Directory: _/full/path/to/snowy-trees_
-   - Icon: <img src="/resources/icons/tree_icon.png"
+   - Icon: <img src="/assets/icons/tree_icon.png"
                  alt="Snowy Tree icon" 
-                 width="30" 
-                 height="30" /> which can be found in */snowy-trees-0.1/resources/icons/tree_icon.png*
+                 height="30" /> which can be found in */snowy-trees-0.2/assets/icons/tree_icon.png*
