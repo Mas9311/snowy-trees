@@ -22,8 +22,17 @@ def make_sure_dir_exists():
 
 
 def list_config_files():
-    """Returns the list of all configuration files in the folder (if it exists)."""
-    return os.listdir(get_folder()) if dir_exists() else []
+    """Returns the alphabetically-sorted list of all configuration files in the folder.
+    Returns an empty list if the folder or files within do not exist"""
+    if not dir_exists():
+        return []
+    unsorted = os.listdir(get_folder())
+    if not unsorted:
+        return []
+    sorted_list = []
+    for file in sorted(unsorted):
+        sorted_list.append(file)
+    return sorted_list
 
 
 def dir_exists():
