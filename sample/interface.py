@@ -224,8 +224,10 @@ class FileFrame(Frame):
     def create_save_text(self, _row):
         self.save_entry = Entry(self, bg='#aaaaaa', fg='#3d008e', width=28,
                                 highlightthickness=0, font=self._font)
-        self.save_entry.bind("<Return>", (lambda event:
-                                          file_helper.export_file_as(self.save_entry.get(), self.gui.tree.arg_dict)))
+        for _enter_button in ['<Return>', '<KP_Enter>']:
+            self.save_entry.bind(_enter_button,
+                                 (lambda event:
+                                  file_helper.export_file_as(self.save_entry.get(), self.gui.tree.arg_dict)))
         self.save_entry.grid(row=_row, column=0, sticky=NW)
 
 
@@ -539,7 +541,7 @@ class GUI(Frame):
         self.pack(fill=BOTH, expand=True)
         self.root = parent
         self.root.configure(bd=0)
-        # self.root.image = PhotoImage(file='./assets/icons/transparent.png')  # Prepare for Toolbar to be transparent
+        # self.root.image = PhotoImage(file='./assets/icons/transparent.png')  # ToolbarFrame bg will be transparent
         self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='./assets/icons/tree_icon.png'))
 
         # creates the template of the Tree to print; snow & ornaments are unique upon printing.
