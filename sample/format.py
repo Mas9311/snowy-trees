@@ -7,7 +7,7 @@ class Notification:
         - Prints in the body block of the Notification.
     Title message is centered, body messages are left-justified"""
     def __init__(self, messages):
-        self.default_len = 20
+        self.default_len = 10
         self.max_len = self.default_len
 
         self.title_side = '▓'
@@ -57,15 +57,25 @@ class Notification:
             self.max_len = max(self.max_len, line_len)
 
     def center_title(self):
-        """In the case of:
-            One of the body message lines are the longest,
-            That body message line is of an odd-number length
-            and the title message length is an even number,
-        Then:
-            Center the title message by increasing the max_len by 1."""
-        if self.max_len % 2 is 1 and len(self.title_m) % 2 is 0:
-            # print('center the title')
+        """There are two cases in which the title is off-center.
+        Is the title even?  Is the max_len even?
+        [NAND] 01 or 10 => modify to make the title centered.
+        00: No change. Both even.
+        01: Title message is odd, max_length is even.
+        10: Title message is even, max_length is odd.
+        11: No change. Both add."""
+        title_even = self.max_len % 2 is 0
+        max_len_even = len(self.title_m) % 2 is 0
+        # if title_even and max_len_even:
+        #     print('No Change: title=even, max_len=even')
+        if not title_even and max_len_even:
+            print('Add space to title_m: title=odd, max_len=even')
+            self.title_m += ' '
+        if title_even and not max_len_even:
+            print('Increase max_len: title=even, max_len=odd')
             self.max_len += 1
+        # if not title_even and not max_len_even:
+        #     print('No change: title=odd, max_len=odd')
 
     def create_title(self):
         top = f'{self.title_side}{self.title_top * (self.max_len - 2)}{self.title_side}\n'
@@ -125,3 +135,14 @@ class Notification:
         and no need to print(Notification)."""
         return(f'{self.title}'
                f'{self.body}')
+
+
+# if __name__ == '__main__':
+#     """There are 4 scenarios of when the title can be off-centered.
+#     The following Notifications test all 4 plus two where the title are the longest."""
+#     Notification(['body is longest!', 'The title is even @ 16', 'The body is even at 26', '', 'No change'])
+#     Notification(['body is longest', 'The title is odd at 15', 'The body is even at 26', '', '∴ max_len += 1'])
+#     Notification(['body is longest!', 'The title is even @ 16', 'The body is odd at 27!!', '', '∴ title_m += \' \''])
+#     Notification(['body is longest', 'The title is odd at 15', 'The body is odd at 27!!', '', 'No change'])
+#     Notification(['title is the longest!', 'title is odd @ 21', '', 'No change'])
+#     Notification(['title is the longest', 'title is even @ 20', '', 'No change'])
