@@ -135,9 +135,9 @@ class Notification:
     def __str__(self):
         """Printable form of the class.
         This method is called in constructor, so do not save the Notification variable
-        and no need to print(Notification)."""
-        return(f'{self.title}'
-               f'{self.body}')
+        and no need to print(Notification).
+        If body does not exist, does not print it."""
+        return f'{self.title}{self.body if self.body else ""}'
 
 
 def print_change(type_of, before, after):
