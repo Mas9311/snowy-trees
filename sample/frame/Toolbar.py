@@ -16,12 +16,14 @@ class ToolbarFrame(Frame):
         self._font = None
         self.toolbar_buttons = None
         self._defined = ['file', 'options', 'fonts']
+        self.colors = None
         self.opened_frame = None
 
         self._create()
 
     def _create(self):
         self.set_font()
+        self.set_colors()
         self.toolbar_buttons = ToolbarButtonsFrame(self)
 
     def set_font(self, value=None):
@@ -32,6 +34,31 @@ class ToolbarFrame(Frame):
             self.gui.tree.arg_dict['toolbar'] = new_font_key
             self.opened_frame.update_font(new_font_key)
             self.toolbar_buttons.set_font(new_font_key)
+
+    def set_colors(self):
+        """Order of Button backgrounds: Light Grey, Dark Grey, Black"""
+        self.colors = {
+            'bg': [
+                '#aaaaaa',
+                '#333333',
+                '#000000'
+            ],
+            'fg': [
+                '#3d008e',
+                '#00d165',
+                '#ffffff'
+            ],
+            'ab': [
+                '#00ff80',
+                '#3d008e',
+                '#444444'
+            ],
+            'af': [
+                '#aaaaaa',
+                '#333333',
+                '#cccccc'
+            ]
+        }
 
     def close_frame(self):
         if self.opened_frame is not None:
@@ -44,6 +71,15 @@ class ToolbarFrame(Frame):
 
     def get_defined(self):
         return self._defined
+
+    def get_color(self, key, index):
+        if index >= 0:
+            # Wants a colored
+            index = index % 2
+        else:
+            # Wants the black and white
+            index = 2
+        return self.colors[key][index]
 
 
 class ToolbarButtonsFrame(Frame):
