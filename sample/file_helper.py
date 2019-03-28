@@ -1,6 +1,5 @@
 import os
 
-# from sample.format import Notification, py_cmd
 from sample.format import Notification, py_cmd
 
 
@@ -13,7 +12,7 @@ def get_folder():
 def make_sure_dir_exists():
     """Creates the config_files folder if it does not exist."""
     configs = get_folder()
-    if not os.path.exists(configs):
+    if not dir_exists():
         os.mkdir(configs)
         Notification(['Created config_files folder',
                       'Your configuration files',
@@ -23,16 +22,19 @@ def make_sure_dir_exists():
 
 
 def list_config_files():
-    """Returns the list of all configuration files in the folder."""
-    files = os.listdir(get_folder())
-    # print(files)
-    return files
+    """Returns the list of all configuration files in the folder (if it exists)."""
+    return os.listdir(get_folder()) if dir_exists() else []
+
+
+def dir_exists():
+    """Returns True if the configuration folder exists."""
+    return os.path.exists(get_folder())
 
 
 def file_exists(filepath):
     """Returns a True if the file exists, False if it does not.
     Must give it the full path to the file."""
-    return os.path.exists(filepath)
+    return os.path.exists(filepath) if dir_exists() else False
 
 
 def strip_filename(name):
@@ -96,22 +98,26 @@ def import_from_file(name):
     a dictionary format. Equivalent to parameter's ArgumentParser arg_dict.
     Values are turned from strings into their respective data types."""
     arg_dict = {}
-
-    name = strip_filename(name)
-    filename = filename_with_extension(name)
-    filepath = os.path.join(get_folder(), filename)
-    # print(filepath)
-    if file_exists(filepath):
-        with open(filepath, 'r') as import_f:
-            lines = import_f.read().splitlines()
-            for line in lines:
-                key, value = line.split('\t')
-                arg_dict[key] = str_to_type(key, value)
-            import_f.close()
-        print(f'\'{filename}\' file successfully loaded!')
+    if dir_exists():
+        name = strip_filename(name)
+        filename = filename_with_extension(name)
+        filepath = os.path.join(get_folder(), filename)
+        # print(filepath)
+        if file_exists(filepath):
+            with open(filepath, 'r') as import_f:
+                lines = import_f.read().splitlines()
+                for line in lines:
+                    key, value = line.split('\t')
+                    arg_dict[key] = str_to_type(key, value)
+                import_f.close()
+            print(f'\'{filename}\' file successfully loaded!')
+        else:
+            Notification([f'File {name} does not exist',
+                          f'> [Enter] to continue execution.'])
     else:
-        Notification([f'File {name} does not exist',
-                      f'> [Enter] to continue execution.'])
+        Notification('Folder does not yet exist')
+
+    if not arg_dict:
         input('> ')
 
     return arg_dict
