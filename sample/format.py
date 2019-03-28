@@ -1,3 +1,6 @@
+import platform
+
+
 class Notification:
     """Prints a Notification to the Terminal, so don't print it yourself.
     The message is surrounded with characters to help it stand out.
@@ -135,6 +138,16 @@ class Notification:
         and no need to print(Notification)."""
         return(f'{self.title}'
                f'{self.body}')
+
+
+def print_change(type_of, before, after):
+    """Prints the changed option to the console with before and after values"""
+    if str(before) != str(after):
+        print(f'{type_of}: {before} => {after}')
+
+
+def py_cmd():
+    return ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
 
 
 # if __name__ == '__main__':

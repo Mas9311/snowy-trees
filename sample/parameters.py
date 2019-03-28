@@ -1,17 +1,16 @@
 import argparse
 import calendar
-import platform
 import time
 
 import numpy as np
 import sys
 
-from sample import file_helper, Tree
+from sample.file_helper import import_from_file
+from sample.format import py_cmd
+from sample.image import Tree
 
-py_cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
 
-
-def default_settings():
+def default_configurations():
     return {
         'width': 125,
         'speed': 'slow',
@@ -73,7 +72,7 @@ def windows_font_choices():
     return [w for w in font_dict()['windows'].keys()]
 
 
-def retrieve():
+def retrieve_parameters():
     """Retrieves the parameters from the console if provided.
     Returns the parameters in dict format.
     If an unknown argument is passed, print the --help screen.
@@ -82,7 +81,7 @@ def retrieve():
         config_argument()
         sys.exit()
 
-    defaults = default_settings()
+    defaults = default_configurations()
 
     cmd_description = ('             ╔══════════════════════════════════════════════════╗            ┃\n'
                        '             ║   Loops a snowy tree much like a gif wallpaper   ║            ┃\n'
@@ -90,7 +89,7 @@ def retrieve():
                        '                                                                             ┃\n'
                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛')
 
-    parser = argparse.ArgumentParser(usage=py_cmd + ' [options]                                              ┃',
+    parser = argparse.ArgumentParser(usage=py_cmd() + ' [options]                                              ┃',
                                      description=cmd_description,
                                      add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -100,14 +99,14 @@ def retrieve():
                            action='store_true',
                            default=defaults['interface'],
                            dest='interface',
-                           help='GUI printing of the tree. (default=%(default)s)                   '
+                           help='GUI printing of the tree. (default=%(default)s)                  '
                                 'No additional argument needed.')
 
     interface.add_argument('-c', '--cli',
                            action='store_false',
                            default=not defaults['interface'],
                            dest='interface',
-                           help='CLI printing of the tree. (default=%(default)s)                  '
+                           help='CLI printing of the tree. (default=%(default)s)                   '
                                 'No additional argument needed.')
 
     parser.add_argument('-w', '--width',
@@ -232,18 +231,19 @@ def retrieve():
 
     parser.add_argument('-v', '--version',
                         action='version',
-                        version=version_description)
+                        version=version_description,
+                        help='VERSION prints to console, and exits.')
 
     parser.add_argument('-h', '--help',
                         action='help',
                         default=argparse.SUPPRESS,
-                        help='HELP message is displayed (this is the message), then exits')
+                        help='HELP message is displayed (this is the message), and exits')
 
     known_args, unknown_args = parser.parse_known_args()
     arg_dict = {}
 
     if known_args.file:
-        arg_dict = file_helper.import_from_file(known_args.file)
+        arg_dict = import_from_file(known_args.file)
 
     if not arg_dict:
         # converts the arguments from a Namespace type => dictionary
@@ -280,7 +280,7 @@ def retrieve():
 
 def length_list_type(length_input):
     length_input = int(length_input)
-    length_min = default_settings()['length']
+    length_min = default_configurations()['length']
     if length_input < length_min:
         print(f'List argument must be >= {length_min}. Resorting to the default of {length_min}.')
     return length_input
@@ -309,16 +309,16 @@ def print_welcome(parser):
           '│   arguments to help you find the "perfect" output.                         │\n'
           '│   They are {width, speed, density, tiers}                                  │\n'
           '│ To see the demo, type --config after one of the configurable arguments:    │\n'
-          '│$ ' + py_cmd + ' --width --config                                           │\n'
+          '│$ ' + py_cmd() + ' --width --config                                           │\n'
           '│   Note: demos can be chained together as shown in:                         │\n'
-          '│$ ' + py_cmd + ' -w --config -s --config -d --config -t --config            │\n'
+          '│$ ' + py_cmd() + ' -w --config -s --config -d --config -t --config            │\n'
           '│                                                                            │\n'
           '│ The {textbox, toolbar, windows} fonts are for the GUI implementation only. │\n'
           '│                                                                            │\n'
           '│                                                                            │\n'
           '│ You can now SAVE your configurations into a file and load it during the    │\n'
           '│   program execution, i.e.:                                                 │\n'
-          '│$ ' + py_cmd + ' -f tall_monitor                                            │\n'
+          '│$ ' + py_cmd() + ' -f tall_monitor                                            │\n'
           '╰────────────────────────────────────────────────────────────────────────────╯\n')
     input('Press [Enter] to print --help:\n>')
 
@@ -327,7 +327,7 @@ def print_welcome(parser):
 
     run_with = ''
     for k in ['width', 'speed', 'density', 'tiers', 'ornaments', 'length']:
-        run_with += f'\t{k}: {default_settings()[k]}\n'
+        run_with += f'\t{k}: {default_configurations()[k]}\n'
     input(f'\nPress [Enter] to run with cli with the default Tree of:\n{run_with}>')
     print()
 
@@ -417,12 +417,12 @@ def speed_demo():
           '└────────────────────────────────────────────────────────────────────────────┘')
 
     speed_list = ['a \'slow\'', 'an \'average\'', 'a \'fast\'', 'an \'ultra\'']
-    defaults = default_settings()
+    defaults_dict = default_configurations()
     options = speed_choices()
     trees = []
     for option in options:
-        defaults['speed'] = option
-        trees.append(Tree.Tree(defaults))
+        defaults_dict['speed'] = option
+        trees.append(Tree(defaults_dict))
 
     first_round = True
     while True:
@@ -461,14 +461,14 @@ def density_demo():
           '└────────────────────────────────────────────────────────────────────────────┘')
 
     density_list = [' \'thin\'', 'n \'average\'', ' \'thick\'', 'n \'ultra\'']
-    defaults_dict = default_settings()
+    defaults_dict = default_configurations()
     defaults_dict['speed'] = 'average'
     options = density_choices()
 
     trees = []
     for option in options:
         defaults_dict['density'] = option
-        trees.append(Tree.Tree(defaults_dict))
+        trees.append(Tree(defaults_dict))
 
     input('Press [Enter] to start printing snowfall with density from \'thin\' to \'ultra\'.\n>')
     while True:
@@ -502,14 +502,14 @@ def tiers_demo():
           '│ After it has finished, you can redo the demo if you indicate you do not    │\n'
           '│     understand the tiers.                                                  │\n'
           '└────────────────────────────────────────────────────────────────────────────┘')
-    defaults_dict = default_settings()
+    defaults_dict = default_configurations()
     defaults_dict['speed'] = 'average'
     options = range(1, 14)
 
     trees = []
     for option in options:
         defaults_dict['tiers'] = option
-        trees.append(Tree.Tree(defaults_dict))
+        trees.append(Tree(defaults_dict))
 
     input('Press [Enter] to start printing the tiers from 1 to 13.\n>')
     while True:

@@ -1,6 +1,7 @@
 import os
 
-from sample import format, parameters
+# from sample.format import Notification, py_cmd
+from sample.format import Notification, py_cmd
 
 
 def get_folder():
@@ -14,11 +15,11 @@ def make_sure_dir_exists():
     configs = get_folder()
     if not os.path.exists(configs):
         os.mkdir(configs)
-        format.Notification(['Created config_files folder',
-                             'Your configuration files',
-                             'will be saved here.',
-                             '',
-                             'Welcome to the club [:'])
+        Notification(['Created config_files folder',
+                      'Your configuration files',
+                      'will be saved here.',
+                      '',
+                      'Welcome to the club [:'])
 
 
 def file_exists(filepath):
@@ -53,9 +54,9 @@ def export_file_as(name, arg_dict):
     filename = filename_with_extension(name)
     filepath = os.path.join(get_folder(), filename)
     if file_exists(filepath):
-        format.Notification(['File already exists',
-                             'Overwrite the file?',
-                             '> Enter [Y] to overwrite'])
+        Notification(['File already exists',
+                      'Overwrite the file?',
+                      '> Enter [Y] to overwrite'])
         answer = input('> ').strip().lower()
         if answer == 'y':
             print('File overwritten\n')
@@ -79,7 +80,7 @@ def write_file(filepath, arg_dict, name):
     if arg_dict['verbose']:
         print(f'Saved current configurations to \n{filepath}\n')
     print(f'You can now run:\n'
-          f'$ {parameters.py_cmd} -f {name}\n'
+          f'$ {py_cmd()} -f {name}\n'
           f'to load the current configurations.')
 
 
@@ -102,8 +103,8 @@ def import_from_file(name):
             import_f.close()
         print(f'\'{filename}\' file successfully loaded!')
     else:
-        format.Notification([f'File {name} does not exist',
-                             f'> [Enter] to continue execution.'])
+        Notification([f'File {name} does not exist',
+                      f'> [Enter] to continue execution.'])
         input('> ')
 
     return arg_dict
