@@ -71,12 +71,12 @@ class GUI(Frame):
         self.toolbar_frame = ToolbarFrame(self)
 
     def set_dimensions(self):
-        self._convert_width_to_pixels()
+        self.assign_width_to_pixels()
         self.set_height_dim()
         self.x_dim = self.winfo_x()
         self.y_dim = self.winfo_y()
 
-    def _convert_width_to_pixels(self):
+    def assign_width_to_pixels(self):
         self.w_dim = (self.tree.screen_width + self.tree.make_even) * 6
 
     def set_height_dim(self):
@@ -105,30 +105,44 @@ class GUI(Frame):
             self.tree.arg_dict[key] = value
         self.tree.update_parameters()
         if key == 'new file':
-            before = self.w_dim
-            self._convert_width_to_pixels()
-            if before != self.w_dim:
-                if self.tree.arg_dict['verbose']:
-                    print('Width:', before, '=>', self.w_dim)
-                self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
+            self.manually_set_dimensions()
         self.textbox.print_trees_now()
 
-    def window_change(self, _):
+    def manually_set_dimensions(self):
+        before = self.w_dim
+        self.assign_width_to_pixels()
+        if before != self.w_dim:
+            if self.tree.arg_dict['verbose']:
+                print('File\'s new width:', before, '=>', self.w_dim)
+            self.window_change()
+
+    def _dim(self):
+        return {
+            'w': self.w_dim,
+            'h': self.h_dim,
+            'x': self.x_dim,
+            'y': self.y_dim
+        }
+
+    def window_change(self, event=None):
         if self.tree.arg_dict['verbose']:
             # print(_) # prints the <event> parameter
             before_w = self.w_dim
             before_h = self.h_dim
             before_x = self.x_dim
             before_y = self.y_dim
+        if isinstance(event, Event):
+            self.w_dim = self.winfo_width()
+            if self.tree.screen_width != self._convert_pixels_to_width():
+                # Only resets the tree if the width changes (~6 pixels), not every GUI pixel change
+                self.set_screen_width()
+            self.h_dim = self.winfo_height()
+            self.x_dim = self.winfo_rootx()
+            self.y_dim = self.winfo_rooty()
+        else:
+            print('  Manually changing the GUI dimensions\n'
+                  '  - Ignore the first printed width')
 
-        self.w_dim = self.winfo_width()
-        if self.tree.screen_width != self._convert_pixels_to_width():
-            # Only resets the tree if the width changes (~6 pixels), not every GUI pixel change
-            self.set_screen_width()
-
-        self.h_dim = self.winfo_height()
-        self.x_dim = self.winfo_rootx()
-        self.y_dim = self.winfo_rooty()
         self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
 
         if self.tree.arg_dict['verbose']:
