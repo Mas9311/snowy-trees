@@ -69,10 +69,10 @@ class Notification:
         # if title_even and max_len_even:
         #     print('No Change: title=even, max_len=even')
         if not title_even and max_len_even:
-            print('Add space to title_m: title=odd, max_len=even')
+            # print('Add space to title_m: title=odd, max_len=even')
             self.title_m += ' '
         if title_even and not max_len_even:
-            print('Increase max_len: title=even, max_len=odd')
+            # print('Increase max_len: title=even, max_len=odd')
             self.max_len += 1
         # if not title_even and not max_len_even:
         #     print('No change: title=odd, max_len=odd')
