@@ -54,29 +54,40 @@ class GUI(Frame):
         self._create()
 
         self.update_idletasks()
-        self.w_dim = self._convert_width_to_pixels()
-        if self.tree.arg_dict['textbox'] == 'small':
-            self.h_dim = ((48 * self.tree.tree_tiers) + 53) * 2
-        elif self.tree.arg_dict['textbox'] == 'medium':
-            self.h_dim = int(self.tree.screen_height * 13 * 2)  # prints 2 trees
-        self.x_dim = self.winfo_x()
-        self.y_dim = self.winfo_y()
+        self.w_dim = 0
+        self.h_dim = 0
+        self.x_dim = 0
+        self.y_dim = 0
+        self.set_dimensions()
 
         self.set_root()
 
         self.textbox.print_trees_now()  # immediately fills the current GUI window with trees
         self.textbox.run_gui()  # continue execution
 
-    def _convert_width_to_pixels(self):
-        return (self.tree.screen_width + self.tree.make_even) * 6
-
-    def _convert_pixels_to_width(self):
-        return self.w_dim // 6
-
     def _create(self):
         self.textbox = Textbox(self)
         self.window_manager_frame = WindowManagerFrame(self)
         self.toolbar_frame = ToolbarFrame(self)
+
+    def set_dimensions(self):
+        self._convert_width_to_pixels()
+        self.set_height_dim()
+        self.x_dim = self.winfo_x()
+        self.y_dim = self.winfo_y()
+
+    def _convert_width_to_pixels(self):
+        self.w_dim = (self.tree.screen_width + self.tree.make_even) * 6
+
+    def set_height_dim(self):
+        num_trees = 2
+        if self.tree.arg_dict['textbox'] == 'small':
+            self.h_dim = ((48 * self.tree.tree_tiers) + 53) * num_trees
+        elif self.tree.arg_dict['textbox'] == 'medium':
+            self.h_dim = int(self.tree.screen_height * 13 * num_trees)
+
+    def _convert_pixels_to_width(self):
+        return self.w_dim // 6
 
     def set_root(self):
         self.root.bind('<Configure>', self.window_change)
@@ -94,9 +105,12 @@ class GUI(Frame):
             self.tree.arg_dict[key] = value
         self.tree.update_parameters()
         if key == 'new file':
-            print('width of new file is different')
-            self.w_dim = self._convert_width_to_pixels()
-            self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
+            before = self.w_dim
+            self._convert_width_to_pixels()
+            if before != self.w_dim:
+                if self.tree.arg_dict['verbose']:
+                    print('Width:', before, '=>', self.w_dim)
+                self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
         self.textbox.print_trees_now()
 
     def window_change(self, _):
