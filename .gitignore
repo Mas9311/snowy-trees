@@ -107,4 +107,4 @@ venv.bak/
 sample/__pycache__/
 sample/frame/__pycache__/
 .idea
-config_files
+config_files/
