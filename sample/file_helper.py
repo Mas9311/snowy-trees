@@ -1,9 +1,11 @@
 import os
 
-from sample import parameters
+from sample import format, parameters
 
 
 def get_folder():
+    """Returns the true path of the user's current directory (pwd bash command)
+    And adds the name of the folder that saves all the saved configuration files."""
     return os.path.join(os.getcwd(), 'config_files')
 
 
@@ -12,35 +14,83 @@ def make_sure_dir_exists():
     configs = get_folder()
     if not os.path.exists(configs):
         os.mkdir(configs)
-        print('\tFirst time creating a config file. Welcome to the club [:')
+        format.Notification(['Created config_files folder',
+                             'Your configuration files',
+                             'will be saved here.',
+                             '',
+                             'Welcome to the club [:'])
 
 
-def file_exists(name):
-    configs = get_folder()
-    if os.path.exists(configs) and os.path.exists(name):
-        return True
-    return False
+def file_exists(filepath):
+    """Returns a True if the file exists, False if it does not.
+    Must give it the full path to the file."""
+    return os.path.exists(filepath)
+
+
+def strip_filename(name):
+    """Returns the name of the file as:
+     - all lowercase letters
+     - no file extension (.txt)"""
+    name, *_ = name.split('.')
+    return name.lower()
+
+
+def filename_with_extension(name):
+    """Returns the name of the file as:
+     - all lowercase letters
+     - .txt file extension"""
+    return strip_filename(name) + '.txt'
 
 
 def export_file_as(name, arg_dict):
+    """Prep-step before actually writing to the file.
+    There are two possibilities using the filename given:
+      1. No file with that name: proceeds to write the configurations to the file.
+      2. File already exists: halt the GUI and ask the user to overwrite."""
     make_sure_dir_exists()
 
-    filename = format_filename(name)
+    name = strip_filename(name)
+    filename = filename_with_extension(name)
     filepath = os.path.join(get_folder(), filename)
+    if file_exists(filepath):
+        format.Notification(['File already exists',
+                             'Overwrite the file?',
+                             '> Enter [Y] to overwrite'])
+        answer = input('> ').strip().lower()
+        if answer == 'y':
+            print('File overwritten\n')
+            write_file(filepath, arg_dict, name)
+        else:
+            print('File was not overwritten\n')
+    else:
+        # File does not exist, so write configurations to file
+        write_file(filepath, arg_dict, name)
+
+
+def write_file(filepath, arg_dict, name):
+    """This is the second step to exporting a file.
+    File either does not exist or user has confirmed they want to overwrite
+    Writes Tree.arg_dict dictionary to the file as key {tab} value"""
     with open(filepath, 'w') as export_f:
         for key in arg_dict.keys():
             export_f.write(f'{key}\t{arg_dict[key]}\n')
         export_f.close()
-    # print(f'Saved current configurations to \n{filepath}')
+
+    if arg_dict['verbose']:
+        print(f'Saved current configurations to \n{filepath}\n')
     print(f'You can now run:\n'
           f'$ {parameters.py_cmd} -f {name}\n'
           f'to load the current configurations.')
 
 
 def import_from_file(name):
+    """Read the configurations from the file given and place them into
+    a dictionary format. Equivalent to parameter's ArgumentParser arg_dict.
+    Values are turned from strings into their respective data types."""
     arg_dict = {}
 
-    filename = format_filename(name)
+    name = strip_filename(name)
+    filename = filename_with_extension(name)
     filepath = os.path.join(get_folder(), filename)
     # print(filepath)
     if file_exists(filepath):
@@ -52,16 +102,11 @@ def import_from_file(name):
             import_f.close()
         print(f'\'{filename}\' file successfully loaded!')
     else:
-        input(f'\'{filename}\' file loading failed ]:\n'
-              f'Press [Enter] to restore defaults.\n>')
+        format.Notification([f'File {name} does not exist',
+                             f'> [Enter] to continue execution.'])
+        input('> ')
 
     return arg_dict
-
-
-def format_filename(name):
-    name, *_ = name.split('.')
-    filename = f'{name.lower()}.txt'
-    return filename
 
 
 def str_to_type(key, value):
@@ -75,9 +120,6 @@ def str_to_type(key, value):
     if key in ints:
         return int(value)
     elif key in booleans:
-        if value == 'True':
-            return True
-        else:
-            return False
+        return True if value == 'True' else False
     else:
         return value
