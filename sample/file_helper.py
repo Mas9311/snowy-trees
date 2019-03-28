@@ -22,6 +22,13 @@ def make_sure_dir_exists():
                       'Welcome to the club [:'])
 
 
+def list_config_files():
+    """Returns the list of all configuration files in the folder."""
+    files = os.listdir(get_folder())
+    # print(files)
+    return files
+
+
 def file_exists(filepath):
     """Returns a True if the file exists, False if it does not.
     Must give it the full path to the file."""
