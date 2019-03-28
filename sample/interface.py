@@ -85,14 +85,18 @@ class GUI(Frame):
         self.root.geometry('{}x{}+{}+{}'.format(self.w_dim, self.h_dim, self.x_dim, self.y_dim))
 
     def set_screen_width(self):
-            before = self.tree.screen_width
-            self.reset_tree('width', self._convert_pixels_to_width())
-            print_change('Window Width', before, self.tree.screen_width)
+        before = self.tree.screen_width
+        self.reset_tree('width', self._convert_pixels_to_width())
+        print_change('Window Width', before, self.tree.screen_width)
 
     def reset_tree(self, key=None, value=None):
         if key and value:
             self.tree.arg_dict[key] = value
         self.tree.update_parameters()
+        if key == 'new file':
+            print('width of new file is different')
+            self.w_dim = self._convert_width_to_pixels()
+            self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
         self.textbox.print_trees_now()
 
     def window_change(self, _):

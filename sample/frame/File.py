@@ -151,6 +151,6 @@ class OpenFrame(Frame):
         new_dict = import_from_file(filename)
         if self.gui.tree.arg_dict != new_dict:
             self.gui.tree.arg_dict = new_dict
-            self.gui.reset_tree()
+            self.gui.reset_tree(key='new file')
         else:
             print('  ...But it has the same configurations as the current GUI')
