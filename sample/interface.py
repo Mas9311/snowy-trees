@@ -89,8 +89,9 @@ class GUI(Frame):
             self.reset_tree('width', self._convert_pixels_to_width())
             print_change('Window Width', before, self.tree.screen_width)
 
-    def reset_tree(self, key, value):
-        self.tree.arg_dict[key] = value
+    def reset_tree(self, key=None, value=None):
+        if key and value:
+            self.tree.arg_dict[key] = value
         self.tree.update_parameters()
         self.textbox.print_trees_now()
 
