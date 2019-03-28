@@ -123,32 +123,28 @@ class OpenFrame(Frame):
 
         self._defined = ['save', 'open']
         self._files = None
-        self.open_label = None
 
-        self.create()
-
-    def create(self):
-        _row = len(self._defined) + 1
-        self.create_open_label(_row)
-        self.create_buttons(_row + 1)
+        self.create_buttons(len(self._defined) + 1)
 
     def create_open_label(self, _row):
-        self.open_label = Label(self, text='Click any buttons below\nto import the configs', bg='#aaaaaa', fg='#3d008e',
+        temp = Label(self, text='Click any buttons below\nto import the configs', bg='#aaaaaa', fg='#3d008e',
                                 highlightthickness=0, font=self._font)
-        self.open_label.grid(row=_row, column=0, sticky=NW + SE)
+        temp.grid(row=_row, column=0, sticky=NW + SE)
 
     def create_buttons(self, _row):
         self._files = list_config_files()
         if self._files:
-            for i, file in enumerate(self._files, start=_row):
+            self.create_open_label(_row)
+            for i, file in enumerate(self._files, start=_row + 1):
                 temp = Button(self, font=self._font, text=file, anchor=W, width=10, highlightthickness=0,
                               bg=self.color('bg', i+1), fg=self.color('fg', i+1),
                               activeforeground=self.color('fg', -1), activebackground=self.color('bg', -1),
                               command=lambda file=file: self.open_file(file))
                 temp.grid(row=i, column=0, sticky=NW + SE)
         else:
+            i = len(self._defined)
             temp = Label(self, text='No configuration files', highlightthickness=0, font=self._font,
-                         bg=self.color('bg', _row + 1), fg=self.color('fg', _row + 1))
+                         bg=self.color('bg', i), fg=self.color('fg', i))
             temp.grid(row=_row, column=0, sticky=NW + SE)
 
     def open_file(self, filename):
