@@ -146,8 +146,14 @@ def print_change(type_of, before, after):
         print(f'{type_of}: {before} => {after}')
 
 
-def py_cmd():
-    return ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
+def py_cmd(additional=''):
+    cmd = ('python3', 'python.exe')[platform.system() == 'Windows'] + ' run.py'
+    if additional:
+        additional.strip()
+        num_spaces = 0 if platform.system() == 'Windows' else 3
+        spaces = ' ' * num_spaces
+        cmd += ' ' + additional + spaces
+    return cmd
 
 
 # if __name__ == '__main__':
