@@ -137,7 +137,7 @@ def str_to_type(key, value):
     'width',  'True'  => True
     'length', '5'     => 5
     'density', 'thin' => 'thin' """
-    ints = ['width', 'tiers', 'length']
+    ints = ['width', 'tiers', 'length', 'w_dim', 'h_dim', 'x_dim', 'y_dim']
     booleans = ['interface', 'ornaments', 'verbose']
 
     if key in ints:
