@@ -12,22 +12,31 @@ from sample.image import Tree
 
 def default_configurations():
     return {
-        'interface': True,
-        'width': 125,
-        'speed': 'slow',
-        'density': 'average',
-        'tiers': 4,
-        'ornaments': True,
-        'length': 5,
-        'textbox': 'medium',
-        'toolbar': 'large',
-        'windows': 'large',
-        'verbose': False
+        'interface': True,      # True=GUI interface, False=CLI interface
+        'width': 125,           # 125 characters long
+        'speed': 'slow',        # slow refresh rate between printing
+        'density': 'average',   # average snowfall density
+        'tiers': 4,             # 4 triangles on Tree
+        'ornaments': True,      # True=print ornaments, False=don't print ornaments
+        'length': 5,            # 5 unique Trees in the list to print from
+        'textbox': 'medium',    # GUI: medium-sized font of where Tree is printed
+        'toolbar': 'large',     # GUI: large-sized font of the top-left buttons
+        'windows': 'large',     # GUI: large-sized - + x of the top-right buttons [ − + × ]
+        'w_dim': 0,             # GUI: width    of pop up window in pixels
+        'h_dim': 0,             # GUI: height   of pop up window in pixels
+        'x_dim': 0,             # GUI: x-offset of pop up window in pixels
+        'y_dim': 0,             # GUI: y-offset of pop up window in pixels
+        'verbose': False        # False=don't print every little thing, True=print everything that changes
     }
 
 
 def speed_dict():
-    return {'slow': 0.9810000, 'average': 0.7265000, 'fast': 0.465000, 'ultra': 0.1}  # ultra=0.05 minimum
+    return {
+        'slow': 0.9810000,      # about a second
+        'average': 0.7265000,   # about 3/4ths of a second
+        'fast': 0.465000,       # about half a second
+        'ultra': 0.1            # Do NOT set 'ultra' as anything lower than 0.05!
+    }
 
 
 def speed_choices():
@@ -35,7 +44,12 @@ def speed_choices():
 
 
 def density_dict():
-    return {'thin': 36, 'average': 128, 'thick': 512, 'ultra': 733}
+    return {
+        'thin': 36,             # 03.6% chance to print a snowflake
+        'average': 128,         # 12.8% chance to print a snowflake
+        'thick': 512,           # 51.2% chance to print a snowflake
+        'ultra': 733            # 73.3% chance to print a snowflake
+    }
 
 
 def density_choices():
@@ -177,7 +191,7 @@ def retrieve_parameters():
                         metavar='',
                         dest='textbox',
                         choices=textbox_font_choices(),
-                        help=('TEXTBOX font size: (default=%(default)s)                        '
+                        help=('TEXTBOX font size of GUI: (default=%(default)s)                 '
                               'The textbox is location of the Tree to be displayed.       '
                               'Valid choices are [%(choices)s]'))
 
@@ -187,7 +201,7 @@ def retrieve_parameters():
                         metavar='',
                         dest='toolbar',
                         choices=toolbar_font_choices(),
-                        help=('TOOLBAR buttons font size: (default=%(default)s)                 '
+                        help=('TOOLBAR buttons font size of GUI: (default=%(default)s)          '
                               'These are the toolbar buttons located at the top-left.     '
                               'Valid choices are [%(choices)s]'))
 
@@ -197,9 +211,45 @@ def retrieve_parameters():
                         metavar='',
                         dest='windows',
                         choices=windows_font_choices(),
-                        help=('WINDOW manager buttons font size: (default=%(default)s)          '
+                        help=('WINDOW manager buttons font size of GUI: (default=%(default)s)   '
                               'These are the − + × buttons located at the top-right.      '
                               'Valid choices are [%(choices)s]'))
+
+    parser.add_argument('--wdim',
+                        type=dimension_type,
+                        metavar='',
+                        default=defaults['w_dim'],
+                        dest='w_dim',
+                        help=(f'WIDTH of the GUI window, in pixels:                        '
+                              'Instead of using this option, just alter the GUI\'s width   '
+                              'manually and save it to a configuration file.'))
+
+    parser.add_argument('--hdim',
+                        type=dimension_type,
+                        metavar='',
+                        default=defaults['h_dim'],
+                        dest='h_dim',
+                        help=(f'HEIGHT of the GUI window, in pixels:                       '
+                              'Instead of using this argument, just alter the height of    '
+                              'the GUI manually and save it to a configuration file.'))
+
+    parser.add_argument('--xdim',
+                        type=dimension_type,
+                        metavar='',
+                        default=defaults['x_dim'],
+                        dest='x_dim',
+                        help=(f'X-offset of the GUI window, in pixels:                     '
+                              'Instead of using this argument, just drag the GUI to the    '
+                              'x-coordinate manually and save it to a configuration file.'))
+
+    parser.add_argument('--ydim',
+                        type=dimension_type,
+                        metavar='',
+                        default=defaults['y_dim'],
+                        dest='y_dim',
+                        help=(f'Y-offset of the GUI window, in pixels:                     '
+                              'Instead of using this argument, just drag the GUI to the    '
+                              'y-coordinate and save it to a configuration file.'))
 
     parser.add_argument('-f', '--file',
                         type=str,
@@ -217,7 +267,7 @@ def retrieve_parameters():
                         dest='verbose',
                         help=('VERBOSE GUI geometry changes: (default=%(default)s)              '
                               'Use this only to debug. Prints out (in pixels) which       '
-                              'dimension of the GUI (width, height, x, y) was altered.    '
+                              'dimension of the GUI (w_dim, h_dim, x, y) was altered.     '
                               'No additional argument needed => Sets the verbose to True.'))
 
     version_description = ('           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           \n'
@@ -257,6 +307,10 @@ def retrieve_parameters():
             'textbox': known_args.textbox,
             'toolbar': known_args.toolbar,
             'windows': known_args.windows,
+            'w_dim': known_args.w_dim,
+            'h_dim': known_args.h_dim,
+            'x_dim': known_args.x_dim,
+            'y_dim': known_args.y_dim,
             'verbose': known_args.verbose
         }
 
@@ -284,11 +338,37 @@ def retrieve_parameters():
 
 
 def length_list_type(length_input):
-    length_input = int(length_input)
     length_min = default_configurations()['length']
-    if length_input < length_min:
-        print(f'List argument must be >= {length_min}. Resorting to the default of {length_min}.')
-    return length_input
+    try:
+        length_input = int(length_input)
+        if length_input < length_min:
+            print_arg_error('List Length', f'{length_input} must be >= {length_min}.', length_min)
+        return length_input
+    except ValueError:
+        print_arg_error('List Length', f'{length_input} is not an int', length_min)
+        return length_min
+
+
+def dimension_type(dim_input):
+    dim_min = default_configurations()['w_dim']  # default of 0.
+    print(type(dim_min))
+    arg_type = 'Dimension (in pixels)'
+    try:
+        dim_input = int(dim_input)
+        if dim_input < dim_min:
+            print_arg_error(arg_type, f'{dim_input} must be >= {dim_min}.', dim_min)
+        return dim_input
+    except ValueError:
+        print_arg_error(arg_type, f'{dim_input} is not an int.', dim_min)
+        return dim_min
+
+
+def print_arg_error(arg_type, message, default_val):
+    Notification([
+        f'{arg_type} argument Error',
+        f'{message}',
+        f'Resorting to the default of {default_val}.'
+    ])
 
 
 def print_welcome(parser):
