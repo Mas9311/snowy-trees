@@ -138,9 +138,8 @@ class OpenFrame(Frame):
         temp.grid(row=_row, column=0, sticky=NW + SE)
 
     def create_buttons(self, _row):
-        self._files = list_config_files()
+        self._files = list_config_files()  # alphabetically sorted list of configuration files
         if self._files:
-            print(self._files)
             self.create_open_label(_row)
             for i, file in enumerate(self._files, start=_row + 1):
                 temp = Button(self, font=self._font, text=file, anchor=W, width=10, highlightthickness=0,
@@ -157,7 +156,10 @@ class OpenFrame(Frame):
     def open_file(self, filename):
         new_dict = import_from_file(filename)
         if self.gui.tree.arg_dict != new_dict:
-            self.gui.tree.arg_dict = new_dict
-            self.gui.reset_tree(key='new file')
+            if self.gui.window_manager_frame.maximized_bool:
+                new_dict['width'] = self.gui.tree.arg_dict['width']
+            if self.gui.tree.arg_dict != new_dict:
+                self.gui.tree.arg_dict = new_dict
+                self.gui.reset_tree(key='new file')
         else:
             print('  ...But it has the same configurations as the current GUI\n')
