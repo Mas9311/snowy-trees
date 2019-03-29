@@ -109,12 +109,15 @@ class GUI(Frame):
         self.textbox.print_trees_now()
 
     def manually_set_dimensions(self):
-        before = self.w_dim
-        self.assign_width_to_pixels()
-        if before != self.w_dim:
-            if self.tree.arg_dict['verbose']:
-                print('File\'s new width:', before, '=>', self.w_dim)
-            self.window_change()
+        if not self.window_manager_frame.maximized_bool:
+            before = self.w_dim
+            self.assign_width_to_pixels()
+            if before != self.w_dim:
+                if self.tree.arg_dict['verbose']:
+                    print('File\'s new width:', before, '=>', self.w_dim)
+                self.window_change()
+        else:
+            print('Currently maximized')
 
     def _dim(self):
         return {
@@ -142,7 +145,6 @@ class GUI(Frame):
         else:
             print('  Manually changing the GUI dimensions\n'
                   '  - Ignore the first printed width')
-
         self.root.geometry('{}x{}'.format(self.w_dim, self.h_dim))
 
         if self.tree.arg_dict['verbose']:
