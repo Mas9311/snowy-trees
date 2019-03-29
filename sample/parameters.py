@@ -6,12 +6,13 @@ import numpy as np
 import sys
 
 from sample.file_helper import import_from_file
-from sample.format import py_cmd
+from sample.format import py_cmd, Notification
 from sample.image import Tree
 
 
 def default_configurations():
     return {
+        'interface': True,
         'width': 125,
         'speed': 'slow',
         'density': 'average',
@@ -21,7 +22,6 @@ def default_configurations():
         'textbox': 'medium',
         'toolbar': 'large',
         'windows': 'large',
-        'interface': False,
         'verbose': False
     }
 
@@ -89,7 +89,7 @@ def retrieve_parameters():
                        '                                                                             ┃\n'
                        '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛')
 
-    parser = argparse.ArgumentParser(usage=py_cmd() + ' [options]                                              ┃',
+    parser = argparse.ArgumentParser(usage=py_cmd('[options]') + '                                              ┃',
                                      description=cmd_description,
                                      add_help=False,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -115,9 +115,9 @@ def retrieve_parameters():
                         default=defaults['width'],
                         help=(f'WIDTH of the terminal window: (default=%(default)s)                '
                               '   271 => characters printed on a single line on a 32-inch '
-                              '          monitor in landscape orientation                 '
+                              '          monitor in landscape orientation                 '
                               '   151 => characters printed on a single line on a 32-inch '
-                              '          monitor in portrait orientation'))
+                              '          monitor in portrait orientation'))
 
     parser.add_argument('-s', '--speed',
                         type=str,
@@ -147,15 +147,6 @@ def retrieve_parameters():
                               'Valid choices can only be:                                 '
                               '               [%(choices)s]'))
 
-    parser.add_argument('-l', '--length',
-                        type=length_list_type,
-                        default=defaults['length'],
-                        metavar='',
-                        help=('LENGTH of the tree list to print: (default=%(default)s)              '
-                              'Saves your device from wasting electricity to generate all '
-                              'the random numbers for snow and ornament arrangement.      '
-                              'Valid choices are only whole numbers >= %(default)s.'))
-
     ornaments = parser.add_mutually_exclusive_group(required=False)
     ornaments.add_argument('-y', '--yes',
                            action='store_true',
@@ -170,6 +161,15 @@ def retrieve_parameters():
                            dest='ornaments',
                            help=('NO ornaments: (default=%(default)s)                              '
                                  'Ornaments will not be displayed on the tree.'))
+
+    parser.add_argument('-l', '--length',
+                        type=length_list_type,
+                        default=defaults['length'],
+                        metavar='',
+                        help=('LENGTH of the tree list to print: (default=%(default)s)              '
+                              'Saves your device from wasting electricity to generate all '
+                              'the random numbers for snow and ornament arrangement.      '
+                              'Valid choices are only whole numbers >= %(default)s.'))
 
     parser.add_argument('-tf', '--textbox',
                         type=str,
@@ -203,10 +203,9 @@ def retrieve_parameters():
 
     parser.add_argument('-f', '--file',
                         type=str,
-                        default='',
                         metavar='',
                         dest='file',
-                        help=('FILE name to import configurations: (default=%(default)s)          '
+                        help=('FILE name to import configurations:                        '
                               'Once you have saved the configurations to a file, you can  '
                               'now import those instead of typing all the arguments.      '
                               'Filename must be valid to be successfully imported.        '
@@ -268,12 +267,18 @@ def retrieve_parameters():
             unrecognized = ' \'' + unknown_args[0] + '\' is'
         else:
             unrecognized = 's ' + str(unknown_args) + ' are'
-        input('\nThe argument' + unrecognized + ' not valid.\n\nPress [Enter] to quit\n>')
+        Notification([
+            f'Argument{"" if len(unknown_args) is 1 else "s"} not recognized',
+            f'The argument{unrecognized} not valid',
+            f'> [Enter] to quit'
+        ])
+        input('\n> ')
+        print()
         parser.parse_args()  # prints error message and stops execution
-        raise Exception('Unknown arguments')  # redundantly raised an Exception to ensure failure
+        sys.exit()  # redundantly halts execution
 
     if len(sys.argv) == 1:  # no arguments passed => print the welcome screen
-        print_welcome(parser)
+        arg_dict['interface'] = print_welcome(parser)
 
     return arg_dict
 
@@ -297,30 +302,38 @@ def print_welcome(parser):
           '┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                      ╚══════╝ │\n'
           '│                                                                            │\n'
           '│                                                                            │\n'
-          '│ No additional arguments passed, so here is the intro welcome message!      │\n'
+          '│ No additional arguments detected, so here is the intro welcome message!    │\n'
           '│ The purpose is to show you how to configure the arguments.                 │\n'
           '│ The next screen is the --help menu to show you the arguments available.    │\n'
           '│                                                                            │\n'
           '│ First, you have to decide if you want the GUI or CLI implementation.       │\n'
-          '│   - GUI is a configurable pop-up window (recommended).                     │\n'
-          '│   - CLI is in Terminal, so you will need to manually configure and rerun.  │\n'
-          '│                                                                            │\n'
-          '│ If you wish to use the CLI implementation, there are 4 configurable        │\n'
-          '│   arguments to help you find the "perfect" output.                         │\n'
-          '│   They are {width, speed, density, tiers}                                  │\n'
-          '│ To see the demo, type --config after one of the configurable arguments:    │\n'
-          '│$ ' + py_cmd() + ' --width --config                                           │\n'
-          '│   Note: demos can be chained together as shown in:                         │\n'
-          '│$ ' + py_cmd() + ' -w --config -s --config -d --config -t --config            │\n'
-          '│                                                                            │\n'
-          '│ The {textbox, toolbar, windows} fonts are for the GUI implementation only. │\n'
-          '│                                                                            │\n'
-          '│                                                                            │\n'
-          '│ You can now SAVE your configurations into a file and load it during the    │\n'
-          '│   program execution, i.e.:                                                 │\n'
-          '│$ ' + py_cmd() + ' -f tall_monitor                                            │\n'
+          '│   - GUI is a dynamic, configurable, pop-up window.          [ RECOMMENDED ]│\n'
+          '│   - CLI prints the image to the console, so you will need to manually      │\n'
+          '│       configure your arguments and rerun the execution to see a change.    │\n'
           '╰────────────────────────────────────────────────────────────────────────────╯\n')
-    input('Press [Enter] to print --help:\n>')
+    input('> [Enter] to read the GUI and CLI descriptions.\n> ')
+    print()
+
+    print('┌────────────────────────────────────────────────────────────────────────────┐\n'
+          '│                                    GUI:                                    │\n'
+          '│ - Once you have your configurations set to your preference, click on the   │\n'
+          '│     File > Save As... to save your configurations to a file.               │\n'
+          '│ - Load your saved configurations with:                                     │\n'
+          '│$ ' + py_cmd('-f tall_monitor') + '                                         │\n'
+          '├────────────────────────────────────────────────────────────────────────────┤\n'
+          '│                                    CLI:                                    │\n'
+          '│ - You will need to run the command with something that looks like:         │\n'
+          '│$ ' + py_cmd('-w 179 -s fast -d thin -t 5 -l 7') + '                        │\n'
+          '│                                                                            │\n'
+          '│ - In order to find your values, there are 4 demos available to help you!   │\n'
+          '│     They are --width, --speed, --density, --tiers (or -w, -s, -d, -t)      │\n'
+          '│ - To see the demo, type --config after an argument such as:                │\n'
+          '│$ ' + py_cmd('-w --config') + '                                             │\n'
+          '│     Note: demos can be chained together as shown in:                       │\n'
+          '│$ ' + py_cmd('-w --config -s --config -d --config -t --config') + '         │\n'
+          '╰────────────────────────────────────────────────────────────────────────────╯')
+    input('> [Enter] to print the --help screen.\n> ')
+    print()
 
     print('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓')
     parser.print_help()
@@ -328,14 +341,31 @@ def print_welcome(parser):
     run_with = ''
     for k in ['width', 'speed', 'density', 'tiers', 'ornaments', 'length']:
         run_with += f'\t{k}: {default_configurations()[k]}\n'
-    input(f'\nPress [Enter] to run with cli with the default Tree of:\n{run_with}>')
+    print(f'Will run with the configurations set to:\n{run_with}')
+    Notification([
+        '    [Enter] or [c] to continue    ',
+        '> [Enter] to run the GUI interface',
+        '--Opens in a pop up window',
+        '--Customizable configurations',
+        '',
+        '> [c] to run the CLI interface',
+        '--Prints to this console',
+        '--Not customizable'
+    ])
+    answer = input('\n> ').strip().lower()
     print()
+
+    if answer:
+        for i in answer:
+            if i == 'c':
+                return False
+    return True
 
 
 def config_argument():
     """This function is called when the user specifies to run the --config demo on
     one or more optional arguments.
-    It will remove the areuments, call the corresponding function associated to the
+    It will remove the arguments, call the corresponding function associated to the
     argument, and loop until no more --config arguments are left.
         Note: the user cannot group arguments such as '-wsdt --config', but should instead
         run them separately as in '-w --config -s --config -d --config -t --config'"""
@@ -366,23 +396,25 @@ def config_argument():
 
 def width_demo():
     """Called when the user specifies they wish to run the WIDTH --config demo"""
-    print('┌─────────────────────┬──────────────────────────────┬───────────────────────┐\n'
-          '│                     │ Width --config Demonstration │                       │\n'
-          '│                     └──────────────────────────────┘                       │\n'
-          '│ In order to find the best WIDTH, or number of character to print, you      │\n'
-          '│     should now adjust the Terminal window to your desired width.           │\n'
+    print('┌─────────────────────┬────────────────────────────────┬─────────────────────┐\n'
+          '│                     │ --width --config Demonstration │                     │\n'
+          '│                     └────────────────────────────────┘                     │\n'
+          '│ In order to find the best WIDTH (number of characters to print), please    │\n'
+          '│     adjust the console window to the desired width before starting.        │\n'
+          '│ The width of a line is found on the left-hand side.                        │\n'
           '│                                                                            │\n'
-          '│ The goal is to find the line that ends exactly at the end of your window.  │\n'
+          '│ The goal is to find the number of characters it takes to fill the          │\n'
+          '│     entire width of the current console window.                            │\n'
           '├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┤\n'
-          '│ First, it will print line lengths of 400 to 50 in increments of 50 get     │\n'
-          '│     you in the general area.                                               │\n'
-          '│ Then, you will guess the width, and it will print ± 10 of the guess.       │\n'
-          '│     Guessing will continue until you are satisfied.                        │\n'
-          '└────────────────────────────────────────────────────────────────────────────┘')
-    input('\nPress [Enter] to print the varying widths\n>')
-
-    fir_char = '+'
-    sec_char = '-'
+          '│ First, it will print line lengths in increments of 50 to get you started.  │\n'
+          '│ Then, you will guess the width, and it will print ± 5 of the guess given.  │\n'
+          '│   - Guessing will continue until you find the number.                      │\n'
+          '└────────────────────────────────────────────────────────────────────────────┘\n')
+    input('> [Enter] to print the varying widths.\n'
+          '> ')
+    print()
+    fir_char = '▆'  # ░ ▒ ▓
+    sec_char = '·'  # :
     char = fir_char
     for line_len in np.linspace(400, 50, 8, dtype=int):
         char = (fir_char, sec_char)[char == fir_char]
@@ -390,31 +422,38 @@ def width_demo():
         print(str(line_len) + ' ' + line)
 
     while True:
-        guess = retrieve_int('What\'s your best guess of the width of this current window:')
+        guess = retrieve_int('What\'s your best guess of the width of this current console window:')
         char = fir_char
 
-        for line_len in range(guess-10, guess+11):
+        for line_len in range(guess-5, guess+6):
             char = (fir_char, sec_char)[char == fir_char]
             line = char * (line_len - len(str(line_len)) - 1)
             print(str(line_len) + ' ' + line)
-        answer = input('Did you find the number? Enter [Y]/[N]\n>').lower().strip()
-        if answer and answer[0] == 'y':
-            input(f'\nGlad to hear it. Now run it with\n\t$ {py_cmd} -w <###>\nPress [Enter] to continue.\n> ')
-            break
+        answer = input('Did you find the number you wanted?\n'
+                       '> [y] / [n]\n'
+                       '> ').lower().strip()
+        print()
+        if answer:
+            if answer[0] == 'y':
+                input(f'\n  Now run it with:\n'
+                      f'$ {py_cmd("-w ###")}\n'
+                      f'  > [Enter] to continue.\n'
+                      f'> ')
+                print()
+                return
 
 
 def speed_demo():
     """Called when the user specifies they wish to run the SPEED --config demo"""
     print('┌────────────────────────────────────────────────────────────────────────────┐\n'
-          '│                       Speed --config Demonstration                         │\n'
+          '│                       --speed --config Demonstration                       │\n'
           '│                                                                            │\n'
-          '│ There are 4 SPEEDs with varying refresh rates ranging from 1 to .1 seconds │\n'
+          '│ There are 4 SPEEDs with varying refresh rates ranging from 1 to .1 seconds.│\n'
           '│                                                                            │\n'
-          '│ The goal is to find what refresh rate you are most comfortable with.       │\n'
+          '│ The goal is to find which speed string is the most appealing to you.       │\n'
           '├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┤\n'
-          '│ They will be printed in order of slowest to fastest for a 5 sec each       │\n'
-          '│     Demo will repeat if you indicate you do not understand the speeds.     │\n'
-          '└────────────────────────────────────────────────────────────────────────────┘')
+          '│ They will be printed in order of slowest to fastest for 5 sec each.        │\n'
+          '└────────────────────────────────────────────────────────────────────────────┘\n')
 
     speed_list = ['a \'slow\'', 'an \'average\'', 'a \'fast\'', 'an \'ultra\'']
     defaults_dict = default_configurations()
@@ -424,11 +463,11 @@ def speed_demo():
         defaults_dict['speed'] = option
         trees.append(Tree(defaults_dict))
 
-    first_round = True
+    input(f'> [Enter] to start printing at speeds ranging from \'slow\' to \'ultra\'.\n'
+          f'> ')
+    print()
     while True:
         for curr in range(4):
-            if first_round:
-                input('Press [Enter] to start printing at ' + speed_list[curr] + ' speed.\n>')
             curr_tree = trees[curr]
 
             start = calendar.timegm(time.gmtime())
@@ -437,28 +476,23 @@ def speed_demo():
                 print('This is ' + speed_list[curr] + ' speed')
                 time.sleep(curr_tree.sleep_time)
 
-        first_round = False
-        answer = input('Do you understand the speeds? [Y]/[N]\n>').lower().strip()
-        if answer and answer[0] == 'y':
-            input(f'\nGlad to hear it. Now run it with:\n\t$ {py_cmd} -s <desired_speed>'
-                  '\nPress [Enter] to continue.\n> ')
+        if user_finished('speed string', '-s <speed_string>'):
             break
 
 
 def density_demo():
     """Called when the user specifies they wish to run the DENSITY --config demo"""
     print('┌────────────────────────────────────────────────────────────────────────────┐\n'
-          '│                       Density --config Demonstration                       │\n'
+          '│                      --density --config Demonstration                      │\n'
           '│                                                                            │\n'
-          '│ There are 4 DENSITYs with varying chances (in %) to print a snowflake.     │\n'
+          '│ There are 4 DENSITYs with varying chances of printing a snowflake.         │\n'
           '│                                                                            │\n'
-          '│ The goal is to find which density is the most appealing.                   │\n'
+          '│ The goal is to find which density string is the most appealing to you.     │\n'
           '├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┤\n'
-          '│ They will be printed in order of lightest to heaviest snowfall for a total │\n'
-          '│     of 5 seconds each.                                                     │\n'
-          '│ After it has finished, you can redo the demo you indicate you do not       │\n'
-          '│     understand the densities.                                              │\n'
-          '└────────────────────────────────────────────────────────────────────────────┘')
+          '│ They will be printed in order of lightest to heaviest snowfall for         │\n'
+          '│     3 seconds per density.                                                 │\n'
+          '│ Demo will continue until you find your preferred density string.           │\n'
+          '└────────────────────────────────────────────────────────────────────────────┘\n')
 
     density_list = [' \'thin\'', 'n \'average\'', ' \'thick\'', 'n \'ultra\'']
     defaults_dict = default_configurations()
@@ -470,38 +504,34 @@ def density_demo():
         defaults_dict['density'] = option
         trees.append(Tree(defaults_dict))
 
-    input('Press [Enter] to start printing snowfall with density from \'thin\' to \'ultra\'.\n>')
+    input('> [Enter] to start printing snow with densities from \'thin\' to \'ultra\'.\n'
+          '> ')
+    print()
     while True:
         for curr in range(len(density_list)):
             curr_tree = trees[curr]
 
             start_time = calendar.timegm(time.gmtime())
-            while calendar.timegm(time.gmtime()) - start_time < 5:
+            while calendar.timegm(time.gmtime()) - start_time < 3:
                 print(curr_tree)
                 print('This is a' + density_list[curr] + ' density')
                 time.sleep(curr_tree.sleep_time)
-
-        answer = input('Do you understand the densities? [Y]/[N]\n>').lower().strip()
-        if answer and answer[0] == 'y':
-            input(f'\nGlad to hear it. Now run it with:\n\t$ {py_cmd} -d <desired_density>'
-                  '\nPress [Enter] to continue.\n> ')
+        if user_finished('density string', '-d <density_string>'):
             break
 
 
 def tiers_demo():
     """Called when the user specifies they wish to run the TIERS --config demo"""
     print('┌────────────────────────────────────────────────────────────────────────────┐\n'
-          '│                        Tiers --config Demonstration                        │\n'
+          '│                       --tiers --config Demonstration                       │\n'
           '│                                                                            │\n'
           '│ The TIERS (or number of triangles of a tree) range from 1 to 13 inclusive. │\n'
           '│                                                                            │\n'
-          '│ The goal is to find which tier number looks the most appealing for the     │\n'
-          '│     height of your Terminal window. Note: Ornaments are not set by default.│\n'
+          '│ The goal is to find which tier number is the most appealing to you.        │\n'
           '├ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─┤\n'
-          '│ They will be printed in order of smallest to largest for 3 seconds each.   │\n'
-          '│ After it has finished, you can redo the demo if you indicate you do not    │\n'
-          '│     understand the tiers.                                                  │\n'
-          '└────────────────────────────────────────────────────────────────────────────┘')
+          '│ They will be printed in order of smallest to largest (3 times per tree).   │\n'
+          '│ Demo will continue until you find the number of tiers.                     │\n'
+          '└────────────────────────────────────────────────────────────────────────────┘\n')
     defaults_dict = default_configurations()
     defaults_dict['speed'] = 'average'
     options = range(1, 14)
@@ -511,26 +541,41 @@ def tiers_demo():
         defaults_dict['tiers'] = option
         trees.append(Tree(defaults_dict))
 
-    input('Press [Enter] to start printing the tiers from 1 to 13.\n>')
+    input('> [Enter] to start printing the tiers ranging from 1 to 13.\n'
+          '> ')
     while True:
         for curr_tree in trees:
-            start = calendar.timegm(time.gmtime())
-            while calendar.timegm(time.gmtime()) - start < 3:
+            for _ in range(3):
                 print(curr_tree)
                 print(f'This tree has {curr_tree.tree_tiers} tier{("", "s")[curr_tree.tree_tiers != 1]}')
                 time.sleep(curr_tree.sleep_time)
-        answer = input('Do you understand the tiers? [Y]/[N]\n>').lower().strip()
-        if answer and answer[0] == 'y':
-            input(f'\nGlad to hear it. Now run it with\n\t$ {py_cmd} -t <##>\nPress [Enter] to quit.\n> ')
+        if user_finished('tiers', '-t ##'):
             break
+
+
+def user_finished(type_of, command_additional):
+    answer = input(f'Did you find the {type_of} you wanted?\n'
+                   f'> [y] / [n]\n'
+                   f'> ').lower().strip()
+    print()
+    if answer:
+        if answer[0] == 'y':
+            input(f'\n  Now run it with:\n'
+                  f'$ {py_cmd(command_additional)}\n\n'
+                  f'> [Enter] to continue.\n'
+                  f'> ')
+            print()
+            return True
+    return False
 
 
 def retrieve_int(message):
     """A simple function to retrieve a valid integer."""
     while True:
-        input_str = input(message + '\n>').strip()
+        input_str = input(message + '\n> ').strip()
+        print()
         try:
             return int(input_str)
         except ValueError:
-            print(f' ** {input_str} is not a valid number **')
+            Notification(f'\'{input_str}\' is not a valid number')
             pass
