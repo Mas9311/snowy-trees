@@ -55,7 +55,7 @@ class WindowManagerFrame(Frame):
         # self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.tree.arg_dict["maximized"]}')
 
     def _minimize(self):
-        if self.gui.tree.arg_dict['maximized']:
-            self._maximize()
+        # if self.gui.tree.arg_dict['maximized']:
+        #     self._maximize()
             # print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
         self.root.state('iconic')
