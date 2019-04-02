@@ -24,7 +24,7 @@ class Textbox(Text):
     def print_trees_now(self):
         """Prints the (minimum + 1) number of trees in order to fill the height of the GUI window"""
         initial_tree_str = ''
-        num_trees = (self.gui.h_dim // 13 // self.gui.tree.screen_height) + 2
+        num_trees = int(self.gui.tree.arg_dict['h_dim'] / 13 / self.gui.tree.screen_height) + 2
         for _ in range(num_trees):
             initial_tree_str = self.gui.tree.list[self.gui.tree.increment_index()] + '\n' + initial_tree_str
         self.insert('0.0', initial_tree_str)
