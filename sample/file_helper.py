@@ -61,6 +61,13 @@ def filename_with_extension(name):
     return strip_filename(name) + '.txt'
 
 
+def get_filepath(name):
+    name = strip_filename(name)
+    filename = filename_with_extension(name)
+    filepath = os.path.join(get_folder(), filename)
+    return filepath
+
+
 def export_file_as(name, arg_dict):
     """Prep-step before actually writing to the file.
     There are two possibilities using the filename given:
@@ -68,9 +75,7 @@ def export_file_as(name, arg_dict):
       2. File already exists: halt the GUI and ask the user to overwrite."""
     make_sure_dir_exists()
 
-    name = strip_filename(name)
-    filename = filename_with_extension(name)
-    filepath = os.path.join(get_folder(), filename)
+    filepath = get_filepath(name)
     if file_exists(filepath):
         Notification(['File already exists',
                       'Overwrite the file?',
@@ -103,16 +108,15 @@ def write_file(filepath, arg_dict, name):
           f'to load the current configurations.')
 
 
-def import_from_file(name):
+def import_from_file(name, verbose=True):
     """Read the configurations from the file given and place them into
     a dictionary format. Equivalent to parameter's ArgumentParser arg_dict.
     Values are turned from strings into their respective data types."""
     arg_dict = {}
     if dir_exists():
         name = strip_filename(name)
-        filename = filename_with_extension(name)
-        filepath = os.path.join(get_folder(), filename)
-        # print(filepath)
+        filepath = get_filepath(name)
+
         if file_exists(filepath):
             with open(filepath, 'r') as import_f:
                 lines = import_f.read().splitlines()
@@ -120,7 +124,8 @@ def import_from_file(name):
                     key, value = line.split('\t')
                     arg_dict[key] = str_to_type(key, value)
                 import_f.close()
-            print(f'\'{filename}\' file successfully loaded!')
+            if not verbose:
+                print(f'\'{name}\' file successfully loaded!')
         else:
             Notification([f'File {name} does not exist',
                           f'> [Enter] to continue execution.'])
