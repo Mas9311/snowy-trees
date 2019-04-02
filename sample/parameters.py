@@ -19,6 +19,7 @@ def default_configurations():
         'tiers': 4,             # 4 triangles on Tree
         'ornaments': True,      # True=print ornaments, False=don't print ornaments
         'length': 5,            # 5 unique Trees in the list to print from
+        'maximized': False,     # GUI: False=not maximized, True=maximized
         'textbox': 'medium',    # GUI: medium-sized font of where Tree is printed
         'toolbar': 'large',     # GUI: large-sized font of the top-left buttons
         'windows': 'large',     # GUI: large-sized - + x of the top-right buttons [ − + × ]
@@ -251,6 +252,16 @@ def retrieve_parameters():
                               'Instead of using this argument, just drag the GUI to the    '
                               'y-coordinate and save it to a configuration file.'))
 
+    parser.add_argument('-m', '--max',
+                        type=str,
+                        metavar='',
+                        dest='maximized',
+                        help=('MAXimize the GUI: (default=%(default)s)                           '
+                              'When creating the GUI, maximize the GUI to the current     '
+                              'monitor. This is best when used with the x-offset to       '
+                              'differentiate which monitor to use.                        '
+                              'No additional argument needed => Sets maximized to True.'))
+
     parser.add_argument('-f', '--file',
                         type=str,
                         metavar='',
@@ -311,6 +322,7 @@ def retrieve_parameters():
             'h_dim': known_args.h_dim,
             'x_dim': known_args.x_dim,
             'y_dim': known_args.y_dim,
+            'maximized': known_args.maximized,
             'verbose': known_args.verbose
         }
 
