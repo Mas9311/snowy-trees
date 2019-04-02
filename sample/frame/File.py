@@ -155,11 +155,12 @@ class OpenFrame(Frame):
 
     def open_file(self, filename):
         new_dict = import_from_file(filename)
-        if self.gui.tree.arg_dict != new_dict:
-            if self.gui.window_manager_frame.maximized_bool:
-                new_dict['width'] = self.gui.tree.arg_dict['width']
-            if self.gui.tree.arg_dict != new_dict:
-                self.gui.tree.arg_dict = new_dict
-                self.gui.reset_tree(key='new file')
+        if self.gui.tree.arg_dict != new_dict:  # If they aren't the same
+            if self.gui.tree.arg_dict['maximized']:  # If GUI is not maximized
+                new_dict['width'] = self.gui.tree.arg_dict['width']  # update the width
+
+            if self.gui.tree.arg_dict != new_dict:  # if they still aren't the same after updating
+                self.gui.tree.arg_dict = new_dict  # update the Tree's dict
+                self.gui.reset_tree(key='new file')  # manually set the dimensions and print the new Tree.
         else:
             print('  ...But it has the same configurations as the current GUI\n')

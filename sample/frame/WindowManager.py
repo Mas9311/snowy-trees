@@ -12,7 +12,6 @@ class WindowManagerFrame(Frame):
         self.gui = parent
         self.root = self.gui.root
 
-        self.maximized_bool = False
         self._font = None
         self._defined = ['minimize', 'maximize', 'close']
         self.buttons = {}         # Contains: close, maximize, minimize           # ?maybe: border
@@ -49,12 +48,12 @@ class WindowManagerFrame(Frame):
         self.root.destroy()
 
     def _maximize(self):
-        self.maximized_bool = not self.maximized_bool
-        self.root.overrideredirect(self.maximized_bool)  # No borders or title bar
-        self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.maximized_bool}')
+        self.gui.tree.arg_dict['maximized'] = not self.gui.tree.arg_dict['maximized']
+        self.root.overrideredirect(self.gui.tree.arg_dict['maximized'])  # No borders or title bar
+        self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.tree.arg_dict["maximized"]}')
 
     def _minimize(self):
-        if self.maximized_bool:
+        if self.gui.tree.arg_dict['maximized']:
             self._maximize()
             # print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
         self.root.state('iconic')
