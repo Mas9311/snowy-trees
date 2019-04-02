@@ -75,7 +75,8 @@ def export_file_as(name, arg_dict):
         Notification(['File already exists',
                       'Overwrite the file?',
                       '> Enter [Y] to overwrite'])
-        answer = input('> ').strip().lower()
+        answer = input('\n> ').strip().lower()
+        print()
         if answer == 'y':
             print('File overwritten\n')
             write_file(filepath, arg_dict, name)
