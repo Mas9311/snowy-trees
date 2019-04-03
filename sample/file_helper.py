@@ -99,8 +99,6 @@ def write_file(filepath, arg_dict, name, verbose=True):
     with open(filepath, 'w') as export_f:
         for key in arg_dict.keys():
             value = arg_dict[key]
-            if key == 'maximized':
-                value = False
             export_f.write(f'{key}\t{value}\n')
         export_f.close()
 
