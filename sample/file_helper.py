@@ -68,7 +68,7 @@ def get_filepath(name):
     return filepath
 
 
-def export_file_as(name, arg_dict):
+def export_file_as(name, arg_dict, verbose=True):
     """Prep-step before actually writing to the file.
     There are two possibilities using the filename given:
       1. No file with that name: proceeds to write the configurations to the file.
@@ -84,28 +84,32 @@ def export_file_as(name, arg_dict):
         print()
         if answer == 'y':
             print('File overwritten\n')
-            write_file(filepath, arg_dict, name)
+            write_file(filepath, arg_dict, name, verbose)
         else:
             print('File was not overwritten\n')
     else:
         # File does not exist, so write configurations to file
-        write_file(filepath, arg_dict, name)
+        write_file(filepath, arg_dict, name, verbose)
 
 
-def write_file(filepath, arg_dict, name):
+def write_file(filepath, arg_dict, name, verbose=True):
     """This is the second step to exporting a file.
     File either does not exist or user has confirmed they want to overwrite
     Writes Tree.arg_dict dictionary to the file as key {tab} value"""
     with open(filepath, 'w') as export_f:
         for key in arg_dict.keys():
-            export_f.write(f'{key}\t{arg_dict[key]}\n')
+            value = arg_dict[key]
+            if key == 'maximized':
+                value = False
+            export_f.write(f'{key}\t{value}\n')
         export_f.close()
 
-    if arg_dict['verbose']:
+    if arg_dict['verbose'] and verbose:
         print(f'Saved current configurations to \n{filepath}\n')
-    print(f'You can now run:\n'
-          f'$ {py_cmd()} -f {name}\n'
-          f'to load the current configurations.')
+    if verbose:
+        print(f'You can now run:\n'
+              f'$ {py_cmd()} -f {name}\n'
+              f'to load the current configurations.')
 
 
 def import_from_file(name, verbose=True):
@@ -124,7 +128,7 @@ def import_from_file(name, verbose=True):
                     key, value = line.split('\t')
                     arg_dict[key] = str_to_type(key, value)
                 import_f.close()
-            if not verbose:
+            if verbose:
                 print(f'\'{name}\' file successfully loaded!')
         else:
             Notification([f'File {name} does not exist',
