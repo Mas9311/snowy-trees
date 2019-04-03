@@ -31,7 +31,7 @@ class WindowManagerFrame(Frame):
     def set_configurations(self):
         self.set_font()
         self.configurations['close'] = {'text_char': '×', 'command': self._close}
-        self.configurations['maximize'] = {'text_char': '+', 'command': self._maximize}
+        self.configurations['maximize'] = {'text_char': '+', 'command': self.maximize}
         self.configurations['minimize'] = {'text_char': '−', 'command': self._minimize}
 
     def set_font(self, value=None):
@@ -47,17 +47,17 @@ class WindowManagerFrame(Frame):
     def _close(self):
         self.root.destroy()
 
-    def _maximize(self):
+    def maximize(self):
         if self.gui.tree.arg_dict['verbose']:
             print('maximize:', self.gui.tree.arg_dict['maximized'], '=>', not self.gui.tree.arg_dict['maximized'])
 
-        # self.root.overrideredirect(self.gui.tree.arg_dict['maximized'])  # No borders or title bar
-        # self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.tree.arg_dict["maximized"]}')
         self.gui.tree.arg_dict['maximized'] = not self.gui.tree.arg_dict['maximized']
         self.root.wm_attributes('-zoomed', self.gui.tree.arg_dict['maximized'])  # Should work on all OS
+        # self.root.overrideredirect(self.gui.tree.arg_dict['maximized'])  # No borders or title bar
+        # self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.tree.arg_dict["maximized"]}')
 
     def _minimize(self):
         if self.gui.tree.arg_dict['maximized']:
-            self._maximize()
+            self.maximize()
             print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
         self.root.state('iconic')
