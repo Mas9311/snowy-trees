@@ -48,14 +48,16 @@ class WindowManagerFrame(Frame):
         self.root.destroy()
 
     def _maximize(self):
-        self.gui.tree.arg_dict['maximized'] = not self.gui.tree.arg_dict['maximized']
+        if self.gui.tree.arg_dict['verbose']:
+            print('maximize:', self.gui.tree.arg_dict['maximized'], '=>', not self.gui.tree.arg_dict['maximized'])
+
         # self.root.overrideredirect(self.gui.tree.arg_dict['maximized'])  # No borders or title bar
-        # print('click maximize')
-        self.root.wm_attributes('-zoomed', 1)  # Should work on all OS
         # self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.tree.arg_dict["maximized"]}')
+        self.root.wm_attributes('-zoomed', self.gui.tree.arg_dict['maximized'])  # Should work on all OS
+        self.gui.tree.arg_dict['maximized'] = not self.gui.tree.arg_dict['maximized']
 
     def _minimize(self):
-        # if self.gui.tree.arg_dict['maximized']:
-        #     self._maximize()
-            # print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
+        if self.gui.tree.arg_dict['maximized']:
+            self._maximize()
+            print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
         self.root.state('iconic')
