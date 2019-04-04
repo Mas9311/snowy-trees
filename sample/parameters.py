@@ -253,10 +253,10 @@ def retrieve_parameters():
                               'y-coordinate and save it to a configuration file.'))
 
     parser.add_argument('-m', '--max',
-                        type=str,
-                        metavar='',
+                        action='store_true',
+                        default=defaults['maximized'],
                         dest='maximized',
-                        help=('MAXimize the GUI: (default=%(default)s)                           '
+                        help=('MAXimize the GUI: (default=%(default)s)                          '
                               'When creating the GUI, maximize the GUI to the current     '
                               'monitor. This is best when used with the x-offset to       '
                               'differentiate which monitor to use.                        '
@@ -315,6 +315,7 @@ def retrieve_parameters():
             'tiers': known_args.tiers,
             'ornaments': known_args.ornaments,
             'length': known_args.length,
+            'maximized': known_args.maximized,
             'textbox': known_args.textbox,
             'toolbar': known_args.toolbar,
             'windows': known_args.windows,
@@ -322,7 +323,6 @@ def retrieve_parameters():
             'h_dim': known_args.h_dim,
             'x_dim': known_args.x_dim,
             'y_dim': known_args.y_dim,
-            'maximized': known_args.maximized,
             'verbose': known_args.verbose
         }
 
