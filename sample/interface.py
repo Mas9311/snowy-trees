@@ -84,29 +84,26 @@ class GUI(Frame):
     def _create_default_file(self):
         make_sure_dir_exists()
         if not file_exists(get_filepath('default')):
+            revert = self.tree
             mouse_x, mouse_y = pyautogui.position()
             pyautogui.moveTo(30, 30)
 
-            old = self.tree
             re_maximize = retrieve_parameters()['maximized']
             if re_maximize:
-                print('DEFAULT UNMAXIMIZE')
                 self.tree.arg_dict['maximized'] = True
-                self.window_manager_frame._maximize()
+                self.window_manager_frame.maximize()
 
             self.tree = Tree(default_configurations())
-            print('DEFAULT:', self.root.winfo_width(), self.root.winfo_height(), self.winfo_rootx(), self.winfo_rooty())
-            self.tree.arg_dict['w_dim'] = 0
-            self.tree.arg_dict['h_dim'] = 0
+            self.tree.update_parameters()
             self.tree.arg_dict['x_dim'] = self.winfo_rootx()  # 3 or 4
             self.tree.arg_dict['y_dim'] = self.winfo_rooty()  # 29 or 54
 
             export_file_as('default', self.tree.arg_dict, False)
             pyautogui.moveTo(mouse_x, mouse_y)
-            self.tree = old
+            self.tree = revert
             if re_maximize:
                 self.tree.arg_dict['maximized'] = False
-                self.window_manager_frame._maximize()
+                self.window_manager_frame.maximize()
 
         defaults = import_from_file('default', False)
         self.configurations['x_dim']['offset'] = defaults['x_dim']
@@ -164,9 +161,6 @@ class GUI(Frame):
     def assign_width_dim(self):
         """Converts width (in characters) to pixels"""
         self.tree.arg_dict['w_dim'] = (self.tree.screen_width + self.tree.make_even) * 6
-
-        # if self.tree.arg_dict['maximized']:
-        #     self.tree.arg_dict['w_dim'] -= 3
 
     def convert_w_dim(self):
         """Converts pixels to width (in characters)"""
@@ -253,8 +247,6 @@ class GUI(Frame):
         else:
             if self.tree.arg_dict['verbose']:
                 print('Currently maximized')
-        # print('manual maximized:', self.tree.arg_dict['w_dim'], self.tree.arg_dict['h_dim'],
-        #       self.tree.arg_dict['x_dim'], self.tree.arg_dict['y_dim'])
 
     def have_root_dimensions_changed(self):
         w = self.winfo_width() == self.tree.arg_dict['w_dim']
@@ -262,25 +254,12 @@ class GUI(Frame):
         x = self.winfo_rootx() == self.tree.arg_dict['x_dim']
         y = self.winfo_rooty() == self.tree.arg_dict['y_dim']
 
-        # if self.tree.arg_dict['verbose']:
-        #     if not w:
-        #         print('\tdifferent w:', self.winfo_width(), self.tree.arg_dict['w_dim'])
-        #     if not h:
-        #         print('\tdifferent h:', self.winfo_height(), self.tree.arg_dict['h_dim'])
-        #     if not x:
-        #         print('\tdifferent x:', self.winfo_rootx(), self.tree.arg_dict['x_dim'])
-        #     if not y:
-        #         print('\tdifferent y:', self.winfo_rooty(), self.tree.arg_dict['y_dim'])
-
         return w or h or x or y
 
     def textbox_change(self):
-        if self.tree.arg_dict['verbose']:
-            print('textbox: ', end='')
-
         if not self.tree.arg_dict['maximized']:
             if self.tree.arg_dict['verbose']:
-                print('not maximized.')
+                print('textbox not maximized.')
             before = (f"{self.winfo_width()}x{self.winfo_height()}+"
                       f"{self.winfo_rootx()}+{self.winfo_rooty()}")
 
@@ -288,26 +267,11 @@ class GUI(Frame):
             self.tree.arg_dict['width'] = self.convert_w_dim()
 
             self.tree.arg_dict['h_dim'] = self.winfo_height()
-            self.tree.arg_dict['x_dim'] = self.winfo_rootx()  #- self.configurations['x_dim']['offset']
-            if abs(self.tree.arg_dict['x_dim'] - self.winfo_rootx()) == self.configurations['x_dim']['offset']:
-                if self.tree.arg_dict['x_dim'] > self.winfo_rootx():
-                    print('  t, x -=', self.configurations['x_dim']['offset'])
-                    self.tree.arg_dict['x_dim'] -= self.configurations['x_dim']['offset']
-                else:
-                    print('  t, x +=', self.configurations['x_dim']['offset'])
-                    self.tree.arg_dict['x_dim'] += self.configurations['x_dim']['offset']
+            self.tree.arg_dict['x_dim'] = self.winfo_rootx()
 
             self.tree.arg_dict['y_dim'] = self.winfo_rooty()
             if abs(self.tree.arg_dict['y_dim'] - self.winfo_rooty()) == (2 * self.configurations['y_dim']['offset']):
                 self.tree.arg_dict['y_dim'] -= (2 * self.configurations['y_dim']['offset'])
-            # print(self.tree.arg_dict['y_dim'], self.winfo_rooty())
-            # if abs(self.tree.arg_dict['y_dim'] - self.winfo_rooty()) == self.configurations['y_dim']['offset']:
-            #     if self.tree.arg_dict['y_dim'] > self.winfo_rooty():
-            #         print('  t, y -=', self.configurations['y_dim']['offset'])
-            #         self.tree.arg_dict['y_dim'] -= self.configurations['y_dim']['offset']
-            #     else:
-            #         print('  t, y +=', self.configurations['y_dim']['offset'])
-            #         self.tree.arg_dict['y_dim'] += self.configurations['y_dim']['offset']
 
             # self.correct_height()
 
@@ -328,7 +292,7 @@ class GUI(Frame):
                 )
         else:
             if self.tree.arg_dict['verbose']:
-                print('maximized.')
+                print('textbox maximized.')
             print('current  : ', end='')
             curr_monitor = self.get_monitor()
             print('requested: ', end='')
@@ -353,7 +317,7 @@ class GUI(Frame):
             self.textbox.print_trees_now()
 
             self.tree.arg_dict['maximized'] = False
-            self.window_manager_frame._maximize()
+            self.window_manager_frame.maximize()
 
             self.root.geometry('{}x{}+{}+{}'.format(
                 self.tree.arg_dict['w_dim'],
@@ -365,75 +329,58 @@ class GUI(Frame):
                 pyautogui.moveTo(mouse_x, mouse_y)
 
     def root_change(self):
-        print('root', self.tree.arg_dict['x_dim'], self.winfo_rootx(), self.tree.arg_dict['y_dim'], self.winfo_rooty())
-        # if self.have_root_dimensions_changed():
-        before = (f"{self.winfo_width()}x{self.winfo_height()}+"
-                  f"{self.winfo_rootx()}+{self.winfo_rooty()}")
-        before_w_h = f"{self.tree.arg_dict['w_dim']}x{self.tree.arg_dict['h_dim']}"
+        if self.have_root_dimensions_changed():
+            print('root')
+            before = (f"{self.winfo_width()}x{self.winfo_height()}+"
+                      f"{self.winfo_rootx()}+{self.winfo_rooty()}")
+            before_w_h = f"{self.tree.arg_dict['w_dim']}x{self.tree.arg_dict['h_dim']}"
 
-        self.tree.arg_dict['w_dim'] = self.winfo_width()
-        self.tree.arg_dict['width'] = self.convert_w_dim()
+            self.tree.arg_dict['w_dim'] = self.winfo_width()
+            self.tree.arg_dict['width'] = self.convert_w_dim()
+            self.tree.arg_dict['h_dim'] = self.winfo_height()
+            self.tree.arg_dict['x_dim'] = self.winfo_rootx()
+            self.tree.arg_dict['y_dim'] = self.winfo_rooty()
 
-        self.tree.arg_dict['h_dim'] = self.winfo_height()
+            after = (f"{self.tree.arg_dict['w_dim']}x{self.tree.arg_dict['h_dim']}+"
+                     f"{self.tree.arg_dict['x_dim']}+{self.tree.arg_dict['y_dim']}")
+            after_w_h = f"{self.tree.arg_dict['w_dim']}x{self.tree.arg_dict['h_dim']}"
 
-        # if abs(self.tree.arg_dict['x_dim'] - self.winfo_rootx()) != self.configurations['x_dim']['offset']:
-        self.tree.arg_dict['x_dim'] = self.winfo_rootx()
-        # print('  r subtracting offset from x_dim')
-        # self.tree.arg_dict['x_dim'] -= self.configurations['x_dim']['offset']
-
-        # if abs(self.tree.arg_dict['y_dim'] - self.winfo_rooty()) != self.configurations['y_dim']['offset']:
-        self.tree.arg_dict['y_dim'] = self.winfo_rooty()
-        # if self.tree.arg_dict['y_dim'] > self.winfo_rooty():
-        # print('  r, y -=', self.configurations['y_dim']['offset'])
-        # self.tree.arg_dict['y_dim'] = self.winfo_rooty() - self.configurations['y_dim']['offset']
-        #     else:
-        #         print('  r, y +=', self.configurations['y_dim']['offset'])
-        #         self.tree.arg_dict['y_dim'] += self.configurations['y_dim']['offset']
-
-        # if abs(self.tree.arg_dict['y_dim'] - self.winfo_rooty()) == ((54 / 2) - 4):
-        #     self.tree.arg_dict['y_dim'] -= 23
-
-        # self.correct_height()
-
-        after = (f"{self.tree.arg_dict['w_dim']}x{self.tree.arg_dict['h_dim']}+"
-                 f"{self.tree.arg_dict['x_dim']}+{self.tree.arg_dict['y_dim']}")
-        after_w_h = f"{self.tree.arg_dict['w_dim']}x{self.tree.arg_dict['h_dim']}"
-        if before != after:
-            if self.tree.arg_dict['verbose'] and before != after:
-                print('root: setting', before, '=>', after)
-        if before_w_h == after_w_h:
-            print('same root w/h')
-            self.root.geometry('{}x{}+{}+{}'.format(
-                self.tree.arg_dict['w_dim'],
-                self.tree.arg_dict['h_dim'],
-                self.winfo_rootx() - 3,
-                self.winfo_rooty() - 29
-            ))
-        else:
-            print('different root w/h', before_w_h, after_w_h)
+            if before != after:
+                if self.tree.arg_dict['verbose']:
+                    print('root: setting', before, '=>', after)
+            if self.tree.arg_dict['maximized']:
+                print('updating the tree parameters')
+                self.tree.update_parameters()
+            if before_w_h == after_w_h:
+                print(f"{self.tree.arg_dict['w_dim']}x{self.tree.arg_dict['h_dim']}+"
+                      f"{self.winfo_rootx() - self.configurations['x_dim']['offset']}+{self.winfo_rooty() - self.configurations['y_dim']['offset']}")
+                self.root.geometry('{}x{}+{}+{}'.format(
+                    self.tree.arg_dict['w_dim'],
+                    self.tree.arg_dict['h_dim'],
+                    self.winfo_rootx() - self.configurations['x_dim']['offset'],
+                    self.winfo_rooty() - self.configurations['y_dim']['offset']
+                ))
 
     def window_change(self, event=None):
         if self.winfo_width() is not 1:
-            # if abs(self.tree.arg_dict['x_dim'] - self.winfo_rootx()) != self.configurations['x_dim']['offset']:
-            #     if abs(self.tree.arg_dict['y_dim'] - self.winfo_rooty()) == self.configurations['y_dim']['offset']:
-                    if self.tree.arg_dict['verbose']:
-                        # print(_) # prints the <event> parameter
-                        before_w = self.tree.arg_dict['w_dim']
-                        before_h = self.tree.arg_dict['h_dim']
-                        before_x = self.tree.arg_dict['x_dim']
-                        before_y = self.tree.arg_dict['y_dim']
+            if self.tree.arg_dict['verbose']:
+                # print(event) # prints the <event> parameter
+                before_w = self.tree.arg_dict['w_dim']
+                before_h = self.tree.arg_dict['h_dim']
+                before_x = self.tree.arg_dict['x_dim']
+                before_y = self.tree.arg_dict['y_dim']
 
-                    if not self.offsets_are_set:
-                        self.offsets_are_set = True
-                        self._create_default_file()
+            if not self.offsets_are_set:
+                self.offsets_are_set = True
+                self._create_default_file()
 
-                    if event.widget.winfo_id() == self.textbox.winfo_id():
-                        self.textbox_change()
-                    elif event.widget.winfo_id() == self.root.winfo_id():
-                        self.root_change()
+            if event.widget.winfo_id() == self.textbox.winfo_id():
+                self.textbox_change()
+            elif event.widget.winfo_id() == self.root.winfo_id():
+                self.root_change()
 
-                    if self.tree.arg_dict['verbose']:
-                        print_change('\t   gui width', before_w, self.tree.arg_dict['w_dim'])
-                        print_change('\t  gui height', before_h, self.tree.arg_dict['h_dim'])
-                        print_change('\tgui x offset', before_x, self.tree.arg_dict['x_dim'])
-                        print_change('\tgui y offset', before_y, self.tree.arg_dict['y_dim'])
+            if self.tree.arg_dict['verbose']:
+                print_change('\t   gui width', before_w, self.tree.arg_dict['w_dim'])
+                print_change('\t  gui height', before_h, self.tree.arg_dict['h_dim'])
+                print_change('\tgui x offset', before_x, self.tree.arg_dict['x_dim'])
+                print_change('\tgui y offset', before_y, self.tree.arg_dict['y_dim'])
