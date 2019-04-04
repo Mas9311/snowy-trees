@@ -31,7 +31,8 @@ def list_config_files():
         return []
     sorted_list = []
     for file in sorted(unsorted):
-        sorted_list.append(file)
+        if file != 'default.txt':
+            sorted_list.append(file)
     return sorted_list
 
 
