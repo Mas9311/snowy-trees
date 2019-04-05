@@ -27,11 +27,11 @@ class ToolbarFrame(Frame):
         self.toolbar_buttons = ToolbarButtonsFrame(self)
 
     def set_font(self, value=None):
-        new_font_key = (value, self.gui.tree.arg_dict['toolbar'])[value is None]
+        new_font_key = (value, self.gui.get_arg('toolbar'))[value is None]
         self._font = parameters.font_dict()['toolbar'][new_font_key]
         # print('Toolbar metrics:\t', self._font.metrics())                        # TODO: test on [windows 10, mac OSX]
         if value is not None:
-            self.gui.tree.arg_dict['toolbar'] = new_font_key
+            self.gui.set_arg('toolbar', new_font_key)
             self.opened_frame.update_font(new_font_key)
             self.toolbar_buttons.set_font(new_font_key)
 
@@ -109,7 +109,7 @@ class ToolbarButtonsFrame(Frame):
             self.buttons[curr].grid(row=0, column=index, sticky=NW + SE)
 
     def set_font(self, value=None):
-        new_font_key = (value, self.gui.tree.arg_dict['toolbar'])[value is None]
+        new_font_key = (value, self.gui.get_arg('toolbar'))[value is None]
         self._font = parameters.font_dict()['toolbar'][new_font_key]
         for key in self.buttons.keys():
             self.buttons[key].config(font=self._font)

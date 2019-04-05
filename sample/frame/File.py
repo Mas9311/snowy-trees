@@ -55,12 +55,12 @@ class FileFrame(Frame):
 
     def close_frame(self):
         if self.opened_frame is not None:
-            if self.gui.tree.arg_dict['verbose']:
+            if self.gui.get_arg('verbose'):
                 *_, f_type = str(self.opened_frame).split('.!')
                 try:
                     int(f_type[-1])
                     f_type = f_type[:-1]
-                except:
+                except ValueError:
                     pass
                 f_type = f'{f_type[0].upper()}{f_type[1:-5]} button\'s {f_type[-5].upper()}{f_type[-4:]}'
                 print(f'Closing the {f_type}')
@@ -156,10 +156,11 @@ class OpenFrame(Frame):
     def open_file(self, filename):
         new_dict = import_from_file(filename)
         if self.gui.tree.arg_dict != new_dict:  # If they aren't the same
-            if self.gui.tree.arg_dict['maximized']:  # If GUI is not maximized
-                new_dict['width'] = self.gui.tree.arg_dict['width']  # update the width
-            if not new_dict['maximized'] and self.gui.tree.arg_dict['maximized']:
-                self.gui.tree.arg_dict['maximized'] = False
+            # if self.gui.get_arg('maximized'):  # If GUI is maximized
+            #     new_dict['width'] = self.gui.get_arg('width')  # update the width
+            if new_dict['maximized'] is not self.gui.get_arg('maximized'):
+                if self.gui.get_arg('verbose'):
+                    print('open file:', self.gui.get_arg('maximized'), '=>', new_dict['maximized'])
                 self.gui.window_manager_frame.maximize()
             if self.gui.tree.arg_dict != new_dict:  # if they still aren't the same after updating
                 self.gui.tree.arg_dict = new_dict  # update the Tree's dict

@@ -35,11 +35,11 @@ class WindowManagerFrame(Frame):
         self.configurations['minimize'] = {'text_char': '−', 'command': self._minimize}
 
     def set_font(self, value=None):
-        new_font_key = (value, self.gui.tree.arg_dict['windows'])[value is None]
+        new_font_key = (value, self.gui.get_arg('windows'))[value is None]
         self._font = font_dict()['windows'][new_font_key]
         # print('WindowManager metrics:\t', self._font.metrics())                  # TODO: test on [windows 10, mac OSX]
         if value is not None:
-            self.gui.tree.arg_dict['windows'] = new_font_key
+            self.gui.set_arg('windows', new_font_key)
             for key in self.buttons.keys():
                 self.buttons[key].config(font=self._font)
                 # print('WindowManager: Changed font on', key, 'button')
@@ -48,16 +48,16 @@ class WindowManagerFrame(Frame):
         self.root.destroy()
 
     def maximize(self):
-        if self.gui.tree.arg_dict['verbose']:
-            print('maximize:', self.gui.tree.arg_dict['maximized'], '=>', not self.gui.tree.arg_dict['maximized'])
+        if self.gui.get_arg('verbose'):
+            print('maximize:', self.gui.get_arg('maximized'), '=>', not self.gui.get_arg('maximized'))
 
-        self.gui.tree.arg_dict['maximized'] = not self.gui.tree.arg_dict['maximized']
-        self.root.wm_attributes('-zoomed', self.gui.tree.arg_dict['maximized'])  # Should work on all OS
-        # self.root.overrideredirect(self.gui.tree.arg_dict['maximized'])  # No borders or title bar
-        # self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.tree.arg_dict["maximized"]}')
+        self.gui.set_arg('maximized', not self.gui.get_arg('maximized'))
+        self.root.wm_attributes('-zoomed', self.gui.get_arg('maximized'))  # Should work on all OS
+        # self.root.overrideredirect(self.gui.get_arg('maximized'))  # No borders or title bar
+        # self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.get_arg("maximized")}')
 
     def _minimize(self):
-        if self.gui.tree.arg_dict['maximized']:
+        if self.gui.get_arg('maximized'):
             self.maximize()
             print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
         self.root.state('iconic')

@@ -40,16 +40,16 @@ class OptionsFrame(Frame):
 
     def _create(self):
         speeds = speed_choices()
-        self.int_speed = speeds.index(self.gui.tree.arg_dict['speed']) + 1
+        self.int_speed = speeds.index(self.gui.get_arg('speed')) + 1
         self.curr_speed = speeds[self.int_speed - 1]
 
         densities = density_choices()
-        self.int_density = densities.index(self.gui.tree.arg_dict['density']) + 1
+        self.int_density = densities.index(self.gui.get_arg('density')) + 1
         self.curr_density = densities[self.int_density - 1]
 
         self.int_tiers = self.gui.tree.tree_tiers
 
-        self.ornaments_bool = self.gui.tree.arg_dict['ornaments']
+        self.ornaments_bool = self.gui.get_arg('ornaments')
 
         # Create the rest of the options frame
         self.set_opt_speed(1)

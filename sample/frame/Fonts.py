@@ -33,15 +33,15 @@ class FontsFrame(Frame):
 
     def _create(self):
         fonts = textbox_font_choices()
-        self.int_textbox = fonts.index(self.gui.tree.arg_dict['textbox']) + 1
+        self.int_textbox = fonts.index(self.gui.get_arg('textbox')) + 1
         self.curr_textbox = fonts[self.int_textbox - 1]
 
         fonts = toolbar_font_choices()
-        self.int_toolbar = fonts.index(self.gui.tree.arg_dict['toolbar']) + 1
+        self.int_toolbar = fonts.index(self.gui.get_arg('toolbar')) + 1
         self.curr_toolbar = fonts[self.int_toolbar - 1]
 
         fonts = windows_font_choices()
-        self.int_windows = fonts.index(self.gui.tree.arg_dict['windows']) + 1
+        self.int_windows = fonts.index(self.gui.get_arg('windows')) + 1
         self.curr_windows = fonts[self.int_windows - 1]
 
         self.set_view_textbox(1)
