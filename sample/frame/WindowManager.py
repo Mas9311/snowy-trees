@@ -52,9 +52,9 @@ class WindowManagerFrame(Frame):
             print('maximize:', self.gui.get_arg('maximized'), '=>', not self.gui.get_arg('maximized'))
 
         self.gui.set_arg('maximized', not self.gui.get_arg('maximized'))
-        self.root.wm_attributes('-zoomed', self.gui.get_arg('maximized'))  # Should work on all OS
+        self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.get_arg("maximized")}')
+        # self.root.wm_attributes('-zoomed', self.gui.get_arg('maximized'))  # Should work on all OS
         # self.root.overrideredirect(self.gui.get_arg('maximized'))  # No borders or title bar
-        # self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.get_arg("maximized")}')
 
     def _minimize(self):
         if self.gui.get_arg('maximized'):

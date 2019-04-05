@@ -69,8 +69,6 @@ class GUI(Frame):
 
         self.textbox.print_trees_now()  # immediately fills the current GUI window with trees
         self.textbox.run_gui()  # continue execution
-        print(f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}+"
-              f"{self.get_arg('x_dim')}+{self.get_arg('y_dim')}")
 
     def _create(self):
         self._create_monitors()
@@ -114,8 +112,8 @@ class GUI(Frame):
 
     def _create_monitors(self):
         screen_info = get_monitors()
-        for m in screen_info[::-1]:  # for me, the monitors are right-to-left. May not always be the case, though
-            print(str(m))
+        for index, m in enumerate(screen_info[::-1]):  # for me, the monitors are right-to-left.
+            print(f'monitor {index}: {m.width}x{m.height}+{m.x}+{m.y}')
             self.monitors.append({
                 'w_dim': m.width,
                 'h_dim': m.height,
@@ -161,7 +159,8 @@ class GUI(Frame):
             _, mouse_y = pyautogui.position()
         for index, m in enumerate(self.monitors):
             if m['x_dim'] <= mouse_x <= m['w_dim'] + m['x_dim']:
-                print(f"{message + ' '}mouse on monitor {index}")
+                if self.get_arg('verbose'):
+                    print(f"{message + ' ' if message else ''}mouse on monitor {index}")
                 return m
 
     def assign_width_dim(self):
@@ -202,8 +201,8 @@ class GUI(Frame):
     def set_root(self):
         self.root.bind('<Configure>', self.window_change)
         self.root.title('Snowy Trees')
+        # self.root.overrideredirect(True)
         self.root.resizable(width=True, height=True)
-        # self.root.configure(bd=0)
 
         self.root.geometry('{}x{}+{}+{}'.format(
             self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
@@ -225,6 +224,8 @@ class GUI(Frame):
 
     def manually_set_dimensions(self):
         if not self.get_arg('maximized'):
+            if self.get_arg('verbose'):
+                print('manually set not maximized.')
             before = (f"{self.get_arg('w_dim')}, {self.get_arg('h_dim')}, "
                       f"{self.get_arg('x_dim')}, {self.get_arg('y_dim')}")
             # self.correct_height()
@@ -239,7 +240,7 @@ class GUI(Frame):
                     print('manually setting:', before, after)
         else:
             if self.get_arg('verbose'):
-                print('Currently maximized')
+                print('manually set maximized.')
             self.tree.update_parameters()
 
     def have_root_dimensions_changed(self):
@@ -314,6 +315,17 @@ class GUI(Frame):
             if curr_monitor != requested_monitor:
                 pyautogui.moveTo(mouse_x, mouse_y)  # move mouse back to its original position
 
+    def wmf_change(self):
+        print('WMF maximized =', self.get_arg('maximized'))
+        if self.get_arg('maximized'):
+            curr_monitor = self.get_monitor(self.get_arg('x_dim'), self.get_arg('y_dim'))
+            print(self.winfo_width(), curr_monitor['w_dim'])
+            if self.winfo_width() == curr_monitor['w_dim']:
+                print('\n\n\n')
+                self.set_arg('width', self.convert_w_dim())
+                self.tree.update_parameters()
+                self.textbox.print_trees_now()
+
     def root_change(self):
         if self.have_root_dimensions_changed():
             if not self.get_arg('maximized'):
@@ -340,9 +352,10 @@ class GUI(Frame):
                     print('updating the tree parameters')
                     self.tree.update_parameters()
                 if before_w_h == after_w_h:
-                    print(f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}+"
-                          f"{self.winfo_rootx() - self.configurations['x_dim']['offset']}+"
-                          f"{self.winfo_rooty() - self.configurations['y_dim']['offset']}")
+                    if self.get_arg('verbose'):
+                        print(f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}+"
+                              f"{self.winfo_rootx() - self.configurations['x_dim']['offset']}+"
+                              f"{self.winfo_rooty() - self.configurations['y_dim']['offset']}")
                     self.root.geometry('{}x{}+{}+{}'.format(
                         self.get_arg('w_dim'),
                         self.get_arg('h_dim'),
@@ -352,6 +365,7 @@ class GUI(Frame):
             else:
                 if self.get_arg('verbose'):
                     print('root maximized.')
+                    self.set_arg('width', self.convert_w_dim())
 
     def window_change(self, event=None):
         if self.winfo_width() is not 1:
@@ -366,6 +380,8 @@ class GUI(Frame):
 
             if event.widget.winfo_id() == self.textbox.winfo_id():
                 self.textbox_change()
+            elif event.widget.winfo_id() == self.window_manager_frame.winfo_id():
+                self.wmf_change()
             elif event.widget.winfo_id() == self.root.winfo_id():
                 self.root_change()
 
