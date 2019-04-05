@@ -163,6 +163,29 @@ class GUI(Frame):
                     print(f"{message + ' ' if message else ''}mouse on monitor {index}")
                 return m
 
+    def get_dimensions(self, type_of_window='gui'):
+        if type_of_window == 'gui':
+            w = self.get_arg('w_dim')
+            h = self.get_arg('h_dim')
+            x = self.get_arg('x_dim')
+            y = self.get_arg('y_dim')
+        else:
+            w = self.winfo_width()
+            h = self.winfo_height()
+            x = self.winfo_rootx()
+            y = self.winfo_rooty()
+
+        return f"{w}x{h}+{x}+{y}"
+
+    def set_dimensions(self):
+        self.set_arg('w_dim', self.winfo_width())
+        self.set_arg('width', self.convert_w_dim())
+        self.set_arg('h_dim', self.winfo_height())
+        self.set_arg('x_dim', self.winfo_rootx())
+        self.set_arg('y_dim', self.winfo_rooty())
+
+        return self.get_dimensions()
+
     def assign_width_dim(self):
         """Converts width (in characters) to pixels"""
         self.set_arg('w_dim', (self.tree.screen_width + self.tree.make_even) * 6)
@@ -226,15 +249,14 @@ class GUI(Frame):
         if not self.get_arg('maximized'):
             if self.get_arg('verbose'):
                 print('manually set not maximized.')
-            before = (f"{self.get_arg('w_dim')}, {self.get_arg('h_dim')}, "
-                      f"{self.get_arg('x_dim')}, {self.get_arg('y_dim')}")
+
+            before = self.get_dimensions()
             # self.correct_height()
             self.root.geometry('{}x{}+{}+{}'.format(
                 self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
             self.tree.update_parameters()
+            after = self.get_dimensions()
 
-            after = (f"{self.get_arg('w_dim')}, {self.get_arg('h_dim')}, "
-                     f"{self.get_arg('x_dim')}, {self.get_arg('y_dim')}")
             if before != after:
                 if self.get_arg('verbose'):
                     print('manually setting:', before, after)
@@ -255,16 +277,9 @@ class GUI(Frame):
         if not self.get_arg('maximized'):
             if self.get_arg('verbose'):
                 print('textbox not maximized.')
-            before = (f"{self.winfo_width()}x{self.winfo_height()}+"
-                      f"{self.winfo_rootx()}+{self.winfo_rooty()}")
+            before = self.get_dimensions('window')
+            self.set_dimensions()
 
-            self.set_arg('w_dim', self.winfo_width())
-            self.set_arg('width', self.convert_w_dim())
-
-            self.set_arg('h_dim', self.winfo_height())
-
-            self.set_arg('x_dim', self.winfo_rootx())
-            self.set_arg('y_dim', self.winfo_rooty())
             if abs(self.get_arg('y_dim') - self.winfo_rooty()) == (2 * self.configurations['y_dim']['offset']):
                 self.set_arg('y_dim', self.get_arg('y_dim') - (2 * self.configurations['y_dim']['offset']))
 
@@ -315,13 +330,13 @@ class GUI(Frame):
             if curr_monitor != requested_monitor:
                 pyautogui.moveTo(mouse_x, mouse_y)  # move mouse back to its original position
 
-    def wmf_change(self):
-        print('WMF maximized =', self.get_arg('maximized'))
+    def wmf_maximize_button_change(self):
         if self.get_arg('maximized'):
-            curr_monitor = self.get_monitor(self.get_arg('x_dim'), self.get_arg('y_dim'))
-            print(self.winfo_width(), curr_monitor['w_dim'])
-            if self.winfo_width() == curr_monitor['w_dim']:
-                print('\n\n\n')
+            if self.get_arg('verbose'):
+                print('WMF changed. maximized =', self.get_arg('maximized'))
+            loc_of_gui_monitor = self.get_monitor(self.get_arg('x_dim') + 1, self.get_arg('y_dim') + 1)
+
+            if self.winfo_width() == loc_of_gui_monitor['w_dim']:
                 self.set_arg('width', self.convert_w_dim())
                 self.tree.update_parameters()
                 self.textbox.print_trees_now()
@@ -331,19 +346,11 @@ class GUI(Frame):
             if not self.get_arg('maximized'):
                 if self.get_arg('verbose'):
                     print('root not maximized.')
-                before = (f"{self.winfo_width()}x{self.winfo_height()}+"
-                          f"{self.winfo_rootx()}+{self.winfo_rooty()}")
-                before_w_h = f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}"
+                before = self.get_dimensions('monitor')
+                before_w_h, *_ = before.split('+')
 
-                self.set_arg('w_dim', self.winfo_width())
-                self.set_arg('width', self.convert_w_dim())
-                self.set_arg('h_dim', self.winfo_height())
-                self.set_arg('x_dim', self.winfo_rootx())
-                self.set_arg('y_dim', self.winfo_rooty())
-
-                after = (f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}+"
-                         f"{self.get_arg('x_dim')}+{self.get_arg('y_dim')}")
-                after_w_h = f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}"
+                after = self.set_dimensions()
+                after_w_h, *_ = after.split('+')
 
                 if before != after:
                     if self.get_arg('verbose'):
@@ -381,7 +388,7 @@ class GUI(Frame):
             if event.widget.winfo_id() == self.textbox.winfo_id():
                 self.textbox_change()
             elif event.widget.winfo_id() == self.window_manager_frame.winfo_id():
-                self.wmf_change()
+                self.wmf_maximize_button_change()
             elif event.widget.winfo_id() == self.root.winfo_id():
                 self.root_change()
 

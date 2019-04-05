@@ -49,7 +49,7 @@ class WindowManagerFrame(Frame):
 
     def maximize(self):
         if self.gui.get_arg('verbose'):
-            print('maximize:', self.gui.get_arg('maximized'), '=>', not self.gui.get_arg('maximized'))
+            print('WMF maximize:', self.gui.get_arg('maximized'), '=>', not self.gui.get_arg('maximized'))
 
         self.gui.set_arg('maximized', not self.gui.get_arg('maximized'))
         self.root.call('wm', 'attributes', '.', '-fullscreen', f'{self.gui.get_arg("maximized")}')
@@ -58,6 +58,7 @@ class WindowManagerFrame(Frame):
 
     def _minimize(self):
         if self.gui.get_arg('maximized'):
+            if self.gui.get_arg('verbose'):
+                print('WMF minimize: maximized => not maximized, then minimize.')
             self.maximize()
-            print('WMF._minimize:\n\tMaximized => not Maximized, then Minimized')
         self.root.state('iconic')
