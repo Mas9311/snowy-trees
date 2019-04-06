@@ -20,9 +20,9 @@ def default_configurations():
         'ornaments': True,      # True=print ornaments, False=don't print ornaments
         'length': 5,            # 5 unique Trees in the list to print from
         'maximized': False,     # GUI: False=not maximized, True=maximized
-        'textbox': 'medium',    # GUI: medium-sized font of where Tree is printed
-        'toolbar': 'large',     # GUI: large-sized font of the top-left buttons
-        'windows': 'large',     # GUI: large-sized - + x of the top-right buttons [ − + × ]
+        'textbox': 'm',         # GUI: medium-sized font of where Tree is printed
+        'toolbar': 'l',         # GUI: large-sized font of the top-left buttons
+        'windows': 'l',         # GUI: large-sized - + x of the top-right buttons [ − + × ]
         'w_dim': 0,             # GUI: width    of pop up window in pixels
         'h_dim': 0,             # GUI: height   of pop up window in pixels
         'x_dim': 0,             # GUI: x-offset of pop up window in pixels
@@ -60,17 +60,23 @@ def density_choices():
 def font_dict():
     return {
         'textbox': {
-            'small': ('fixed', -11),
-            'medium': 'fixed',
-            'large': ('fixed', -15)
+            's': ('fixed', -11),
+            'm': 'fixed',
+            'l': ('fixed', -15)
         },
         'toolbar': {
-            'small': ('Courier New', 10, 'bold'),
-            'large': ('Courier', 25)
+            'xs': '"Courier New" 10 bold',
+            's': '"Courier New" 12 bold',
+            'm': '"Courier New" 15 bold',
+            'l': '"Courier New" 18 bold',
+            'xl': '"Courier" 25'
         },
         'windows': {
-            'small': ('Times Roman', 9, 'bold'),
-            'large': ('Times New Roman', 18, 'bold')
+            'xs': '"Times" -10 bold',
+            's': '"Times" 9 bold',
+            'm': '"Times" 12 bold',
+            'l': '"Times" 15 bold',
+            'xl': '"Times New Roman" 18 bold'
         }
     }
 
