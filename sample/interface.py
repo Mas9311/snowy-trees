@@ -1,7 +1,7 @@
+import pyautogui
+import screeninfo
 import time
 from tkinter import *
-from screeninfo import get_monitors
-import pyautogui
 
 from sample.file_helper import make_sure_dir_exists, file_exists, export_file_as, get_filepath, import_from_file
 from sample.format import print_change, Notification
@@ -111,15 +111,41 @@ class GUI(Frame):
                   f"y={self.configurations['y_dim']['offset']}")
 
     def _create_monitors(self):
-        screen_info = get_monitors()
-        for index, m in enumerate(screen_info[::-1]):  # for me, the monitors are right-to-left.
-            print(f'monitor {index}: {m.width}x{m.height}+{m.x}+{m.y}')
+        screen_info = screeninfo.get_monitors()
+        for index, m in enumerate(screen_info):  # for me, the monitors are right-to-left.
             self.monitors.append({
+                'index': index,
                 'w_dim': m.width,
                 'h_dim': m.height,
                 'x_dim': m.x,
                 'y_dim': m.y
             })
+        self.correct_indices()
+        self.correct_screens()
+        for m in self.monitors:
+            print(f"monitor {m['index']}: {m['w_dim']}x{m['h_dim']}+{m['x_dim']}+{m['y_dim']}")
+
+    def correct_indices(self):
+        self.monitors = sorted(self.monitors, key=lambda x: x['x_dim'])
+        for index, m in enumerate(self.monitors):
+            m['index'] = index
+
+    def correct_screens(self):
+        # First check if there are any negatives
+        all_positives = True
+        for m in self.monitors:
+            if m['x_dim'] < 0:
+                all_positives = False
+        if not all_positives:
+            # There is at least one negative offsets, so we need to correct them
+            for m in self.monitors:
+                zero_monitor = self.get_monitor(1, 1)
+                if m['x_dim'] < 0:
+                    zero_monitor['x_dim'] = abs(m['x_dim'])
+                    zero_monitor['y_dim'] = abs(m['y_dim'])
+                    m['x_dim'] = 0
+                    m['y_dim'] = 0
+            self.correct_indices()
 
     def _create_configurations(self):
         self.configurations['w_dim'] = {'assign': self.assign_width_dim, 'offset': 0}
@@ -142,10 +168,9 @@ class GUI(Frame):
                     else:
                         if self.get_arg('verbose'):
                             print(curr_dim, 'is custom. Leaving it alone')
-            # self.correct_height()
         else:
             self.manually_set_dimensions()
-    
+
     def get_arg(self, key):
         return self.tree.arg_dict[key]
 
@@ -162,6 +187,15 @@ class GUI(Frame):
                 if self.get_arg('verbose'):
                     print(f"{message + ' ' if message else ''}mouse on monitor {index}")
                 return m
+
+    def move_mouse(self, requested_monitor):
+        mouse_x, mouse_y = pyautogui.position()
+        delta_x = (requested_monitor['x_dim'] - mouse_x)  # x distance to top-left corner
+        delta_y = (requested_monitor['y_dim'] - mouse_y)  # y distance to top-left corner
+        delta_x += (requested_monitor['w_dim'] // 2)  # centered horizontally on requested screen
+        delta_y += (requested_monitor['h_dim'] // 2)  # centered  vertically  on requested screen
+        pyautogui.move(delta_x, delta_y)  # move mouse to th center of the other screen to prevent the 0 error
+        return mouse_x, mouse_y
 
     def get_dimensions(self, type_of_window='gui'):
         if type_of_window == 'gui':
@@ -181,8 +215,11 @@ class GUI(Frame):
         self.set_arg('w_dim', self.winfo_width())
         self.set_arg('width', self.convert_w_dim())
         self.set_arg('h_dim', self.winfo_height())
-        self.set_arg('x_dim', self.winfo_rootx())
-        self.set_arg('y_dim', self.winfo_rooty())
+
+        if self.winfo_rootx() - self.get_arg('x_dim') is not self.configurations['x_dim']['offset']:
+            self.set_arg('x_dim', self.winfo_rootx())
+        if self.winfo_rooty() - self.get_arg('y_dim') is not self.configurations['y_dim']['offset']:
+            self.set_arg('y_dim', self.winfo_rooty())
 
         return self.get_dimensions()
 
@@ -196,24 +233,13 @@ class GUI(Frame):
 
     def assign_height_dim(self):
         num_trees = 2
-        if self.get_arg('textbox') == 'small':
+        if self.get_arg('textbox') == 's':
             self.set_arg('h_dim', ((48 * self.tree.tree_tiers) + 53) * num_trees)
-        elif self.get_arg('textbox') == 'medium':
+        elif self.get_arg('textbox') == 'm':
             self.set_arg('h_dim', self.tree.screen_height * 13 * num_trees)
         else:
             Notification(['Height unknown', 'Just going to assign 500 pixels?'])
             self.set_arg('h_dim', 500)
-        # self.correct_height()
-
-    # def correct_height(self):
-    #     current_monitor = self.get_monitor()
-    #     max_h = current_monitor['h_dim']
-    #
-    #     if self.get_arg('h_dim') + self.get_arg('y_dim') > max_h:
-    #         self.set_dim('h_dim', self.get_arg('h_dim') - (self.get_arg('h_dim') + self.get_arg('y_dim')) - max_h)
-    #         print('correcting h_dim:', self.get_arg('h_dim'))
-    #         self.root.geometry('{}x{}+{}+{}'.format(
-    #             self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
 
     def assign_x_dim(self):
         self.set_arg('x_dim', self.winfo_x())
@@ -224,6 +250,7 @@ class GUI(Frame):
     def set_root(self):
         self.root.bind('<Configure>', self.window_change)
         self.root.title('Snowy Trees')
+        self.root.configure(bd=0)
         # self.root.overrideredirect(True)
         self.root.resizable(width=True, height=True)
 
@@ -263,7 +290,11 @@ class GUI(Frame):
         else:
             if self.get_arg('verbose'):
                 print('manually set maximized.')
+            requested_monitor = self.get_monitor(message='requested:')
+
+            mouse_x, mouse_y = self.move_mouse(requested_monitor)
             self.tree.update_parameters()
+            pyautogui.moveTo(mouse_x, mouse_y)
 
     def have_root_dimensions_changed(self):
         w = self.winfo_width() == self.get_arg('w_dim')
@@ -283,10 +314,7 @@ class GUI(Frame):
             if abs(self.get_arg('y_dim') - self.winfo_rooty()) == (2 * self.configurations['y_dim']['offset']):
                 self.set_arg('y_dim', self.get_arg('y_dim') - (2 * self.configurations['y_dim']['offset']))
 
-            # self.correct_height()
-
-            after = (f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}+"
-                     f"{self.get_arg('x_dim')}+{self.get_arg('y_dim')}")
+            after = self.get_dimensions()
 
             self.tree.update_parameters()
             self.textbox.print_trees_now()
@@ -303,12 +331,7 @@ class GUI(Frame):
             requested_monitor = self.get_monitor(self.get_arg('x_dim'), self.get_arg('y_dim'), 'requested:')
 
             if curr_monitor != requested_monitor:
-                mouse_x, mouse_y = pyautogui.position()
-                delta_x = (requested_monitor['x_dim'] - mouse_x)  # x distance to top-left corner
-                delta_y = (requested_monitor['y_dim'] - mouse_y)  # y distance to top-left corner
-                delta_x += (requested_monitor['w_dim'] // 2)  # centered horizontally on requested screen
-                delta_y += (requested_monitor['h_dim'] // 2)  # centered  vertically  on requested screen
-                pyautogui.move(delta_x, delta_y)  # move mouse to th center of the other screen to prevent the 0 error
+                mouse_x, mouse_y = self.move_mouse(requested_monitor)
 
             l_border = b_border = r_border = self.configurations['x_dim']['offset']  # { left, bottom, right } borders
             t_border = self.configurations['y_dim']['offset']  # { top } border
@@ -358,7 +381,8 @@ class GUI(Frame):
                 if self.get_arg('maximized'):
                     print('updating the tree parameters')
                     self.tree.update_parameters()
-                if before_w_h == after_w_h:
+
+                if before_w_h != after_w_h:
                     if self.get_arg('verbose'):
                         print(f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}+"
                               f"{self.winfo_rootx() - self.configurations['x_dim']['offset']}+"
@@ -372,7 +396,7 @@ class GUI(Frame):
             else:
                 if self.get_arg('verbose'):
                     print('root maximized.')
-                    self.set_arg('width', self.convert_w_dim())
+                self.set_arg('width', self.convert_w_dim())
 
     def window_change(self, event=None):
         if self.winfo_width() is not 1:

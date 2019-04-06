@@ -1,5 +1,7 @@
 from tkinter import *
 
+import pyautogui
+
 from sample.file_helper import export_file_as, list_config_files, import_from_file
 
 
@@ -160,7 +162,8 @@ class OpenFrame(Frame):
             #     new_dict['width'] = self.gui.get_arg('width')  # update the width
             if new_dict['maximized'] is not self.gui.get_arg('maximized'):
                 if self.gui.get_arg('verbose'):
-                    print('open file:', self.gui.get_arg('maximized'), '=>', new_dict['maximized'])
+                    print('open file, maximized:', self.gui.get_arg('maximized'), '=>', new_dict['maximized'])
+
                 self.gui.window_manager_frame.maximize()
             if self.gui.tree.arg_dict != new_dict:  # if they still aren't the same after updating
                 self.gui.tree.arg_dict = new_dict  # update the Tree's dict
