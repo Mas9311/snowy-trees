@@ -21,8 +21,8 @@ def default_configurations():
         'length': 5,            # 5 unique Trees in the list to print from
         'maximized': False,     # GUI: False=not maximized, True=maximized
         'textbox': 'm',         # GUI: medium-sized font of where Tree is printed
-        'toolbar': 'l',         # GUI: large-sized font of the top-left buttons
-        'windows': 'l',         # GUI: large-sized - + x of the top-right buttons [ − + × ]
+        'toolbar': 'm',         # GUI: large-sized font of the top-left buttons
+        'windows': 'm',         # GUI: large-sized - + x of the top-right buttons [ − + × ]
         'w_dim': 0,             # GUI: width    of pop up window in pixels
         'h_dim': 0,             # GUI: height   of pop up window in pixels
         'x_dim': 0,             # GUI: x-offset of pop up window in pixels
