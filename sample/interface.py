@@ -45,7 +45,7 @@ class GUI(Frame):
         Frame.__init__(self, parent)
         self.pack(fill=BOTH, expand=True)
         self.root = parent
-        self.root.configure(background='black')
+        self.root.configure(background='black', bd=0)
         # self.root.image = PhotoImage(file='./assets/icons/transparent.png')  # ToolbarFrame bg will be transparent
         self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file='./assets/icons/tree_icon.png'))
 
@@ -251,7 +251,6 @@ class GUI(Frame):
         self.root.bind('<Configure>', self.window_change)
         self.root.title('Snowy Trees')
         self.root.configure(bd=0)
-        # self.root.overrideredirect(True)
         self.root.resizable(width=True, height=True)
 
         self.root.geometry('{}x{}+{}+{}'.format(
@@ -278,7 +277,6 @@ class GUI(Frame):
                 print('manually set not maximized.')
 
             before = self.get_dimensions()
-            # self.correct_height()
             self.root.geometry('{}x{}+{}+{}'.format(
                 self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
             self.tree.update_parameters()
@@ -290,11 +288,8 @@ class GUI(Frame):
         else:
             if self.get_arg('verbose'):
                 print('manually set maximized.')
-            requested_monitor = self.get_monitor(message='requested:')
-
-            mouse_x, mouse_y = self.move_mouse(requested_monitor)
+            self.set_dimensions()
             self.tree.update_parameters()
-            pyautogui.moveTo(mouse_x, mouse_y)
 
     def have_root_dimensions_changed(self):
         w = self.winfo_width() == self.get_arg('w_dim')
