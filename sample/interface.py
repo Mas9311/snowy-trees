@@ -188,14 +188,14 @@ class GUI(Frame):
                     print(f"{message + ' ' if message else ''}mouse on monitor {index}")
                 return m
 
-    def move_mouse(self, requested_monitor):
-        mouse_x, mouse_y = pyautogui.position()
-        delta_x = (requested_monitor['x_dim'] - mouse_x)  # x distance to top-left corner
-        delta_y = (requested_monitor['y_dim'] - mouse_y)  # y distance to top-left corner
-        delta_x += (requested_monitor['w_dim'] // 2)  # centered horizontally on requested screen
-        delta_y += (requested_monitor['h_dim'] // 2)  # centered  vertically  on requested screen
-        pyautogui.move(delta_x, delta_y)  # move mouse to th center of the other screen to prevent the 0 error
-        return mouse_x, mouse_y
+    # def move_mouse(self, requested_monitor):
+    #     mouse_x, mouse_y = pyautogui.position()
+    #     delta_x = (requested_monitor['x_dim'] - mouse_x)  # x distance to top-left corner
+    #     delta_y = (requested_monitor['y_dim'] - mouse_y)  # y distance to top-left corner
+    #     delta_x += (requested_monitor['w_dim'] // 2)  # centered horizontally on requested screen
+    #     delta_y += (requested_monitor['h_dim'] // 2)  # centered  vertically  on requested screen
+    #     pyautogui.move(delta_x, delta_y)  # move mouse to th center of the other screen to prevent the 0 error
+    #     return mouse_x, mouse_y
 
     def get_dimensions(self, type_of_window='gui'):
         if type_of_window == 'gui':
@@ -306,8 +306,8 @@ class GUI(Frame):
             before = self.get_dimensions('window')
             self.set_dimensions()
 
-            if abs(self.get_arg('y_dim') - self.winfo_rooty()) == (2 * self.configurations['y_dim']['offset']):
-                self.set_arg('y_dim', self.get_arg('y_dim') - (2 * self.configurations['y_dim']['offset']))
+            if self.winfo_rooty() - self.get_arg('y_dim') == self.configurations['y_dim']['offset']:
+                self.set_arg('y_dim', self.get_arg('y_dim') - self.configurations['y_dim']['offset'])
 
             after = self.get_dimensions()
 
@@ -322,11 +322,7 @@ class GUI(Frame):
         else:
             if self.get_arg('verbose'):
                 print('textbox maximized.')
-            curr_monitor = self.get_monitor(message='current  :')
             requested_monitor = self.get_monitor(self.get_arg('x_dim'), self.get_arg('y_dim'), 'requested:')
-
-            if curr_monitor != requested_monitor:
-                mouse_x, mouse_y = self.move_mouse(requested_monitor)
 
             l_border = b_border = r_border = self.configurations['x_dim']['offset']  # { left, bottom, right } borders
             t_border = self.configurations['y_dim']['offset']  # { top } border
@@ -345,9 +341,6 @@ class GUI(Frame):
             self.root.geometry('{}x{}+{}+{}'.format(
                 self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
 
-            if curr_monitor != requested_monitor:
-                pyautogui.moveTo(mouse_x, mouse_y)  # move mouse back to its original position
-
     def wmf_maximize_button_change(self):
         if self.get_arg('maximized'):
             if self.get_arg('verbose'):
@@ -365,10 +358,10 @@ class GUI(Frame):
                 if self.get_arg('verbose'):
                     print('root not maximized.')
                 before = self.get_dimensions('monitor')
-                before_w_h, *_ = before.split('+')
+                before_w_h, before_x, before_y = before.split('+')
 
                 after = self.set_dimensions()
-                after_w_h, *_ = after.split('+')
+                after_w_h, after_x, after_y = after.split('+')
 
                 if before != after:
                     if self.get_arg('verbose'):
@@ -376,6 +369,15 @@ class GUI(Frame):
                 if self.get_arg('maximized'):
                     print('updating the tree parameters')
                     self.tree.update_parameters()
+
+                # if int(before_x) - int(after_x) == self.configurations['x_dim']['offset']:
+                #     self.tree.arg_dict['x_dim'] -= self.configurations['x_dim']['offset']
+                #     self.root.geometry('{}x{}+{}+{}'.format(
+                #         self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
+                # if int(before_y) - int(after_y) == self.configurations['y_dim']['offset']:
+                #     self.tree.arg_dict['y_dim'] -= self.configurations['y_dim']['offset']
+                #     self.root.geometry('{}x{}+{}+{}'.format(
+                #         self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
 
                 if before_w_h != after_w_h:
                     if self.get_arg('verbose'):

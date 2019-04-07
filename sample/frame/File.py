@@ -165,6 +165,7 @@ class OpenFrame(Frame):
 
             if self.gui.tree.arg_dict != new_dict:  # if they still aren't the same after updating
                 self.gui.tree.arg_dict = new_dict  # update the Tree's dict
+                self.gui.set_arg('y_dim', self.gui.get_arg('y_dim') - self.gui.configurations['y_dim']['offset'])
                 self.gui.reset_tree(key='new file')  # manually set the dimensions and print the new Tree.
         else:
             print('  ...But it has the same configurations as the current GUI\n')
