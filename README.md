@@ -64,7 +64,6 @@ The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest w
    - Icon: <img src="/assets/icons/tree_icon.png"
                  alt="Snowy Tree icon" 
                  height="30" />
-           which can be found in */snowy-trees/assets/icons/tree_icon.png*
    
  Landscape monitors: 
  
@@ -73,4 +72,3 @@ The geometry offsets, <code>+0+0</code> and <code>-0+0</code>, are the easiest w
    - Icon: <img src="/assets/icons/tree_icon.png"
                  alt="Snowy Tree icon" 
                  height="30" />
-           which can be found in */snowy-trees/assets/icons/tree_icon.png*
