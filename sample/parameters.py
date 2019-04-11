@@ -59,9 +59,11 @@ def density_choices():
 def font_dict():
     return {
         'textbox': {
-            's': ('fixed', -11),
-            'm': 'fixed',
-            'l': ('fixed', -15)
+            'xs': '"Courier New" -9',
+            's': '"Courier New" -10',
+            'm': 'Courier -11',
+            'l': '"Courier New" 10',
+            'xl': 'Courier'
         },
         'toolbar': {
             'xs': '"Courier New" 10 bold',
