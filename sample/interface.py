@@ -248,9 +248,13 @@ class GUI(Frame):
 
     def assign_height_dim(self):
         num_trees = 2
-        if self.get_arg('textbox') == 's':
+        if self.get_arg('textbox') == 'xs':
             self.set_arg('h_dim', ((48 * self.tree.tree_tiers) + 53) * num_trees)
+        elif self.get_arg('textbox') == 's':
+            self.set_arg('h_dim', ((60 * self.tree.tree_tiers) + 50) * num_trees)
         elif self.get_arg('textbox') == 'm':
+            self.set_arg('h_dim', ((70 * self.tree.tree_tiers) + 60) * num_trees)
+        elif self.get_arg('textbox') == 'l':
             self.set_arg('h_dim', self.tree.screen_height * 13 * num_trees)
         else:
             Notification(['Height unknown', 'Just going to assign 500 pixels?'])
