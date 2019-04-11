@@ -24,7 +24,7 @@ class Tree:
 
         self.star_char = '★'
         self.leaf_char = '❇'  # ❇ #
-        self.snow_char = '*'  # * ❇
+        self.snow_char = '*'  # * ❇ ∗ ✲ ✲ ⁎
         self.base_char = '┆'  # │ ║ ┃ ┆ ┇ ┊ ┋
         self.update_parameters()
 

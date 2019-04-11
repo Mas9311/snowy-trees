@@ -59,9 +59,11 @@ def density_choices():
 def font_dict():
     return {
         'textbox': {
-            's': ('fixed', -11),
-            'm': 'fixed',
-            'l': ('fixed', -15)
+            'xs': '"Courier New" -9',
+            's': '"Courier New" -10',
+            'm': 'Courier -11',
+            'l': '"Courier New" 10',
+            'xl': 'Courier'
         },
         'toolbar': {
             'xs': '"Courier New" 10 bold',
@@ -287,7 +289,7 @@ def retrieve_parameters():
                               'No additional argument needed => Sets the verbose to True.'))
 
     version_description = ('           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           \n'
-                           '           ☐               ☐   snowy-trees v0.2   ☐               ☐           \n'
+                           '           ☐               ☐  snowy-trees v0.2.1  ☐               ☐           \n'
                            '           ☐               ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐               ☐           \n'
                            '           ☐                                                      ☐           \n'
                            '           ☐ Check out if there are any new releases for this at: ☐           \n'
@@ -368,7 +370,6 @@ def length_list_type(length_input):
 
 def dimension_type(dim_input):
     dim_min = default_configurations()['w_dim']  # default of 0.
-    print(type(dim_min))
     arg_type = 'Dimension (in pixels)'
     try:
         dim_input = int(dim_input)
@@ -394,9 +395,9 @@ def print_welcome(parser):
     should not be used. Instead, the user is informed how to run the --config demo.
     After the Welcome screen is printed, it will print the --help option."""
 
-    print('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┱──────────────────────────────────────╔══════╗─╮\n'
-          '┃   Welcome to Snowy Trees   ┃                                      ║ v0.2 ║ │\n'
-          '┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                      ╚══════╝ │\n'
+    print('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┱────────────────────────────────────╔════════╗─╮\n'
+          '┃   Welcome to Snowy Trees   ┃                                    ║ v0.2.1 ║ │\n'
+          '┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                    ╚════════╝ │\n'
           '│                                                                            │\n'
           '│                                                                            │\n'
           '│ No additional arguments detected, so here is the intro welcome message!    │\n'
@@ -471,7 +472,6 @@ def config_argument():
             config_loc = sys.argv.index('--config')
             valid_config = ['-w', '--width', '-s', '--speed', '-d', '--density', '-t', '--tiers']
             arg_to_config = ''
-            print(config_loc, sys.argv)
             for curr_arg in range(config_loc, 0, -1):
                 if sys.argv[curr_arg] in valid_config:
                     arg_to_config = sys.argv[curr_arg].strip('-')

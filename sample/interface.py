@@ -168,6 +168,7 @@ class GUI(Frame):
                     else:
                         if self.get_arg('verbose'):
                             print(curr_dim, 'is custom. Leaving it alone')
+            print(self.get_dimensions())
         else:
             self.manually_set_dimensions()
 
@@ -223,19 +224,37 @@ class GUI(Frame):
 
         return self.get_dimensions()
 
+    def set_root_geometry(self, w=None, h=None, x=None, y=None):
+        if w is None:
+            w = self.get_arg('w_dim')
+        if h is None:
+            h = self.get_arg('h_dim')
+        if x is None:
+            x = self.get_arg('x_dim')
+        if y is None:
+            y = self.get_arg('y_dim')
+
+        self.root.geometry('{}x{}+{}+{}'.format(w, h, x, y))
+
     def assign_width_dim(self):
         """Converts width (in characters) to pixels"""
         self.set_arg('w_dim', (self.tree.screen_width + self.tree.make_even) * 6)
 
-    def convert_w_dim(self):
+    def convert_w_dim(self, input_width=None):
         """Converts pixels to width (in characters)"""
-        return self.get_arg('w_dim') // 6 - self.tree.make_even
+        if input_width is None:
+            input_width = self.get_arg('w_dim')
+        return input_width // 6 - self.tree.make_even
 
     def assign_height_dim(self):
         num_trees = 2
-        if self.get_arg('textbox') == 's':
+        if self.get_arg('textbox') == 'xs':
             self.set_arg('h_dim', ((48 * self.tree.tree_tiers) + 53) * num_trees)
+        elif self.get_arg('textbox') == 's':
+            self.set_arg('h_dim', ((60 * self.tree.tree_tiers) + 50) * num_trees)
         elif self.get_arg('textbox') == 'm':
+            self.set_arg('h_dim', ((70 * self.tree.tree_tiers) + 60) * num_trees)
+        elif self.get_arg('textbox') == 'l':
             self.set_arg('h_dim', self.tree.screen_height * 13 * num_trees)
         else:
             Notification(['Height unknown', 'Just going to assign 500 pixels?'])
@@ -253,8 +272,7 @@ class GUI(Frame):
         self.root.configure(bd=0)
         self.root.resizable(width=True, height=True)
 
-        self.root.geometry('{}x{}+{}+{}'.format(
-            self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
+        self.set_root_geometry()
 
     def set_screen_width(self):
         before = self.tree.screen_width
@@ -277,8 +295,7 @@ class GUI(Frame):
                 print('manually set not maximized.')
 
             before = self.get_dimensions()
-            self.root.geometry('{}x{}+{}+{}'.format(
-                self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
+            self.set_root_geometry()
             self.tree.update_parameters()
             after = self.get_dimensions()
 
@@ -300,25 +317,17 @@ class GUI(Frame):
         return w or h or x or y
 
     def textbox_change(self):
+        self.update_idletasks()  # The missing link in the chain of events!
         if not self.get_arg('maximized'):
             if self.get_arg('verbose'):
-                print('textbox not maximized.')
-            before = self.get_dimensions('window')
-            self.set_dimensions()
+                print('textbox not maximized.', self.get_dimensions(), self.get_dimensions('window'))
 
-            if self.winfo_rooty() - self.get_arg('y_dim') == self.configurations['y_dim']['offset']:
-                self.set_arg('y_dim', self.get_arg('y_dim') - self.configurations['y_dim']['offset'])
-
-            after = self.get_dimensions()
+            self.set_arg('w_dim', self.winfo_width())
+            self.set_arg('width', self.convert_w_dim())
+            self.set_arg('h_dim', self.winfo_height())
 
             self.tree.update_parameters()
             self.textbox.print_trees_now()
-            if before != after:
-                if self.get_arg('verbose'):
-                    print('textbox setting:', before, '=>', after)
-
-                self.root.geometry('{}x{}+{}+{}'.format(
-                    self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
         else:
             if self.get_arg('verbose'):
                 print('textbox maximized.')
@@ -335,11 +344,7 @@ class GUI(Frame):
             self.tree.update_parameters()
             self.textbox.print_trees_now()
 
-            self.set_arg('maximized', False)
-            self.window_manager_frame.maximize()
-
-            self.root.geometry('{}x{}+{}+{}'.format(
-                self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
+            self.set_root_geometry()
 
     def wmf_maximize_button_change(self):
         if self.get_arg('maximized'):
@@ -347,17 +352,16 @@ class GUI(Frame):
                 print('WMF changed. maximized =', self.get_arg('maximized'))
             loc_of_gui_monitor = self.get_monitor(self.get_arg('x_dim') + 1, self.get_arg('y_dim') + 1)
 
-            if self.winfo_width() == loc_of_gui_monitor['w_dim']:
-                self.set_arg('width', self.convert_w_dim())
-                self.tree.update_parameters()
-                self.textbox.print_trees_now()
+            self.set_arg('width', self.convert_w_dim(loc_of_gui_monitor['w_dim']))
+            self.tree.update_parameters()
+            self.textbox.print_trees_now()
 
     def root_change(self):
         if self.have_root_dimensions_changed():
             if not self.get_arg('maximized'):
                 if self.get_arg('verbose'):
-                    print('root not maximized.')
-                before = self.get_dimensions('monitor')
+                    print('root not maximized.', self.get_dimensions(), self.get_dimensions('window'))
+                before = self.get_dimensions()
                 before_w_h, before_x, before_y = before.split('+')
 
                 after = self.set_dimensions()
@@ -370,26 +374,14 @@ class GUI(Frame):
                     print('updating the tree parameters')
                     self.tree.update_parameters()
 
-                # if int(before_x) - int(after_x) == self.configurations['x_dim']['offset']:
-                #     self.tree.arg_dict['x_dim'] -= self.configurations['x_dim']['offset']
-                #     self.root.geometry('{}x{}+{}+{}'.format(
-                #         self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
-                # if int(before_y) - int(after_y) == self.configurations['y_dim']['offset']:
-                #     self.tree.arg_dict['y_dim'] -= self.configurations['y_dim']['offset']
-                #     self.root.geometry('{}x{}+{}+{}'.format(
-                #         self.get_arg('w_dim'), self.get_arg('h_dim'), self.get_arg('x_dim'), self.get_arg('y_dim')))
-
-                if before_w_h != after_w_h:
+                if before_w_h == after_w_h:
+                    same_w = self.get_arg('w_dim')
+                    same_h = self.get_arg('h_dim')
+                    new_x = self.get_arg('x_dim') - self.configurations['x_dim']['offset']
+                    new_y = self.get_arg('y_dim') - self.configurations['y_dim']['offset']
                     if self.get_arg('verbose'):
-                        print(f"{self.get_arg('w_dim')}x{self.get_arg('h_dim')}+"
-                              f"{self.winfo_rootx() - self.configurations['x_dim']['offset']}+"
-                              f"{self.winfo_rooty() - self.configurations['y_dim']['offset']}")
-                    self.root.geometry('{}x{}+{}+{}'.format(
-                        self.get_arg('w_dim'),
-                        self.get_arg('h_dim'),
-                        self.winfo_rootx() - self.configurations['x_dim']['offset'],
-                        self.winfo_rooty() - self.configurations['y_dim']['offset']
-                    ))
+                        print(f"root updating dimensions to {same_w}x{same_h}+{new_x}+{new_y}")
+                    self.set_root_geometry(same_w, same_h, new_x, new_y)
             else:
                 if self.get_arg('verbose'):
                     print('root maximized.')
