@@ -148,26 +148,33 @@ class GUI(Frame):
             self.correct_indices()
 
     def _create_configurations(self):
-        self.configurations['w_dim'] = {'assign': self.assign_width_dim, 'offset': 0}
-        self.configurations['h_dim'] = {'assign': self.assign_height_dim, 'offset': 0}
-        self.configurations['x_dim'] = {'assign': self.assign_x_dim, 'offset': 0}  # 0 => 3 or 4
-        self.configurations['y_dim'] = {'assign': self.assign_y_dim, 'offset': 0}  # 0 => 29 or 54
+        self.configurations['w_dim'] = {'offset': 0}
+        self.configurations['h_dim'] = {'offset': 0}
+        self.configurations['x_dim'] = {'offset': 0}  # 0 => 3 or 4
+        self.configurations['y_dim'] = {'offset': 0}  # 0 => 29 or 54
 
     def _create_dimensions(self):
         if not self.get_arg('maximized'):
-            for curr_dim in self._defined:
-                if self.get_arg(curr_dim) is default_configurations()[curr_dim]:  # 0
-                    if self.get_arg('verbose'):
-                        print(curr_dim, 'is assigned to', self.get_arg(curr_dim))
-                    self.configurations[curr_dim]['assign']()
-                else:
-                    if self.get_arg(curr_dim) is self.configurations[curr_dim]['offset']:
-                        if self.get_arg('verbose'):
-                            print(curr_dim, 'is default. Subtracting offset')
-                        self.set_arg(curr_dim, self.get_arg(curr_dim) - self.configurations[curr_dim]['offset'])
-                    else:
-                        if self.get_arg('verbose'):
-                            print(curr_dim, 'is custom. Leaving it alone')
+            self.assign_width_dim()
+            self.assign_height_dim()
+            self.set_arg('x_dim', self.get_arg('x_dim') - self.configurations['x_dim']['offset'])
+            self.set_arg('y_dim', self.get_arg('y_dim') - self.configurations['y_dim']['offset'])
+            # for curr_dim in self._defined:
+            #     if self.get_arg(curr_dim) is default_configurations()[curr_dim]:  # 0
+            #         if self.get_arg('verbose'):
+            #             print(curr_dim, 'is assigned to', self.get_arg(curr_dim))
+            #         self.configurations[curr_dim]['assign']()
+            #     else:
+            #         if self.get_arg('verbose'):
+            #             print(curr_dim, 'is default. Subtracting offset')
+            #         self.set_arg(curr_dim, self.get_arg(curr_dim) - self.configurations[curr_dim]['offset'])
+            #
+            #         if self.get_arg(curr_dim) is self.configurations[curr_dim]['offset']:
+            #             if self.get_arg('verbose'):
+            #                 print(curr_dim, 'is default. Subtracting offset')
+            #         else:
+            #             if self.get_arg('verbose'):
+            #                 print(curr_dim, 'is custom. Leaving it alone')
             print(self.get_dimensions())
         else:
             self.manually_set_dimensions()
@@ -198,7 +205,7 @@ class GUI(Frame):
     #     pyautogui.move(delta_x, delta_y)  # move mouse to th center of the other screen to prevent the 0 error
     #     return mouse_x, mouse_y
 
-    def get_dimensions(self, type_of_window='gui'):
+    def get_dimensions(self, type_of_window='gui', individual=False):
         if type_of_window == 'gui':
             w = self.get_arg('w_dim')
             h = self.get_arg('h_dim')
@@ -209,10 +216,11 @@ class GUI(Frame):
             h = self.winfo_height()
             x = self.winfo_rootx()
             y = self.winfo_rooty()
-
+        if individual:
+            return w, h, x, y
         return f"{w}x{h}+{x}+{y}"
 
-    def set_dimensions(self):
+    def set_dimensions(self, individual=False):
         self.set_arg('w_dim', self.winfo_width())
         self.set_arg('width', self.convert_w_dim())
         self.set_arg('h_dim', self.winfo_height())
@@ -222,7 +230,7 @@ class GUI(Frame):
         if self.winfo_rooty() - self.get_arg('y_dim') is not self.configurations['y_dim']['offset']:
             self.set_arg('y_dim', self.winfo_rooty())
 
-        return self.get_dimensions()
+        return self.get_dimensions(individual=individual)
 
     def set_root_geometry(self, w=None, h=None, x=None, y=None):
         if w is None:
@@ -361,27 +369,18 @@ class GUI(Frame):
             if not self.get_arg('maximized'):
                 if self.get_arg('verbose'):
                     print('root not maximized.', self.get_dimensions(), self.get_dimensions('window'))
-                before = self.get_dimensions()
-                before_w_h, before_x, before_y = before.split('+')
 
-                after = self.set_dimensions()
-                after_w_h, after_x, after_y = after.split('+')
+                b_w, b_h, b_x, b_y = self.get_dimensions(individual=True)
+                a_w, a_h, a_x, a_y = self.set_dimensions(individual=True)
 
-                if before != after:
-                    if self.get_arg('verbose'):
-                        print('root: setting', before, '=>', after)
-                if self.get_arg('maximized'):
-                    print('updating the tree parameters')
-                    self.tree.update_parameters()
-
-                if before_w_h == after_w_h:
-                    same_w = self.get_arg('w_dim')
-                    same_h = self.get_arg('h_dim')
+                if b_w is a_w and b_h is a_h:
                     new_x = self.get_arg('x_dim') - self.configurations['x_dim']['offset']
+                    if new_x - b_x == self.configurations['x_dim']['offset']:
+                        new_x -= self.configurations['x_dim']['offset']
                     new_y = self.get_arg('y_dim') - self.configurations['y_dim']['offset']
                     if self.get_arg('verbose'):
-                        print(f"root updating dimensions to {same_w}x{same_h}+{new_x}+{new_y}")
-                    self.set_root_geometry(same_w, same_h, new_x, new_y)
+                        print(f"root updating dimensions to {a_w}x{a_h}+{new_x}+{new_y}")
+                    self.set_root_geometry(a_w, a_h, new_x, new_y)
             else:
                 if self.get_arg('verbose'):
                     print('root maximized.')
