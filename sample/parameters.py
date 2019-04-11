@@ -2,7 +2,6 @@ import argparse
 import calendar
 import time
 
-import numpy as np
 import sys
 
 from sample.file_helper import import_from_file
@@ -469,10 +468,11 @@ def config_argument():
         run them separately as in '-w --config -s --config -d --config -t --config'"""
     try:
         while sys.argv.index('--config') is not None:
-            config_loc = sys.argv.index('--config') - 1
+            config_loc = sys.argv.index('--config')
             valid_config = ['-w', '--width', '-s', '--speed', '-d', '--density', '-t', '--tiers']
             arg_to_config = ''
-            for curr_arg in np.linspace(config_loc, 1, config_loc, dtype=int):
+            print(config_loc, sys.argv)
+            for curr_arg in range(config_loc, 0, -1):
                 if sys.argv[curr_arg] in valid_config:
                     arg_to_config = sys.argv[curr_arg].strip('-')
                     sys.argv.pop(curr_arg)
@@ -514,7 +514,7 @@ def width_demo():
     fir_char = '▆'  # ░ ▒ ▓
     sec_char = '·'  # :
     char = fir_char
-    for line_len in np.linspace(400, 50, 8, dtype=int):
+    for line_len in range(400, 50, -50):
         char = (fir_char, sec_char)[char == fir_char]
         line = char * (line_len - len(str(line_len)) - 1)
         print(str(line_len) + ' ' + line)
