@@ -289,7 +289,7 @@ def retrieve_parameters():
                               'No additional argument needed => Sets the verbose to True.'))
 
     version_description = ('           ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐           \n'
-                           '           ☐               ☐   snowy-trees v0.2   ☐               ☐           \n'
+                           '           ☐               ☐  snowy-trees v0.2.1  ☐               ☐           \n'
                            '           ☐               ☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐☐               ☐           \n'
                            '           ☐                                                      ☐           \n'
                            '           ☐ Check out if there are any new releases for this at: ☐           \n'
@@ -395,9 +395,9 @@ def print_welcome(parser):
     should not be used. Instead, the user is informed how to run the --config demo.
     After the Welcome screen is printed, it will print the --help option."""
 
-    print('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┱──────────────────────────────────────╔══════╗─╮\n'
-          '┃   Welcome to Snowy Trees   ┃                                      ║ v0.2 ║ │\n'
-          '┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                      ╚══════╝ │\n'
+    print('┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┱────────────────────────────────────╔════════╗─╮\n'
+          '┃   Welcome to Snowy Trees   ┃                                    ║ v0.2.1 ║ │\n'
+          '┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                    ╚════════╝ │\n'
           '│                                                                            │\n'
           '│                                                                            │\n'
           '│ No additional arguments detected, so here is the intro welcome message!    │\n'
