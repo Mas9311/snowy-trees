@@ -368,7 +368,6 @@ def length_list_type(length_input):
 
 def dimension_type(dim_input):
     dim_min = default_configurations()['w_dim']  # default of 0.
-    print(type(dim_min))
     arg_type = 'Dimension (in pixels)'
     try:
         dim_input = int(dim_input)
@@ -471,7 +470,6 @@ def config_argument():
             config_loc = sys.argv.index('--config')
             valid_config = ['-w', '--width', '-s', '--speed', '-d', '--density', '-t', '--tiers']
             arg_to_config = ''
-            print(config_loc, sys.argv)
             for curr_arg in range(config_loc, 0, -1):
                 if sys.argv[curr_arg] in valid_config:
                     arg_to_config = sys.argv[curr_arg].strip('-')
