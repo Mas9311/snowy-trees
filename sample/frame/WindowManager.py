@@ -24,7 +24,8 @@ class WindowManagerFrame(Frame):
         for (curr, _col) in zip(self._defined, range(len(self._defined))):
             _text = self.configurations[curr]['text_char']
             _command = self.configurations[curr]['command']
-            self.buttons[curr] = Button(self, font=self._font, highlightthickness=0, text=_text, command=_command)
+            self.buttons[curr] = Button(self, padx=5, pady=1, font=self._font, highlightthickness=0,
+                                        text=_text, command=_command)
             self.buttons[curr].grid(row=0, column=_col)
             # print(f'WMF: Created the \'{curr}\' button.')
 
